@@ -46,3 +46,78 @@ INSERT INTO `item_loot_template` VALUES (144345, 90048, 0, 2, 0, 1, 0, 1, 1, '')
 
 INSERT INTO `item_loot_template` VALUES (146898, 147804, 0, 12, 0, 1, 0, 1, 1, '');
 INSERT INTO `item_loot_template` VALUES (146898, 1220, 0, 4, 0, 1, 0, 1, 1, '');
+
+UPDATE creature_template SET lootid = 118971 WHERE entry = 118971 AND lootid = 0;
+UPDATE creature_template SET lootid = 120800 WHERE entry = 120800 AND lootid = 0;
+UPDATE creature_template SET lootid = 120820 WHERE entry = 120820 AND lootid = 0;
+UPDATE creature_template SET lootid = 120816 WHERE entry = 120816 AND lootid = 0;
+
+INSERT INTO `creature_loot_template` VALUES (118971, 124437, 0, 63, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (118971, 146692, 0, 1.9, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (118971, 146708, 0, 1.7, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (118971, 146700, 0, 1.7, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (118971, 146684, 0, 1.2, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (118971, 147729, 0, 1.1, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (118971, 147430, 0, 0.8, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (118971, 138003, 0, 0.04, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (118971, 141585, 0, 0.01, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (118971, 141566, 0, 0, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (118971, 141572, 0, 0, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (118971, 141569, 0, 0, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (118971, 141577, 0, 0, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (118971, 141589, 0, 0, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (118971, 141586, 0, 0, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (118971, 141580, 0, 0, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (118971, 141567, 0, 0, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (118971, 141590, 0, 0, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (118971, 141587, 0, 0, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (118971, 141579, 0, 0, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (118971, 147726, 0, 0, 0, 1, 0, 1, 1, '');
+
+INSERT INTO `creature_loot_template` VALUES (120800, 146684, 0, 16, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120800, 146700, 0, 12, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120800, 146708, 0, 10, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120800, 146692, 0, 5, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120800, 147729, 0, 1, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120800, 147430, 0, 0.9, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120800, 138003, 0, 0.2, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120800, 141566, 0, 0.11, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120800, 141569, 0, 0.01, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120800, 141587, 0, 0.01, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120800, 147726, 0, 0.01, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120800, 141580, 0, 0, 0, 1, 0, 1, 1, '');
+
+INSERT INTO `creature_loot_template` VALUES (120820, 124437, 0, 11, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120820, 146692, 0, 0.4, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120820, 147729, 0, 0.4, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120820, 146684, 0, 0.3, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120820, 146700, 0, 0.3, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120820, 146708, 0, 0.15, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120820, 147430, 0, 0.11, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120820, 137677, 0, 0.1, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120820, 141568, 0, 0, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120820, 141570, 0, 0, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120820, 141572, 0, 0, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120820, 132921, 0, 0, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120820, 141586, 0, 0, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120820, 141567, 0, 0, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120820, 141590, 0, 0, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120820, 141579, 0, 0, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120820, 141585, 0, 0, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120820, 132749, 0, 0, 0, 1, 0, 1, 1, '');
+
+INSERT INTO `creature_loot_template` VALUES (120816, 124437, 0, 12, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120816, 146692, 0, 5, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120816, 146708, 0, 4, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120816, 146684, 0, 3, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120816, 146700, 0, 3, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120816, 147729, 0, 3, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120816, 147726, 0, 0.01, 0, 1, 0, 1, 1, '');
+
+INSERT INTO `creature_loot_template` VALUES (120810, 124437, 0, 12, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120810, 146692, 0, 5, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120810, 146708, 0, 4, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120810, 146684, 0, 3, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120810, 146700, 0, 3, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120810, 147729, 0, 3, 0, 1, 0, 1, 1, '');
+INSERT INTO `creature_loot_template` VALUES (120810, 147726, 0, 0.01, 0, 1, 0, 1, 1, '');
