@@ -1,2 +1,7 @@
 INSERT INTO `spell_linked_spell` VALUES (232893, 213241, 0, 'dh fix dps');
 INSERT INTO `spell_linked_spell` VALUES (213241, 213243, 0, 'dh fix charge');
+
+--fix teleport oplot for Paladin, Shaman, Priest
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES ('17', '0', '215789', '0', '0', '15', '0', '2', '0', '0', '0', '77', '0', '', 'Only paladin teleport oplot');
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES ('17', '0', '215790', '0', '0', '15', '0', '16', '0', '0', '0', '77', '0', '', 'Only priest teleport oplot');
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES ('17', '0', '215792', '0', '0', '15', '0', '64', '0', '0', '0', '77', '0', '', 'Only shaman teleport oplot');
