@@ -16,9 +16,72 @@
 */
 
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "Player.h"
+
+enum TrueshotLodgeSentinel
+{
+    TRUESHOT_LODGE_AREA_ID = 7877,
+    SPELL_EAGLE_SENTINEL   = 208643,
+
+    TEXT_ID_DETECTION_ANNOUNCEMENT = 0
+};
+
+#define SENTINEL_DETECTION_DISTANCE  65.0f
+
+class npc_trueshot_lodge_sentinel : public CreatureScript
+{
+public:
+    npc_trueshot_lodge_sentinel() : CreatureScript("npc_trueshot_lodge_sentinel") { }
+
+    struct npc_trueshot_lodge_sentinelAI : public ScriptedAI
+    {
+        npc_trueshot_lodge_sentinelAI(Creature* creature) : ScriptedAI(creature)
+        {
+            creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_NORMAL, true);
+            creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, true);
+        }
+
+        void Reset() override { }
+
+        void EnterCombat(Unit* /*who*/) override { }
+
+        void AttackStart(Unit* /*who*/) override { }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (!who || !who->IsInWorld() || who->GetAreaId() != TRUESHOT_LODGE_AREA_ID)
+                return;
+
+            if (!me->IsWithinDist(who, SENTINEL_DETECTION_DISTANCE, false))
+                return;
+
+            Player* player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
+
+            if (!player || player->IsGameMaster() || player->IsBeingTeleported() ||
+                player->getClass() == CLASS_HUNTER) // skip only hunters
+                return;
+
+            // Detection announcement
+            Talk(TEXT_ID_DETECTION_ANNOUNCEMENT, player);
+            // Cast eagle sentinel on nearby detected target
+            DoCast(player, SPELL_EAGLE_SENTINEL);
+            return;
+        }
+
+        void UpdateAI(uint32 /*diff*/) override { }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_trueshot_lodge_sentinelAI(creature);
+    }
+};
 
 
 void AddSC_highmountain()
 {
-
+    new npc_trueshot_lodge_sentinel();
 }
