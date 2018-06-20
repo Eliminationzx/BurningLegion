@@ -132,7 +132,7 @@ public:
     }
 };
 
-// 228329 & 228330 - Téléportation
+// 228329 & 228330 - Teleportation
 class spell_dalaran_teleportation : public SpellScript
 {
     PrepareSpellScript(spell_dalaran_teleportation);
@@ -229,7 +229,8 @@ public:
 
     void OnPlayerExit(Player* player) override
     {
-        player->SeamlessTeleportToMap(MAP_BROKEN_ISLANDS);
+        if (player->GetMapId() == MAP_DALARAN_UNDERBELLY)
+            player->SeamlessTeleportToMap(MAP_BROKEN_ISLANDS);
     }
 };
 
