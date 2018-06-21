@@ -1,0 +1,1 @@
+UPDATE `npc_trainer` SET `ReqSkillLine`='0', `ReqSkillRank`='0' WHERE (`spellid`='78670');
