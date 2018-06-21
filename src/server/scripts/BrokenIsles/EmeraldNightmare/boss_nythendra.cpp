@@ -208,8 +208,9 @@ private:
             {
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_INFESTED);
 
-                std::vector<AreaTrigger*> areatriggers = me->GetAreaTriggers(SPELL_INFESTED_GROUND);
-                for (AreaTrigger* at : areatriggers)
+                std::list<AreaTrigger*> ats;
+                me->GetAreaTriggerListWithSpellIDInRange(ats, SPELL_INFESTED_GROUND, 500.f);
+                for (AreaTrigger* at : ats)
                     at->SetDestination(me->GetPosition(), 5000);
             })
             .Schedule(25s, [this](TaskContext /*context*/)
@@ -393,10 +394,11 @@ struct at_nythendra_infested_ground : AreaTriggerAI
 
     void OnUnitEnter(Unit* unit) override
     {
-        Unit* caster = at->GetCaster();
-        if (caster && unit)
-            if (caster->IsValidAttackTarget(unit))
-                caster->CastSpell(unit, SPELL_INFESTED_GROUND_DAMAGE, true);
+        if (Unit* caster = at->GetCaster())
+            if (InstanceScript* instance = caster->GetInstanceScript())
+                if (Creature* nythendra = instance->GetCreature(NPC_NYTHENDRA))
+                    if (nythendra->IsValidAttackTarget(unit))
+                        nythendra->CastSpell(unit, SPELL_INFESTED_GROUND_DAMAGE, true);
     }
 
     void OnUnitExit(Unit* unit) override

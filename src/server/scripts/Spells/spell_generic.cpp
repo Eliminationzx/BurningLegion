@@ -4741,6 +4741,70 @@ class spell_arcane_pulse : public SpellScript
     }
 };
 
+enum SpatialRiftSpells
+{
+    SPELL_SPATIAL_RIFT_AT           = 256948,
+    SPELL_SPATIAL_RIFT_TELEPORT     = 257034,
+    SPELL_SPATIAL_RIFT_DESPAWN_AT   = 257040
+};
+
+// Spatial Rift teleport (Void Elf racial) - 257040
+class spell_spatial_rift_despawn : public SpellScript
+{
+    PrepareSpellScript(spell_spatial_rift_despawn);
+
+    void OnDespawnAreaTrigger(SpellEffIndex /*effIndex*/)
+    {
+        if (AreaTrigger* at = GetCaster()->GetAreaTrigger(SPELL_SPATIAL_RIFT_AT))
+        {
+            GetCaster()->CastSpell(at->GetPosition(), SPELL_SPATIAL_RIFT_TELEPORT, true);
+            at->SetDuration(0);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_spatial_rift_despawn::OnDespawnAreaTrigger, EFFECT_0, SPELL_EFFECT_DESPAWN_AREATRIGGER);
+    }
+};
+
+// Light's Judgement - 256893  (Lightforged Draenei Racial)
+class spell_light_judgement : public SpellScript
+{
+    PrepareSpellScript(spell_light_judgement);
+
+    void HandleDamage(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+            SetHitDamage(6.25f * caster->GetUInt32Value(UNIT_FIELD_ATTACK_POWER));
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_light_judgement::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
+// Light's Reckoning - 255652 (Lightforged Draenei Racial)
+class playerscript_light_reckoning : public PlayerScript
+{
+public:
+    playerscript_light_reckoning() : PlayerScript("playerscript_light_reckoning") { }
+
+    enum
+    {
+        SPELL_LIGHT_RECKONING = 255652
+    };
+
+    void OnDeath(Player* player) override
+    {
+        if (player->HasAura(SPELL_LIGHT_RECKONING))
+            if (SpellInfo const* info = sSpellMgr->GetSpellInfo(SPELL_LIGHT_RECKONING))
+                if (SpellEffectInfo const* effectInfo = info->GetEffect(EFFECT_0))
+                    player->CastSpell(player, effectInfo->TriggerSpell, true);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     new spell_gen_absorb0_hitlimit1();
@@ -4851,4 +4915,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_eredar_bloodmage_blood_siphon_damage);
     RegisterSpellScript(spell_gen_mobile_bank);
     RegisterSpellScript(spell_arcane_pulse);
+    RegisterSpellScript(spell_spatial_rift_despawn);
+    RegisterSpellScript(spell_light_judgement);
+    new playerscript_light_reckoning();
 }
