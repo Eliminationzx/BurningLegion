@@ -705,6 +705,54 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             delete targets;
             break;
         }
+        case SMART_ACTION_CAST_UNIT_SELF:
+        {
+            ObjectList* targets = GetTargets(e, unit);
+            if (!targets)
+                break;
+
+            for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
+            {
+                if (!IsUnit(*itr))
+                    continue;
+
+                TriggerCastFlags triggerFlag = TRIGGERED_NONE;
+                if (e.action.cast.castFlags & SMARTCAST_TRIGGERED)
+                {
+                    if (e.action.cast.triggerFlags)
+                        triggerFlag = TriggerCastFlags(e.action.cast.triggerFlags);
+                    else
+                        triggerFlag = TRIGGERED_FULL_MASK;
+                }
+               
+                (*itr)->ToUnit()->CastSpell((Unit*)nullptr, e.action.cast.spell, triggerFlag);
+            }
+
+            delete targets;
+            break;
+        }
+        case SMART_ACTION_CAST_PASSENGER_SELF:
+        {
+            if (!me)
+                break;  
+
+            Unit* passenger = me->GetVehicleKit()->GetPassenger(0);
+            if (!passenger)
+                break;
+
+            TriggerCastFlags triggerFlag = TRIGGERED_NONE;
+            if (e.action.cast.castFlags & SMARTCAST_TRIGGERED)
+            {
+                if (e.action.cast.triggerFlags)
+                    triggerFlag = TriggerCastFlags(e.action.cast.triggerFlags);
+                else
+                    triggerFlag = TRIGGERED_FULL_MASK;
+            }
+
+            passenger->CastSpell((Unit*)nullptr, e.action.cast.spell, triggerFlag);
+
+            break;
+        }
         case SMART_ACTION_INVOKER_CAST:
         {
             Unit* tempLastInvoker = GetLastInvoker();

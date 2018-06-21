@@ -574,6 +574,9 @@ enum SMART_ACTION
     SMART_ACTION_PLAY_ORPHAN_SPELL_VISUAL           = 202,    // id, travelSpeed, target type variation.
     SMART_ACTION_CANCEL_VISUAL                      = 203,    // VisualType, VisualId.
     SMART_ACTION_CIRCLE_PATH                        = 204,    // Radius, Clockwise, StepCount
+
+    SMART_ACTION_CAST_UNIT_SELF                     = 205,    // SpellId, CastFlags, TriggeredFlags
+    SMART_ACTION_CAST_PASSENGER_SELF                = 206,    // SpellId, CastFlags, TriggeredFlags
     
     SMART_ACTION_END                                = 205
 };
