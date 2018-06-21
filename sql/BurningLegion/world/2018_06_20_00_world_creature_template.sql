@@ -11,7 +11,3 @@ INSERT INTO creature_text_locale (CreatureID, GroupID, ID, Locale, Text) VALUES
 (100491, 0, 0, 'ruRU', 'На эту священную вершину допускаются только охотники, Поворачивайте назад, или дух орла унесет вас отсюда!'), 
 (103444, 0, 0, 'ruRU', 'На эту священную вершину допускаются только охотники, Поворачивайте назад, или дух орла унесет вас отсюда!');
 
--- Trueshot lodge sentinel
-UPDATE creature_template SET ScriptName = 'npc_trueshot_lodge_sentinel' WHERE entry =100709;
-UPDATE creature_template SET ScriptName = 'npc_trueshot_lodge_sentinel' WHERE entry=100491;
-UPDATE creature_template SET ScriptName = 'npc_trueshot_lodge_sentinel' WHERE entry =103444;
