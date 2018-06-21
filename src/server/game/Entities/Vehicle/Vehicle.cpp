@@ -521,6 +521,7 @@ Vehicle* Vehicle::RemovePassenger(Unit* unit)
         sScriptMgr->OnRemovePassenger(this, unit);
 
     unit->SetVehicle(NULL);
+    unit->UpdateObjectVisibility();
     return this;
 }
 
