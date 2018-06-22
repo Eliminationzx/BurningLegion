@@ -13,5 +13,6 @@ UPDATE `creature_template` SET `entry`='108868', `difficulty_entry_1`='0', `diff
 
 INSERT INTO `gossip_menu_option` (`MenuId`, `OptionIndex`, `OptionIcon`, `OptionText`, `OptionBroadcastTextId`, `OptionType`, `OptionNpcFlag`, `VerifiedBuild`) VALUES ('999912', '0', '0', 'I\'\'d like an eagle to Trueshot Lodge.', '0', '1', '1', '0');
 
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES ('15', '999912', '0', '0', '0', '15', '0', '4', '0', '0', '0', '0', '0', '', 'Only hunter teleport oplot');
 
-
+INSERT INTO `gossip_menu_option_locale` (`MenuId`, `OptionIndex`, `Locale`, `OptionText`, `BoxText`) VALUES ('999912', '0', 'ruRU', 'Хочу долететь на орле до Приюта стрелка.', NULL);
