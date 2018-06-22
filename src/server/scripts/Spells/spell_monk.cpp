@@ -1277,7 +1277,7 @@ class spell_monk_touch_of_death : public AuraScript
 {
     PrepareAuraScript(spell_monk_touch_of_death);
 
-    void OnTick(AuraEffect const* aurEff)
+    void OnTick(AuraEffect const* /*aurEff*/)
     {
         if (Unit* caster = GetCaster())
         {
