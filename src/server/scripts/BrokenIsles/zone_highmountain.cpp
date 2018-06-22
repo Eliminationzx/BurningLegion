@@ -24,7 +24,7 @@
 enum TrueshotLodgeSentinel
 {
     TRUESHOT_LODGE_AREA_ID = 7877,
-    SPELL_EAGLE_SENTINEL   = 208643,
+    SPELL_EAGLE_SENTINEL   = 208643
 
     //TEXT_ID_DETECTION_ANNOUNCEMENT = 0
 };
@@ -34,14 +34,18 @@ class trueshot_lodge_sentinel : public PlayerScript
 public:
     trueshot_lodge_sentinel() : PlayerScript("trueshot_lodge_sentinel") {}
 
-    void OnUpdateArea(Player* player, uint32 /*newZone*/, uint32 newArea) override
+void OnUpdateArea(Player* player, uint32 /*newZone*/, uint32 newArea) override
+{
+    
+    switch (player->GetAreaId())
     {
-        if (newArea == TRUESHOT_LODGE_AREA_ID)
+        case TRUESHOT_LODGE_AREA_ID:
         {
-            if (player->getClass() == CLASS_HUNTER)
-                return;
+           if (player->getClass() == CLASS_HUNTER)
+              return;
 
-            player->CastSpell((Unit*)nullptr, SPELL_EAGLE_SENTINEL);
+           player->CastSpell((Unit*)nullptr, SPELL_EAGLE_SENTINEL);
+        }
         }
     }
 };
