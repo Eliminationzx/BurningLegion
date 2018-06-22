@@ -827,6 +827,13 @@ enum AccountDataType
     PER_CHARACTER_CHAT_CACHE        = 7                     // 0x80 p
 };
 
+enum NotificationStyle
+{
+    NOTIFY_STYLE_DEFAULT           = 0,
+    NOTIFY_STYLE_EMOTE             = 1,
+    NOTIFY_STYLE_ANNOUNCE          = 2
+};
+
 #define NUM_ACCOUNT_DATA_TYPES        8
 
 #define GLOBAL_CACHE_MASK           0x15

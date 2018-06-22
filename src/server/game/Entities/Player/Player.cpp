@@ -41,6 +41,7 @@
 #include "CharacterPackets.h"
 #include "Chat.h"
 #include "ChatPackets.h"
+#include "ChatTextBuilder.h"
 #include "CinematicMgr.h"
 #include "CombatLogPackets.h"
 #include "CombatPackets.h"
@@ -29576,4 +29577,25 @@ uint8 Player::GetItemLimitCategoryQuantity(ItemLimitCategoryEntry const* limitEn
     }
 
     return limit;
+}
+
+template<class Do>
+void Player::BroadcastWorker(Do& _do)
+{
+    _do(this);
+}
+
+void Player::SendNotification(uint32 entry, ChatMsg msgType)
+{
+    if (!entry)
+        return;
+
+    va_list ap;
+    va_start(ap, this);
+
+    Trinity::TrinityStringChatBuilder builder(nullptr, msgType, entry, this, &ap);
+    Trinity::LocalizedPacketDo<Trinity::TrinityStringChatBuilder> localizer(builder);
+    BroadcastWorker(localizer);
+
+    va_end(ap);
 }
