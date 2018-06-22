@@ -29590,12 +29590,7 @@ void Player::SendNotification(uint32 entry, ChatMsg msgType)
     if (!entry)
         return;
 
-    va_list ap;
-    va_start(ap, this);
-
-    Trinity::TrinityStringChatBuilder builder(nullptr, msgType, entry, this, &ap);
+    Trinity::TrinityStringChatBuilder builder(nullptr, msgType, entry, this);
     Trinity::LocalizedPacketDo<Trinity::TrinityStringChatBuilder> localizer(builder);
     BroadcastWorker(localizer);
-
-    va_end(ap);
 }
