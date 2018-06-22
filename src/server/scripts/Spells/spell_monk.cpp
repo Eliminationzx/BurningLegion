@@ -3498,6 +3498,7 @@ struct npc_monk_sef_spirit : public ScriptedAI
 
     void IsSummonedBy(Unit* summoner)
     {
+        me->SetLevel(summoner->getLevel());
         summoner->CastSpell(me, SPELL_MONK_TRANSCENDENCE_CLONE_TARGET, true);
         me->CastSpell(me, me->GetEntry() == NPC_FIRE_SPIRIT ? SPELL_MONK_SEF_FIRE_VISUAL : SPELL_MONK_SEF_EARTH_VISUAL, true);
         me->CastSpell(me, SPELL_MONK_SEF_SUMMONS_STATS, true);
