@@ -41,6 +41,7 @@
 #include "CharacterPackets.h"
 #include "Chat.h"
 #include "ChatPackets.h"
+#include "ChatTextBuilder.h"
 #include "CinematicMgr.h"
 #include "CombatLogPackets.h"
 #include "CombatPackets.h"
@@ -18444,6 +18445,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
 
     SetMap(map);
 
+    AddClassPhaseMask(getClass());
+
     // now that map position is determined, check instance validity
     if (!CheckInstanceValidity(true) && !IsInstanceLoginGameMasterException())
         m_InstanceValid = false;
@@ -29576,4 +29579,65 @@ uint8 Player::GetItemLimitCategoryQuantity(ItemLimitCategoryEntry const* limitEn
     }
 
     return limit;
+}
+
+template<class Do>
+void Player::BroadcastWorker(Do& _do)
+{
+    _do(this);
+}
+
+void Player::SendNotification(uint32 entry, ChatMsg msgType)
+{
+    if (!entry)
+        return;
+
+    Trinity::TrinityStringChatBuilder builder(nullptr, msgType, entry, this);
+    Trinity::LocalizedPacketDo<Trinity::TrinityStringChatBuilder> localizer(builder);
+    BroadcastWorker(localizer);
+}
+
+void Player::AddClassPhaseMask(uint8 classId)
+{
+    switch (classId)
+    {
+        case CLASS_WARRIOR:
+            PhasingHandler::AddPhase(this, PHASE_WARRIOR);
+            break;
+        case CLASS_PALADIN:
+            PhasingHandler::AddPhase(this, PHASE_PALADIN);
+            break;
+        case CLASS_HUNTER:
+            PhasingHandler::AddPhase(this, PHASE_HUNTER);
+            break;
+        case CLASS_ROGUE:
+            PhasingHandler::AddPhase(this, PHASE_ROGUE);
+            break;
+        case CLASS_PRIEST:
+            PhasingHandler::AddPhase(this, PHASE_PRIEST);
+            break;
+        case CLASS_DEATH_KNIGHT:
+            PhasingHandler::AddPhase(this, PHASE_DEATH_KNIGHT);
+            break;
+        case CLASS_SHAMAN:
+            PhasingHandler::AddPhase(this, PHASE_SHAMAN);
+            break;
+        case CLASS_MAGE:
+            PhasingHandler::AddPhase(this, PHASE_MAGE);
+            break;
+        case CLASS_WARLOCK:
+            PhasingHandler::AddPhase(this, PHASE_WARLOCK);
+            break;
+        case CLASS_MONK:
+            PhasingHandler::AddPhase(this, PHASE_MONK);
+            break;
+        case CLASS_DRUID:
+            PhasingHandler::AddPhase(this, PHASE_DRUID);
+            break;
+        case CLASS_DEMON_HUNTER:
+            PhasingHandler::AddPhase(this, PHASE_DEMON_HUNTER);
+            break;
+        default:
+            break;
+    }
 }

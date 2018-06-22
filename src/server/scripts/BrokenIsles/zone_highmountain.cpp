@@ -41,7 +41,7 @@ public:
             if (player->getClass() == CLASS_HUNTER)
                 return;
 
-            player->GetSession()->SendNotification(player->GetSession()->GetTrinityString(LANG_BREACHING_TRUESHOT_LODGE));
+            player->SendNotification(LANG_BREACHING_TRUESHOT_LODGE, CHAT_MSG_RAID_BOSS_EMOTE);
             player->CastSpell((Unit*)nullptr, SPELL_EAGLE_SENTINEL);
         }
     }

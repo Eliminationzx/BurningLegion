@@ -2405,6 +2405,7 @@ public:
                 float speedZ = 5;
 
                 speedXY = p_Clicker->GetExactDist2d(x, y) * 10.0f / speedZ;
+                p_Clicker->AddAura(SPELL_WARLOCK_DEMONIC_GATEWAY_TELEPORT_PURPLE);
                 p_Clicker->GetMotionMaster()->MoveJump(x, y, z, p_Clicker->GetOrientation(), speedXY, speedZ);
                 break;
             }
@@ -2495,6 +2496,7 @@ public:
                 float speedZ = 5;
 
                 speedXY = p_Clicker->GetExactDist2d(x, y) * 10.0f / speedZ;
+                p_Clicker->AddAura(SPELL_WARLOCK_DEMONIC_GATEWAY_TELEPORT_GREEN);
                 p_Clicker->GetMotionMaster()->MoveJump(x, y, z, p_Clicker->GetOrientation(), speedXY, speedZ);
                 break;
             }

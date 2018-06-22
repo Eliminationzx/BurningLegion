@@ -2296,6 +2296,10 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         uint32 DoRandomRoll(uint32 minimum, uint32 maximum);
         uint8 GetItemLimitCategoryQuantity(ItemLimitCategoryEntry const* limitEntry) const;
+        template<class Do>
+        void BroadcastWorker(Do& _do);
+        void SendNotification(uint32 entry, ChatMsg msgType);
+        void AddClassPhaseMask(uint8 classId);
         void ShowNeutralPlayerFactionSelectUI();
 
         void UpdateItemLevelAreaBasedScaling();
