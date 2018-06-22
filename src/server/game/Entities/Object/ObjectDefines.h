@@ -50,10 +50,20 @@ enum TempSummonType
     TEMPSUMMON_MANUAL_DESPAWN              = 8              // despawns when UnSummon() is called
 };
 
-enum PhaseMasks
+enum ClassPhaseIds
 {
-    PHASEMASK_NORMAL   = 0x00000001,
-    PHASEMASK_ANYWHERE = 0xFFFFFFFF
+    PHASE_WARRIOR       = 10000,
+    PHASE_PALADIN       = 20000,
+    PHASE_HUNTER        = 30000,
+    PHASE_ROGUE         = 40000,
+    PHASE_PRIEST        = 50000,
+    PHASE_DEATH_KNIGHT  = 60000,
+    PHASE_SHAMAN        = 70000,
+    PHASE_MAGE          = 80000,
+    PHASE_WARLOCK       = 90000,
+    PHASE_MONK          = 100000,
+    PHASE_DRUID         = 110000,
+    PHASE_DEMON_HUNTER  = 120000
 };
 
 enum NotifyFlags
