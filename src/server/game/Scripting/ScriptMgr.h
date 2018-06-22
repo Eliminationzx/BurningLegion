@@ -813,10 +813,10 @@ class TC_GAME_API PlayerScript : public UnitScript
         virtual void OnPlayerChoiceResponse(Player* /*player*/, uint32 /*choiceId*/, uint32 /*responseId*/) { }
 
         // Called when a cooldown start for that player
-        virtual void OnCooldownStart(Player* player, SpellInfo const* spellInfo, uint32 itemId, int32& cooldown, uint32& categoryId, int32& categoryCooldown) { }
+        virtual void OnCooldownStart(Player* /*player*/, SpellInfo const* /*spellInfo*/, uint32 /*itemId*/, int32& /*cooldown*/, uint32& /*categoryId*/, int32& /*categoryCooldown*/) { }
 
         // Called when a charge recovery cooldown start for that player
-        virtual void OnChargeRecoveryTimeStart(Player* player, uint32 chargeCategoryId, int32& chargeRecoveryTime) { }
+        virtual void OnChargeRecoveryTimeStart(Player* /*player*/, uint32 /*chargeCategoryId*/, int32& /*chargeRecoveryTime*/) { }
 };
 
 class TC_GAME_API AccountScript : public ScriptObject

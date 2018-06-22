@@ -20,37 +20,34 @@
 #include "ScriptedGossip.h"
 #include "Player.h"
 #include "WorldSession.h"
+#include "Language.h"
 
-enum TrueshotLodgeSentinel
+enum TrueshotLodgeAreaGuard
 {
     TRUESHOT_LODGE_AREA_ID = 7877,
     SPELL_EAGLE_SENTINEL   = 208643
-
-    //TEXT_ID_DETECTION_ANNOUNCEMENT = 0
 };
 
-class trueshot_lodge_sentinel : public PlayerScript
+class trueshot_lodge_area_guard : public PlayerScript
 {
 public:
-    trueshot_lodge_sentinel() : PlayerScript("trueshot_lodge_sentinel") {}
+    trueshot_lodge_area_guard() : PlayerScript("trueshot_lodge_area_guard") {}
 
-void OnUpdateArea(Player* player, uint32 /*newZone*/, uint32 newArea) override
-{
-    
-    switch (player->GetAreaId())
+    void OnUpdateArea(Player* player, uint32 newAreaId, uint32 /*oldAreaID*/) override
     {
-        case TRUESHOT_LODGE_AREA_ID:
+        if (newAreaId == TRUESHOT_LODGE_AREA_ID)
         {
-           if (player->getClass() == CLASS_HUNTER)
-              return;
+            // Skip action only for hunters
+            if (player->getClass() == CLASS_HUNTER)
+                return;
 
-           player->CastSpell((Unit*)nullptr, SPELL_EAGLE_SENTINEL);
-        }
+            player->GetSession()->SendNotification(player->GetSession()->GetTrinityString(LANG_BREACHING_TRUESHOT_LODGE));
+            player->CastSpell((Unit*)nullptr, SPELL_EAGLE_SENTINEL);
         }
     }
 };
 
 void AddSC_highmountain()
 {
-    new trueshot_lodge_sentinel();
+    new trueshot_lodge_area_guard();
 }
