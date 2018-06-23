@@ -3463,6 +3463,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         const_cast<SpellEffectInfo*>(spellInfo->GetEffect(EFFECT_0))->TargetA = SpellImplicitTargetInfo(TARGET_DEST_DB);
     });
+    
+    ApplySpellFix({
+        189994 // Summon Ysera
+    }, [](SpellInfo* spellInfo)
+    {
+        const_cast<SpellEffectInfo*>(spellInfo->GetEffect(EFFECT_0))->MiscValueB = 161;
+    });
 
     // Taste of Iron Game Aura
     ApplySpellFix({ 164042 }, [](SpellInfo* spellInfo)
