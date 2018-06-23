@@ -264,3 +264,6 @@ INSERT INTO `creature_template` (`entry`, `difficulty_entry_1`, `difficulty_entr
 UPDATE `quest_objectives` SET `ID`='278646', `QuestID`='3823500', `Type`='0', `Order`='2', `StorageIndex`='2', `ObjectID`='999998', `Amount`='1', `Flags`='0', `Flags2`='0', `ProgressBarWeight`='0', `Description`='Del\'thanar Sagewood Rescued', `VerifiedBuild`='25996' WHERE (`ID`='278646');
 UPDATE `quest_objectives` SET `ID`='278645', `QuestID`='3823500', `Type`='0', `Order`='1', `StorageIndex`='0', `ObjectID`='93601', `Amount`='1', `Flags`='0', `Flags2`='0', `ProgressBarWeight`='0', `Description`='Erwind Mistfen Rescued', `VerifiedBuild`='25996' WHERE (`ID`='278645');
 UPDATE `quest_objectives` SET `ID`='277559', `QuestID`='3823500', `Type`='0', `Order`='0', `StorageIndex`='1', `ObjectID`='999999', `Amount`='1', `Flags`='0', `Flags2`='0', `ProgressBarWeight`='0', `Description`='Marnor Lorleaf Rescued', `VerifiedBuild`='25996' WHERE (`ID`='277559');
+
+---fix quest dublicat 38381
+DELETE FROM creature_queststarter WHERE quest IN (38381);
