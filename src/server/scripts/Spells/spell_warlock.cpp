@@ -1554,7 +1554,7 @@ class spell_warl_demonic_gateway : public SpellScript
             return;
 
         std::list<Creature*> gatewayPurpleList;
-        player->GetCreatureListWithEntryInGrid(gatewayPurpleList, 59271, 500.0f);
+        player->GetCreatureListWithEntryInGrid(gatewayPurpleList, eGatewayNpc::PurpleGate, 500.0f);
 
         for (std::list<Creature*>::iterator i = gatewayPurpleList.begin(); i != gatewayPurpleList.end(); ++i)
         {
@@ -1570,7 +1570,7 @@ class spell_warl_demonic_gateway : public SpellScript
             gatewayPurpleList.back()->ToTempSummon()->UnSummon();
 
         std::list<Creature*> gatewayGreenList;
-        player->GetCreatureListWithEntryInGrid(gatewayGreenList, 59262, 500.0f);
+        player->GetCreatureListWithEntryInGrid(gatewayGreenList, eGatewayNpc::GreenGate, 500.0f);
 
         for (std::list<Creature*>::iterator i = gatewayGreenList.begin(); i != gatewayGreenList.end(); ++i)
         {
@@ -2335,20 +2335,18 @@ public:
 
     struct spell_npc_warl_demonic_gateway_purpleAI : public CreatureAI
     {
-        spell_npc_warl_demonic_gateway_purpleAI(Creature* p_Creature) : CreatureAI(p_Creature) { }
-
-        void UpdateAI(uint32 /*diff*/) override
-        {
-        }
-
-        void JustRespawned() override
-        {
-            me->CastSpell(me, eGatewaySpells::PortalVisual, true);
+        spell_npc_warl_demonic_gateway_purpleAI(Creature* p_Creature) : CreatureAI(p_Creature) 
+        { 
+            me->CastSpell((Unit*)nullptr, eGatewaySpells::PortalVisual, true);
 
             me->SetFlag(UNIT_FIELD_INTERACT_SPELLID, eGatewaySpells::GatewayInteract);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_REMOVE_CLIENT_CONTROL);
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
             me->SetReactState(ReactStates::REACT_PASSIVE);
+        }
+
+        void UpdateAI(uint32 /*diff*/) override
+        {
         }
 
         void OnSpellClick(Unit* p_Clicker, bool& /*result*/) override
@@ -2361,7 +2359,7 @@ public:
                 return;
 
             /// Can't use gates in control
-            if (p_Clicker->isFeared())
+            if (p_Clicker->HasUnitState(UNIT_STATE_FLEEING) || p_Clicker->HasUnitState(UNIT_STATE_CONFUSED))
                 return;
 
             Unit* l_Owner = me->GetOwner();
@@ -2426,21 +2424,18 @@ public:
 
     struct spell_npc_warl_demonic_gateway_greenAI : public CreatureAI
     {
-        spell_npc_warl_demonic_gateway_greenAI(Creature* p_Creature) : CreatureAI(p_Creature) { }
-
-        void UpdateAI(uint32 /*diff*/) override
-        {
-        }
-
-        void JustRespawned() override
-        {
-            me->CastSpell(me, eGatewaySpells::PortalVisual, true);
+        spell_npc_warl_demonic_gateway_greenAI(Creature* p_Creature) : CreatureAI(p_Creature) 
+        { 
+            me->CastSpell((Unit*)nullptr, eGatewaySpells::PortalVisual, true);
 
             me->SetFlag(UNIT_FIELD_INTERACT_SPELLID, eGatewaySpells::GatewayInteract);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_REMOVE_CLIENT_CONTROL);
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
             me->SetReactState(ReactStates::REACT_PASSIVE);
+        }
 
+        void UpdateAI(uint32 /*diff*/) override
+        {
         }
 
         void OnSpellClick(Unit* p_Clicker, bool& /*result*/) override
@@ -2452,7 +2447,7 @@ public:
                 return;
 
             /// Can't use gates in control
-            if (p_Clicker->isFeared())
+            if (p_Clicker->HasUnitState(UNIT_STATE_FLEEING) || p_Clicker->HasUnitState(UNIT_STATE_CONFUSED))
                 return;
 
             Unit* l_Owner = me->GetOwner();

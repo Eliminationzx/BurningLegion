@@ -52,18 +52,18 @@ enum TempSummonType
 
 enum ClassPhaseIds
 {
-    PHASE_WARRIOR       = 10000,
-    PHASE_PALADIN       = 20000,
-    PHASE_HUNTER        = 30000,
-    PHASE_ROGUE         = 40000,
-    PHASE_PRIEST        = 50000,
-    PHASE_DEATH_KNIGHT  = 60000,
-    PHASE_SHAMAN        = 70000,
-    PHASE_MAGE          = 80000,
-    PHASE_WARLOCK       = 90000,
-    PHASE_MONK          = 100000,
-    PHASE_DRUID         = 110000,
-    PHASE_DEMON_HUNTER  = 120000
+    PHASE_WARRIOR       = 2275,
+    PHASE_PALADIN       = 3310,
+    PHASE_HUNTER        = 3753,
+    PHASE_ROGUE         = 3754,
+    PHASE_PRIEST        = 3886,
+    PHASE_DEATH_KNIGHT  = 6507,
+    PHASE_SHAMAN        = 6512,
+    PHASE_MAGE          = 6513,
+    PHASE_WARLOCK       = 6874,
+    PHASE_MONK          = 7813,
+    PHASE_DRUID         = 7814,
+    PHASE_DEMON_HUNTER  = 7815
 };
 
 enum NotifyFlags
