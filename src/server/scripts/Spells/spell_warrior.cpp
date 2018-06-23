@@ -2796,7 +2796,7 @@ class spell_warr_ravager : public AuraScript
         }
     }
 
-    void OnTick(AuraEffect const* aurEff)
+    void OnTick(AuraEffect const* /*aurEff*/)
     {
         int32 tickNumber = aurEff->GetTickNumber();
 
