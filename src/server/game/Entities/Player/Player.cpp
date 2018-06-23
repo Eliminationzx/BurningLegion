@@ -477,6 +477,10 @@ bool Player::Create(ObjectGuid::LowType guidlow, WorldPackets::Character::Charac
     SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_GENDER, createInfo->Sex);
     SetUInt32Value(UNIT_FIELD_DISPLAY_POWER, powertype);
     InitDisplayIds();
+
+    // Init class phase
+    InitPlayerClassPhase(createInfo->Class);
+
     if (sWorld->getIntConfig(CONFIG_GAME_TYPE) == REALM_TYPE_PVP || sWorld->getIntConfig(CONFIG_GAME_TYPE) == REALM_TYPE_RPPVP)
     {
         SetByteFlag(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_PVP_FLAG, UNIT_BYTE2_FLAG_PVP);
@@ -18445,7 +18449,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
 
     SetMap(map);
 
-    AddClassPhaseMask(getClass());
+    // Init class phase
+    InitPlayerClassPhase(fields[4].GetUInt8());
 
     // now that map position is determined, check instance validity
     if (!CheckInstanceValidity(true) && !IsInstanceLoginGameMasterException())
@@ -29597,7 +29602,7 @@ void Player::SendNotification(uint32 entry, ChatMsg msgType)
     BroadcastWorker(localizer);
 }
 
-void Player::AddClassPhaseMask(uint8 classId)
+void Player::InitPlayerClassPhase(uint8 classId)
 {
     switch (classId)
     {
