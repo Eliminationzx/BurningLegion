@@ -937,14 +937,8 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
 
 void Spell::CalculateJumpSpeeds(SpellEffectInfo const* effInfo, float dist, float& speedXY, float& speedZ)
 {
-    if (effInfo->MiscValue)
-        speedZ = float(effInfo->MiscValue) / 10;
-    else if (effInfo->MiscValueB)
-        speedZ = float(effInfo->MiscValueB) / 10;
-    else
-        speedZ = 10.0f;
-
-    speedXY = dist * 10.0f / speedZ;
+    speedZ = effInfo->MiscValue ? effInfo->MiscValue / 10.0f : 5.0f;
+    speedXY = (dist * 10.0f + (effInfo->MiscValueB / 2)) / speedZ;
 }
 
 void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
@@ -4349,7 +4343,7 @@ void Spell::EffectKnockBack(SpellEffIndex /*effIndex*/)
             return;
 
     // Spells with SPELL_EFFECT_KNOCK_BACK (like Thunderstorm) can't knockback target if target has ROOT/STUN
-    if (unitTarget->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
+    if (unitTarget->HasUnitState(UNIT_STATE_ROOT))
         return;
 
     // Instantly interrupt non melee spells being cast

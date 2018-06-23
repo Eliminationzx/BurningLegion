@@ -2411,6 +2411,9 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetChampioningFaction(uint32 faction) { m_ChampioningFaction = faction; }
         Spell* m_spellModTakingSpell;
 
+        int64 GetTimeSyncClockDelta() const { return m_timeSyncClockDelta; }
+        void SetTimeSyncClockDelta(int64 clockDelta) { m_timeSyncClockDelta = clockDelta; }
+
         float GetAverageItemLevelEquipped() const;
         float GetAverageItemLevelEquippedAndBag() const;
         uint8 GetSlotEquipmentFromInventory(ItemTemplate const* proto) const;
@@ -2855,8 +2858,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         std::queue<uint32> m_timeSyncQueue;
         uint32 m_timeSyncTimer;
-        uint32 m_timeSyncClient;
         uint32 m_timeSyncServer;
+        int64 m_timeSyncClockDelta;
 
         InstanceTimeMap _instanceResetTimes;
         uint32 _pendingBindId;

@@ -34,8 +34,6 @@
 #include "Vehicle.h"
 #include "WaypointMovementGenerator.h"
 
-#define MOVEMENT_PACKET_TIME_DELAY 0
-
 void WorldSession::HandleMoveWorldportAckOpcode(WorldPackets::Movement::WorldPortResponse& /*packet*/)
 {
     HandleMoveWorldportAck();
@@ -376,13 +374,15 @@ void WorldSession::HandleMovementOpcode(OpcodeClient opcode, MovementInfo& movem
         plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetMap()->IsUnderWater(plrMover->GetPhaseShift(), movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ()));
     }
 
-    uint32 mstime = getMSTime();
-    /*----------------------*/
-    if (m_clientTimeDelay == 0)
-        m_clientTimeDelay = mstime - movementInfo.time;
+    int64 movementTime = (int64)movementInfo.time + plrMover != nullptr ? plrMover->GetTimeSyncClockDelta() : 0; // time of the event on the server clock.
 
-    /* process position-change */
-    movementInfo.time = movementInfo.time + m_clientTimeDelay + MOVEMENT_PACKET_TIME_DELAY;
+    if (movementTime < 0 || movementTime > 0xFFFFFFFF)
+    {
+        TC_LOG_WARN("misc", "The computed movement time using clockDelta is erronous. Using fallback instead");
+        movementTime = getMSTime();
+    }
+
+    movementInfo.time = (uint32)movementTime;
 
     movementInfo.guid = mover->GetGUID();
     mover->m_movementInfo = movementInfo;

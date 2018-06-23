@@ -322,8 +322,8 @@ Player::Player(WorldSession* session) : Unit(true), m_sceneMgr(this)
     m_ChampioningFaction = 0;
 
     m_timeSyncTimer = 0;
-    m_timeSyncClient = 0;
     m_timeSyncServer = 0;
+    m_timeSyncClockDelta = 0;
 
     for (uint8 i = 0; i < MAX_POWERS_PER_CLASS; ++i)
         m_powerFraction[i] = 0;
@@ -27826,7 +27826,7 @@ void Player::ActivateTalentGroup(ChrSpecializationEntry const* spec)
 void Player::ResetTimeSync()
 {
     m_timeSyncTimer = 0;
-    m_timeSyncClient = 0;
+    m_timeSyncClockDelta = 0;
     m_timeSyncServer = getMSTime();
 }
 
