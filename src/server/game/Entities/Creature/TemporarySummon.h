@@ -25,7 +25,7 @@ enum PetEntry
 {
     // Warlock pets
     PET_IMP             = 416,
-    PET_FEL_HUNTER      = 691,
+    PET_FEL_HUNTER      = 417,
     PET_VOID_WALKER     = 1860,
     PET_SUCCUBUS        = 1863,
     PET_DOOMGUARD       = 18540,
