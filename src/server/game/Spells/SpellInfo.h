@@ -536,7 +536,7 @@ class TC_GAME_API SpellInfo
         bool HasAreaAuraEffect(uint32 difficulty) const;
         bool HasAreaAuraEffect() const;
         bool HasOnlyDamageEffects() const;
-        bool HasTarget(uint32 target) const;
+        bool HasTargetType(uint32 target) const;
         bool CasterCanTurnDuringCast() const;
 
         bool HasAttribute(SpellAttr0 attribute) const { return !!(Attributes & attribute); }
