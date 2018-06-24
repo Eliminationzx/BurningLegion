@@ -974,7 +974,7 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
 
         player->TeleportTo(mapid, x, y, z, orientation, unitTarget == m_caster ? TELE_TO_SPELL | TELE_TO_NOT_LEAVE_COMBAT : 0);
 
-        if (Pet* pet = unitTarget->ToPlayer()->GetPet())
+        if (Pet* pet = player->GetPet())
             pet->NearTeleportTo(x, y, z, orientation);
     }
     else if (mapid == unitTarget->GetMapId())
