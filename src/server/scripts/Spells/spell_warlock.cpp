@@ -451,7 +451,7 @@ class spell_warl_shadow_bolt : public SpellScript
 
     void HandleOnCast()
     {
-		Unit* caster = GetCaster();
+        Unit* caster = GetCaster();
         caster->CastSpell(caster, SPELL_WARLOCK_SHADOW_BOLT_SHOULSHARD, true);
 
         if (caster->HasAura(SPELL_WARLOCK_SHADOWY_INSPIRATION_EFFECT))
