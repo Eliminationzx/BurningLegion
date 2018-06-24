@@ -253,6 +253,9 @@ public:
             if (!caster || !target)
                 return;
 
+            if (!caster->HasAura(SPELL_SHAMAN_GHOST_WOLF))
+                caster->CastSpell(caster, SPELL_SHAMAN_GHOST_WOLF);
+
             caster->CastSpell(target, SPELL_SHAMAN_FERAL_LUNGE_DAMAGE, true);
         }
 
