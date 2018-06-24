@@ -7035,7 +7035,22 @@ float Unit::GetUnitSpellCriticalChance(Unit* victim, Spell* spell, AuraEffect co
         case SPELL_DAMAGE_CLASS_RANGED:
         {
             if (victim)
+            {
+                // Freash meat increase Bloodthirst crit chance
+                if (Aura* aura = GetAura(215568, GetGUID()))
+                {
+                    if (spellProto->Id == 23881)
+                    {
+                        int32 critPct = aura->GetEffect(EFFECT_0)->GetAmount();
+                        int32 healthPct = aura->GetEffect(EFFECT_1)->GetAmount();
+                       
+                        if (victim->GetHealthPct() > healthPct)
+                            AddPct(crit_chance, critPct);
+                    }
+                }
+
                 crit_chance += GetUnitCriticalChance(attackType, victim);
+            }
             break;
         }
         default:
