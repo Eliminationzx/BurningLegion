@@ -1565,7 +1565,9 @@ public:
 
 enum LivingSeedSpells
 {
-    SPELL_DRUID_LIVING_SEED_PROC = 48504
+    SPELL_DRUID_LIVING_SEED      = 48500,
+    SPELL_DRUID_LIVING_SEED_PROC = 48504,
+    SPELL_DRUID_LIVING_SEED_HEAL = 48503
 };
 
 // Living Seed - 48500
@@ -1608,6 +1610,51 @@ public:
     AuraScript* GetAuraScript() const override
     {
         return new spell_dru_living_seed_AuraScript();
+    }
+};
+
+// Living Seed - 48504
+// @Version : 7.1.0.22908
+class spell_dru_living_seed_heal : public SpellScriptLoader
+{
+public:
+    spell_dru_living_seed_heal() : SpellScriptLoader("spell_dru_living_seed_heal") { }
+
+    class spell_dru_living_seed_heal_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dru_living_seed_heal_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_DRUID_LIVING_SEED_HEAL,  SPELL_DRUID_LIVING_SEED });
+        }
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            if (eventInfo.GetTypeMask() & PROC_FLAG_TAKEN_PERIODIC && eventInfo.GetSpellTypeMask() & PROC_SPELL_TYPE_HEAL)
+                return false;
+
+            return true;
+        }
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            int32 amount = CalculatePct(aurEff->GetAmount(), sSpellMgr->GetSpellInfo(SPELL_DRUID_LIVING_SEED)->GetEffect(EFFECT_0)->BasePoints);
+            GetTarget()->CastCustomSpell(SPELL_DRUID_LIVING_SEED_HEAL, SPELLVALUE_BASE_POINT0, amount, eventInfo.GetProcTarget(), true, NULL, aurEff);
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(spell_dru_living_seed_heal_AuraScript::CheckProc);
+            OnEffectProc += AuraEffectProcFn(spell_dru_living_seed_heal_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_dru_living_seed_heal_AuraScript();
     }
 };
 
@@ -2418,6 +2465,7 @@ void AddSC_druid_spell_scripts()
     new spell_dru_activate_cat_form();
     new spell_dru_killer_instinct();
     new spell_dru_living_seed();
+    new spell_dru_living_seed_heal();
     new spell_dru_infected_wound();
     RegisterAuraScript(spell_dru_ysera_gift);
     new spell_dru_rake();
