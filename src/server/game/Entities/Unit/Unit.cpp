@@ -4487,17 +4487,30 @@ bool Unit::HasAuraEffect(uint32 spellId, uint8 effIndex, ObjectGuid caster) cons
     return false;
 }
 
-uint32 Unit::GetAuraCount(uint32 spellId) const
+uint32 Unit::GetAuraCount(uint32 spellId, bool sameCaster) const
 {
     uint32 count = 0;
     AuraApplicationMapBounds range = m_appliedAuras.equal_range(spellId);
 
     for (AuraApplicationMap::const_iterator itr = range.first; itr != range.second; ++itr)
     {
-        if (itr->second->GetBase()->GetStackAmount() == 0)
-            ++count;
+        if (sameCaster)
+        {
+            if (itr->second->GetBase()->GetCasterGUID() == GetGUID())
+            {
+                if (itr->second->GetBase()->GetStackAmount() == 0)
+                    ++count;
+                else
+                    count += (uint32)itr->second->GetBase()->GetStackAmount();
+            }
+        }
         else
-            count += (uint32)itr->second->GetBase()->GetStackAmount();
+        {
+            if (itr->second->GetBase()->GetStackAmount() == 0)
+                ++count;
+            else
+                count += (uint32)itr->second->GetBase()->GetStackAmount();
+        }
     }
 
     return count;

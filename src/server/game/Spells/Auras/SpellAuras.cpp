@@ -1563,8 +1563,8 @@ bool Aura::CanStackWith(Aura const* existingAura) const
     Unit* owner = GetOwner()->ToUnit();
 
     // Germination : allow to apply two stacks of Rejuvenation
-    if (GetCaster()->HasAura(155675) && m_spellInfo->Id == 231040)
-        if (owner && owner->GetAuraCount(231040) < 2 && existingSpellInfo->Id == 231040)
+    if (GetCaster()->HasAura(155675) && m_spellInfo->Id == 774 && existingAura->GetId() == 774)
+        if (owner && owner->GetAuraCount(774, true) < 2)
             return true;
 
     // check spell specific stack rules

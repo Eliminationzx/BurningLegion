@@ -1640,9 +1640,7 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-
-            int32 amount = CalculatePct(aurEff->GetAmount(), sSpellMgr->GetSpellInfo(SPELL_DRUID_LIVING_SEED)->GetEffect(EFFECT_0)->BasePoints);
-            GetTarget()->CastCustomSpell(SPELL_DRUID_LIVING_SEED_HEAL, SPELLVALUE_BASE_POINT0, amount, eventInfo.GetProcTarget(), true, NULL, aurEff);
+            GetTarget()->CastCustomSpell(SPELL_DRUID_LIVING_SEED_HEAL, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), eventInfo.GetProcTarget(), true, NULL, aurEff);
         }
 
         void Register() override
