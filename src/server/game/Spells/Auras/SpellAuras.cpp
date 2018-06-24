@@ -761,6 +761,9 @@ void Aura::Update(uint32 diff, Unit* caster)
                         {
                             if (powertype == POWER_HEALTH)
                             {
+                                if (caster == GetOwner())
+                                    return;
+
                                 if (int32(caster->GetHealth()) > manaPerSecond)
                                     caster->ModifyHealth(-manaPerSecond);
                                 else
