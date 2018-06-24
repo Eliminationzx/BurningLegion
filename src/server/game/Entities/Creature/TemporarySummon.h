@@ -36,7 +36,7 @@ enum PetEntry
     PET_ABOMINATION     = 106848,
 
     // Shaman pet
-    PET_SPIRIT_WOLF     = 29264
+    PET_SPIRIT_WOLF     = 69079
 };
 
 struct SummonPropertiesEntry;
