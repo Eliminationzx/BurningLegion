@@ -973,6 +973,9 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
             player->SendDirectMessage(WorldPackets::Spells::CustomLoadScreen(m_spellInfo->Id, customLoadingScreenId).Write());
 
         player->TeleportTo(mapid, x, y, z, orientation, unitTarget == m_caster ? TELE_TO_SPELL | TELE_TO_NOT_LEAVE_COMBAT : 0);
+
+        if (Pet* pet = unitTarget->ToPlayer()->GetPet())
+            pet->NearTeleportTo(x, y, z, orientation);
     }
     else if (mapid == unitTarget->GetMapId())
         unitTarget->NearTeleportTo(x, y, z, orientation, unitTarget == m_caster);
