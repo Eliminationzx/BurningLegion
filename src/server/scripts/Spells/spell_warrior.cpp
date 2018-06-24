@@ -821,8 +821,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_SECOND_WIND_DAMAGED) ||
-                !sSpellMgr->GetSpellInfo(SPELL_WARRIOR_SECOND_WIND_HEAL))
+            if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_SECOND_WIND_DAMAGED))
                 return false;
             return true;
         }
@@ -863,8 +862,6 @@ public:
             if (!caster)
                 return;
 
-            /*if(Aura* aura = caster->GetAura(SPELL_WARRIOR_SECOND_WIND_HEAL))
-                aura->GetEffect(EFFECT_0)->SetAmount(0);*/
             caster->RemoveAura(SPELL_WARRIOR_SECOND_WIND_HEAL);
         }
 
@@ -874,8 +871,6 @@ public:
             if (!caster)
                 return;
 
-            /*if (Aura* aura = caster->GetAura(SPELL_WARRIOR_SECOND_WIND_HEAL))
-                aura->GetEffect(EFFECT_0)->SetAmount(sSpellMgr->GetSpellInfo(SPELL_WARRIOR_SECOND_WIND_HEAL)->GetEffect(EFFECT_0)->BasePoints);*/
             caster->CastSpell(caster, SPELL_WARRIOR_SECOND_WIND_HEAL, true);
         }
 

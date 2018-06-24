@@ -7036,17 +7036,23 @@ float Unit::GetUnitSpellCriticalChance(Unit* victim, Spell* spell, AuraEffect co
         {
             if (victim)
             {
-                // Freash meat increase Bloodthirst crit chance
-                if (Aura* aura = GetAura(215568, GetGUID()))
+                switch (spellProto->Id)
                 {
-                    if (spellProto->Id == 23881)
-                    {
-                        int32 critPct = aura->GetEffect(EFFECT_0)->GetAmount();
-                        int32 healthPct = aura->GetEffect(EFFECT_1)->GetAmount();
-                       
-                        if (victim->GetHealthPct() > healthPct)
-                            AddPct(crit_chance, critPct);
-                    }
+                    case 118000: // Dragon roar always crit
+                        crit_chance = 100.0f;
+                        break;
+                    case 23881: // Bloodthirst & Fresh Meat
+                        if (Aura* aura = GetAura(215568, GetGUID()))
+                        {
+                            int32 critPct = aura->GetEffect(EFFECT_0)->GetAmount();
+                            int32 healthPct = aura->GetEffect(EFFECT_1)->GetAmount();
+
+                            if (victim->GetHealthPct() > healthPct)
+                                AddPct(crit_chance, critPct);
+                        }
+                        break;
+                    default:
+                        break;
                 }
 
                 crit_chance += GetUnitCriticalChance(attackType, victim);
