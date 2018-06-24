@@ -4643,34 +4643,44 @@ enum WarbreakerSpells
 
 class spell_item_warbreaker : public SpellScriptLoader
 {
-    public:
-        spell_item_warbreaker() : SpellScriptLoader("spell_item_warbreaker") { }
+public:
+    spell_item_warbreaker() : SpellScriptLoader("spell_item_warbreaker") { }
 
-        class spell_item_warbreaker_AuraScript : public AuraScript
+    class spell_item_warbreaker_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_item_warbreaker_AuraScript);
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_item_warbreaker_AuraScript);
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
 
-            bool Validate(SpellInfo const* /*spellInfo*/) override
-            {
-                return ValidateSpellInfo({ SPELL_WARBREAKER_DAMAGE });
-            }
-
-            void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
-            {
-                PreventDefaultAction();
-                eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_WARBREAKER_DAMAGE, true);
-            }
-
-            void Register() override
-            {
-                OnEffectProc += AuraEffectProcFn(spell_item_warbreaker_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
-            }
-        };
-
-        AuraScript* GetAuraScript() const override
-        {
-            return new spell_item_warbreaker_AuraScript();
+            if (Player* player = caster->ToPlayer())
+                player->LearnSpell(SPELL_WARBREAKER_DAMAGE, false);
         }
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
+
+            if (Player* player = caster->ToPlayer())
+                player->RemoveSpell(SPELL_WARBREAKER_DAMAGE);
+        }
+
+        void Register() override
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_item_warbreaker_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+            OnEffectRemove += AuraEffectRemoveFn(spell_item_warbreaker_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_item_warbreaker_AuraScript();
+    }
 };
 
 class spell_item_warbreaker_damage : public SpellScriptLoader
