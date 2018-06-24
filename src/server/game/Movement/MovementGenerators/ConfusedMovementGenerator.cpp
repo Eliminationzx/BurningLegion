@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 #include "Creature.h"
 #include "ConfusedMovementGenerator.h"
 #include "PathGenerator.h"
@@ -31,71 +30,74 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
     unit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
     unit->GetPosition(i_x, i_y, i_z);
 
-    if (!unit->IsAlive() || unit->IsStopped())
-        return;
-
-    unit->StopMoving();
-    unit->AddUnitState(UNIT_STATE_CONFUSED_MOVE);
+    if (!unit->IsStopped())
+        unit->StopMoving();
 }
 
 template<class T>
 void ConfusedMovementGenerator<T>::DoReset(T* unit)
 {
+    unit->AddUnitState(UNIT_STATE_CONFUSED);
     i_nextMoveTime.Reset(0);
 
-    if (!unit->IsAlive() || unit->IsStopped())
-        return;
-
-    unit->StopMoving();
-    unit->AddUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_CONFUSED_MOVE);
+    if (!unit->IsStopped())
+        unit->StopMoving();
 }
 
 template<class T>
 bool ConfusedMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
 {
-    if (unit->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED))
+    // Update timer.
+    if (!i_nextMoveTime.Passed())
+        i_nextMoveTime.Update(diff);
+
+    // Check if it's time to move.
+    if (!i_nextMoveTime.Passed())
         return true;
 
-    if (i_nextMoveTime.Passed())
-    {
-        // currently moving, update location
-        unit->AddUnitState(UNIT_STATE_CONFUSED_MOVE);
+    // Only move if there's no reason to stay.
+    if (unit->HasUnitState(UNIT_STATE_NOT_MOVE))
+        return true;
 
-        if (unit->movespline->Finalized())
-            i_nextMoveTime.Reset(urand(800, 1500));
-    }
-    else
-    {
-        // waiting for next move
-        i_nextMoveTime.Update(diff);
-        if (i_nextMoveTime.Passed())
-        {
-            // start moving
-            unit->AddUnitState(UNIT_STATE_CONFUSED_MOVE);
-
-            float dest = 4.0f * (float)rand_norm() - 2.0f;
-
-            Position pos;
-            pos.Relocate(i_x, i_y, i_z);
-            unit->MovePositionToFirstCollision(pos, dest, 0.0f);
-
-            PathGenerator path(unit);
-            path.SetPathLengthLimit(30.0f);
-            bool result = path.CalculatePath(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
-            if (!result || (path.GetPathType() & PATHFIND_NOPATH))
-            {
-                i_nextMoveTime.Reset(100);
-                return true;
-            }
-
-            Movement::MoveSplineInit init(unit);
-            init.MovebyPath(path.GetPath());
-            init.SetWalk(true);
-            init.Launch();
-        }
-    }
+    // Ready to move.
+    _move(unit);
 
     return true;
+}
+
+template<class T>
+void ConfusedMovementGenerator<T>::_move(T* unit)
+{
+    // Get original position (where we started)
+    Position pos;
+    pos.Relocate(i_x, i_y, i_z);
+
+    // Generate vector
+    float dist = float(urand(1, 4));
+    float angle = 2 * float(M_PI) * float(rand_norm());
+
+    // Check how far we can move (collision check).
+    unit->MovePositionToFirstCollision(pos, dist, angle);
+
+    // Generate path
+    PathGenerator path(unit);
+    path.SetPathLengthLimit(10.0f);
+    bool result = path.CalculatePath(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
+    if (!result || (path.GetPathType() & PATHFIND_NOPATH))
+        return; // Return without setting timer, generate another path on next update.
+
+                // Add "currently moving" flag.
+    unit->AddUnitState(UNIT_STATE_CONFUSED_MOVE);
+
+    // Send packet
+    Movement::MoveSplineInit init(unit);
+    init.MovebyPath(path.GetPath());
+    init.SetWalk(true);
+    init.Launch();
+
+    // Next move packet always arrives in 800 ms.
+    // (Blizzard updates movement every 400 ms, so this value could be anything between 400 and 800)
+    i_nextMoveTime.Reset(750);
 }
 
 template<>
@@ -121,3 +123,5 @@ template void ConfusedMovementGenerator<Player>::DoReset(Player*);
 template void ConfusedMovementGenerator<Creature>::DoReset(Creature*);
 template bool ConfusedMovementGenerator<Player>::DoUpdate(Player*, uint32 diff);
 template bool ConfusedMovementGenerator<Creature>::DoUpdate(Creature*, uint32 diff);
+template void ConfusedMovementGenerator<Player>::_move(Player*);
+template void ConfusedMovementGenerator<Creature>::_move(Creature*);

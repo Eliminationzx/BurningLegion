@@ -761,6 +761,9 @@ void Aura::Update(uint32 diff, Unit* caster)
                         {
                             if (powertype == POWER_HEALTH)
                             {
+                                if (caster == GetOwner())
+                                    return;
+
                                 if (int32(caster->GetHealth()) > manaPerSecond)
                                     caster->ModifyHealth(-manaPerSecond);
                                 else
@@ -1557,6 +1560,8 @@ bool Aura::CanStackWith(Aura const* existingAura) const
     if (m_spellInfo->HasAura(GetOwner()->GetMap()->GetDifficultyID(), SPELL_AURA_TRACK_RESOURCES) && existingSpellInfo->HasAura(GetOwner()->GetMap()->GetDifficultyID(), SPELL_AURA_TRACK_RESOURCES))
         return sWorld->getBoolConfig(CONFIG_ALLOW_TRACK_BOTH_RESOURCES);
 
+    Unit* owner = GetOwner()->ToUnit();
+
     // check spell specific stack rules
     if (m_spellInfo->IsAuraExclusiveBySpecificWith(existingSpellInfo)
         || (sameCaster && m_spellInfo->IsAuraExclusiveBySpecificPerCasterWith(existingSpellInfo)))
@@ -1626,8 +1631,8 @@ bool Aura::CanStackWith(Aura const* existingAura) const
     if (HasEffectType(SPELL_AURA_CONTROL_VEHICLE) && existingAura->HasEffectType(SPELL_AURA_CONTROL_VEHICLE))
     {
         Vehicle* veh = NULL;
-        if (GetOwner()->ToUnit())
-            veh = GetOwner()->ToUnit()->GetVehicleKit();
+        if (owner)
+            veh = owner->GetVehicleKit();
 
         if (!veh)           // We should probably just let it stack. Vehicle system will prevent undefined behaviour later
             return true;

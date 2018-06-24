@@ -508,8 +508,8 @@ public:
 
         void EnterCombat(Unit*) override
         {
-		    Talk(SAY_ONCOMBAT_BELIASH);
-			
+            Talk(SAY_ONCOMBAT_BELIASH);
+            
             me->GetScheduler().Schedule(Milliseconds(2500), [this](TaskContext context)
             {
                 me->CastSpell(me, SPELL_SHADOW_BOLT_VOLLEY, true);
@@ -531,8 +531,8 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-		  Talk(SAY_ONDEATH);
-		  
+          Talk(SAY_ONDEATH);
+          
             std::list<Player*> players;
             me->GetPlayerListInGrid(players, 50.0f);
 
@@ -684,7 +684,7 @@ public:
                 GetContextGameObject()->UseDoorOrButton(10000);
             });
 
-            personnalCavernStone->GetScheduler().Schedule(Seconds(4), [](TaskContext context)
+            personnalCavernStone->GetScheduler().Schedule(Seconds(4), [](TaskContext /*context*/)
             {
                 //GetContextGameObject()->Delete();
             });

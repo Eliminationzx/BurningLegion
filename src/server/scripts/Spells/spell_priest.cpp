@@ -1483,7 +1483,7 @@ class spell_pri_shadow_word_death : public SpellScript
     {
         if (Unit* target = GetHitUnit())
         {
-            if (target->GetHealth() < GetHitDamage())
+            if (int32(target->GetHealth()) < GetHitDamage())
                 GetCaster()->CastSpell(GetCaster(), SPELL_PRIEST_SHADOW_WORD_DEATH_ENERGIZE_KILL, true);
             else
                 GetCaster()->ModifyPower(POWER_INSANITY, GetSpellInfo()->GetEffect(EFFECT_2)->BasePoints);

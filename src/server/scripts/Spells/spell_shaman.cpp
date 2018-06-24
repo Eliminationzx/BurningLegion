@@ -243,6 +243,8 @@ public:
         {
             if (!sSpellMgr->GetSpellInfo(SPELL_SHAMAN_FERAL_LUNGE_DAMAGE))
                 return false;
+             if (!sSpellMgr->GetSpellInfo(SPELL_SHAMAN_GHOST_WOLF))
+                return false;
             return true;
         }
 
@@ -252,6 +254,9 @@ public:
             Unit* target = GetHitUnit();
             if (!caster || !target)
                 return;
+
+            if (!caster->HasAura(SPELL_SHAMAN_GHOST_WOLF))
+                caster->CastSpell(caster, SPELL_SHAMAN_GHOST_WOLF, true);
 
             caster->CastSpell(target, SPELL_SHAMAN_FERAL_LUNGE_DAMAGE, true);
         }

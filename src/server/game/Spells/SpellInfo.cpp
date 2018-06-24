@@ -1271,23 +1271,6 @@ bool SpellInfo::HasOnlyDamageEffects() const
     return true;
 }
 
-bool SpellInfo::HasTarget(uint32 target) const
-{
-    for (SpellEffectInfoMap::const_iterator itr = _effects.begin(); itr != _effects.end(); ++itr)
-    {
-        for (SpellEffectInfo const* effect : itr->second)
-        {
-            if (!effect)
-                continue;
-
-            if (effect->TargetA.GetTarget() == target || effect->TargetB.GetTarget() == target)
-                return true;
-        }
-    }
-
-    return false;
-}
-
 bool SpellInfo::CasterCanTurnDuringCast() const
 {
     if (HasAttribute(SPELL_ATTR5_DONT_TURN_DURING_CAST))
@@ -1297,12 +1280,25 @@ bool SpellInfo::CasterCanTurnDuringCast() const
         return false;
 
     // Todo : Find more generic way ?
-    if (HasTarget(TARGET_UNIT_CONE_ENEMY_54) ||
-        HasTarget(TARGET_UNIT_CONE_ENEMY_104) ||
-        HasTarget(TARGET_UNIT_CASTER_AREA_ENEMY_FRONT))
+    if (HasTargetType(TARGET_UNIT_CONE_ENEMY_54) ||
+        HasTargetType(TARGET_UNIT_CONE_ENEMY_104) ||
+        HasTargetType(TARGET_UNIT_CASTER_AREA_ENEMY_FRONT))
         return false;
 
     return true;
+}
+
+bool SpellInfo::HasTargetType(uint32 target) const
+{
+    for (SpellEffectInfoMap::const_iterator itr = _effects.begin(); itr != _effects.end(); ++itr)
+    {
+        for (SpellEffectInfo const* effect : itr->second)
+        {
+            if (effect && (effect->TargetA.GetTarget() == target || effect->TargetB.GetTarget() == target))
+                return true;
+        }
+    }
+    return false;
 }
 
 bool SpellInfo::HasAnyAuraInterruptFlag() const
@@ -2229,24 +2225,25 @@ SpellCastResult SpellInfo::CheckVehicle(Unit const* caster) const
         if (!checkMask)
             checkMask = VEHICLE_SEAT_FLAG_CAN_ATTACK;
 
-        if (VehicleSeatEntry const* vehicleSeat = vehicle->GetSeatForPassenger(caster))
+        VehicleSeatEntry const* vehicleSeat = vehicle->GetSeatForPassenger(caster);
+        if (!vehicleSeat)
+            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+        
+        if (!HasAttribute(SPELL_ATTR6_CASTABLE_WHILE_ON_VEHICLE) && !HasAttribute(SPELL_ATTR0_CASTABLE_WHILE_MOUNTED)
+            && (vehicleSeat->Flags & checkMask) != checkMask)
+            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+
+        // Can only summon uncontrolled minions/guardians when on controlled vehicle
+        if (vehicleSeat->Flags & (VEHICLE_SEAT_FLAG_CAN_CONTROL | VEHICLE_SEAT_FLAG_UNK2))
         {
-            if (!HasAttribute(SPELL_ATTR6_CASTABLE_WHILE_ON_VEHICLE) && !HasAttribute(SPELL_ATTR0_CASTABLE_WHILE_MOUNTED)
-                && (vehicleSeat->Flags & checkMask) != checkMask)
-                return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
-
-            // Can only summon uncontrolled minions/guardians when on controlled vehicle
-            if (vehicleSeat->Flags & (VEHICLE_SEAT_FLAG_CAN_CONTROL | VEHICLE_SEAT_FLAG_UNK2))
+            for (SpellEffectInfo const* effect : GetEffectsForDifficulty(caster->GetMap()->GetDifficultyID()))
             {
-                for (SpellEffectInfo const* effect : GetEffectsForDifficulty(caster->GetMap()->GetDifficultyID()))
-                {
-                    if (!effect || effect->Effect != SPELL_EFFECT_SUMMON)
-                        continue;
+                if (!effect || effect->Effect != SPELL_EFFECT_SUMMON)
+                    continue;
 
-                    SummonPropertiesEntry const* props = sSummonPropertiesStore.LookupEntry(effect->MiscValueB);
-                    if (props && props->Control != SUMMON_CATEGORY_WILD)
-                        return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
-                }
+                SummonPropertiesEntry const* props = sSummonPropertiesStore.LookupEntry(effect->MiscValueB);
+                if (props && props->Control != SUMMON_CATEGORY_WILD)
+                    return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
             }
         }
     }
