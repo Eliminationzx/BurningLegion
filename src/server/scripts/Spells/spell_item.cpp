@@ -4656,7 +4656,11 @@ public:
             if (!caster)
                 return;
 
-            if (Player* player = caster->ToPlayer())
+            Player* player = caster->ToPlayer();
+            if (!player)
+                return;
+
+            if (!player->HasSpell(SPELL_WARBREAKER_DAMAGE))
                 player->LearnSpell(SPELL_WARBREAKER_DAMAGE, false);
         }
 
@@ -4666,7 +4670,11 @@ public:
             if (!caster)
                 return;
 
-            if (Player* player = caster->ToPlayer())
+            Player* player = caster->ToPlayer();
+            if (!player)
+                return;
+
+            if (player->HasSpell(SPELL_WARBREAKER_DAMAGE))
                 player->RemoveSpell(SPELL_WARBREAKER_DAMAGE);
         }
 
