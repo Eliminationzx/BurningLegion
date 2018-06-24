@@ -371,13 +371,10 @@ class npc_eye_of_acherus : public CreatureScript
             npc_eye_of_acherusAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetDisplayId(me->GetCreatureTemplate()->Modelid1);
-                if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
-                {
-                    me->GetCharmInfo()->InitPossessCreateSpells();
-                    owner->SendAutoRepeatCancel(me);
-                }
-
+                me->CastSpell(me, SPELL_EYE_VISUAL, true);
                 me->SetReactState(REACT_PASSIVE);
+                me->SetDisableGravity(true);
+                me->SetControlled(true, UNIT_STATE_ROOT);
 
                 me->GetMotionMaster()->MovePoint(POINT_EYE_FALL, EyeOFAcherusFallPoint, false);
 
@@ -385,6 +382,8 @@ class npc_eye_of_acherus : public CreatureScript
                 init.MoveTo(EyeOFAcherusFallPoint.GetPositionX(), EyeOFAcherusFallPoint.GetPositionY(), EyeOFAcherusFallPoint.GetPositionZ(), false);
                 init.SetFall();
                 init.Launch();
+
+                _events.ScheduleEvent(EVENT_MOVE_START, 7000);
             }
 
             void OnCharmed(bool /*apply*/) override { }
@@ -399,8 +398,7 @@ class npc_eye_of_acherus : public CreatureScript
                     {
                         case EVENT_MOVE_START:
                         {
-                            DoCast(me, SPELL_EYE_FLIGHT_BOOST);
-
+                            me->CastSpell(me, SPELL_EYE_FLIGHT_BOOST);
                             me->SetControlled(false, UNIT_STATE_ROOT);
                             if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
                             {
@@ -421,7 +419,6 @@ class npc_eye_of_acherus : public CreatureScript
             {
                 if (movementType == WAYPOINT_MOTION_TYPE && pointId == POINT_EYE_MOVE_END - 1)
                 {
-                    me->SetSheath(SHEATH_STATE_MELEE);
                     me->RemoveAllAuras();
 
                     if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
@@ -432,15 +429,8 @@ class npc_eye_of_acherus : public CreatureScript
 
                         Talk(TALK_CONTROL, owner);
                     }
-                    me->SetDisableGravity(false);
-                    DoCast(me, SPELL_EYE_FLIGHT);
-                }
-
-                if (movementType == POINT_MOTION_TYPE && pointId == POINT_EYE_FALL)
-                {
-                    me->SetDisableGravity(true);
-                    me->SetControlled(true, UNIT_STATE_ROOT);
-                    _events.ScheduleEvent(EVENT_MOVE_START, 5000);
+                    me->SetDisableGravity(false);               
+                    me->CastSpell(me, SPELL_EYE_FLIGHT);
                 }
             }
 
