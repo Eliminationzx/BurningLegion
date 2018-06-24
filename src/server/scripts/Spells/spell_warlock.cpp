@@ -771,7 +771,7 @@ class spell_warl_health_funnel : public AuraScript
         return ValidateSpellInfo({ SPELL_WARLOCK_HEALTH_FUNNEL_HEAL });
     }
 
-    void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    void HandlePeriodic(AuraEffect const* aurEff)
     {
         Unit* target = GetUnitOwner();
         Unit* caster = GetCaster();
@@ -779,10 +779,12 @@ class spell_warl_health_funnel : public AuraScript
             return;
 
         CustomSpellValues values;
-        int32 damage = caster->CountPctFromMaxHealth(4);
+        int32 damage = caster->CountPctFromMaxHealth(aurEff->GetAmount());
         values.AddSpellMod(SPELLVALUE_BASE_POINT0, damage);
         values.AddSpellMod(SPELLVALUE_BASE_POINT1, damage * 2);
 
+        CleanDamage cleanDamage = CleanDamage(0, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
+        caster->DealDamage(caster, damage, &cleanDamage, NODAMAGE, GetSpellInfo()->GetSchoolMask(), GetSpellInfo(), true);
         caster->CastCustomSpell(SPELL_WARLOCK_HEALTH_FUNNEL_HEAL, values, target, TRIGGERED_FULL_MASK);
     }
 
