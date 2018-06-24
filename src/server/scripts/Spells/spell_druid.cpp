@@ -2422,6 +2422,10 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_REMOVE_CLIENT_CONTROL);
         }
+        
+        void UpdateAI(uint32 /*diff*/) override
+        {
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
