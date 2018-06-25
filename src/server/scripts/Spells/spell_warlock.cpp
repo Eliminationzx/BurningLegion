@@ -218,7 +218,9 @@ enum eGatewaySpells
 {
     PortalVisual = 113900,
     GatewayInteract = 113902,
-    CooldownMarker = 113942
+    CooldownMarker = 113942,
+    TeleportVisualGreen = 236762,
+    TeleportVisualPurple = 236671
 };
 
 enum eGatewayNpc
@@ -778,21 +780,20 @@ class spell_warl_health_funnel : public AuraScript
         if (!target || !caster)
             return;
 
-        CustomSpellValues values;
         int32 damage = caster->CountPctFromMaxHealth(aurEff->GetAmount());
+        
+        CustomSpellValues values;
+        values.AddSpellMod(SPELLVALUE_BASE_POINT0, damage);
+        values.AddSpellMod(SPELLVALUE_BASE_POINT1, damage * 2);
 
         // do not kill health donator
-        if (caster->GetHealth() < damage)
+        if (caster->GetHealth() < uint64(damage))
             damage = caster->GetHealth() - 1;
 
         if (!damage)
             return;
 
         caster->ModifyHealth(-damage);
-
-        values.AddSpellMod(SPELLVALUE_BASE_POINT0, damage);
-        values.AddSpellMod(SPELLVALUE_BASE_POINT1, damage * 2);
-
         caster->CastCustomSpell(SPELL_WARLOCK_HEALTH_FUNNEL_HEAL, values, target, TRIGGERED_FULL_MASK);
     }
 
@@ -2342,21 +2343,41 @@ class spell_npc_warl_demonic_gateway_purple : public CreatureScript
 {
 public:
     spell_npc_warl_demonic_gateway_purple() : CreatureScript("spell_npc_warl_demonic_gateway_purple") { }
-
+    enum eNpc
+    {
+        DELAY_TO_INTERACT = 50
+    };
     struct spell_npc_warl_demonic_gateway_purpleAI : public CreatureAI
     {
-        spell_npc_warl_demonic_gateway_purpleAI(Creature* p_Creature) : CreatureAI(p_Creature) 
-        { 
-            me->CastSpell((Unit*)nullptr, eGatewaySpells::PortalVisual, true);
+        spell_npc_warl_demonic_gateway_purpleAI(Creature* p_Creature) : CreatureAI(p_Creature) { Init(); }
 
-            me->SetFlag(UNIT_FIELD_INTERACT_SPELLID, eGatewaySpells::GatewayInteract);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_REMOVE_CLIENT_CONTROL);
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-            me->SetReactState(ReactStates::REACT_PASSIVE);
-        }
+        EventMap m_events;
+        uint32 ready_to_jump;
 
-        void UpdateAI(uint32 /*diff*/) override
+        void UpdateAI(uint32 diff) override
         {
+            m_events.Update(diff);
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case DELAY_TO_INTERACT:
+                {
+                    ready_to_jump = 1;
+                    me->SetFlag(UNIT_FIELD_INTERACT_SPELLID, eGatewaySpells::GatewayInteract);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_REMOVE_CLIENT_CONTROL);
+                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                    me->SetReactState(ReactStates::REACT_PASSIVE);
+                    break;
+                }
+                }
+            }
+        }
+        void Init()
+        {
+            me->CastSpell(me, eGatewaySpells::PortalVisual, true);
+            ready_to_jump = 0;
+            m_events.ScheduleEvent(DELAY_TO_INTERACT, 500);
         }
 
         void OnSpellClick(Unit* p_Clicker, bool& /*result*/) override
@@ -2408,13 +2429,13 @@ public:
                 // Init dest coordinates
                 float x, y, z;
                 itr->GetPosition(x, y, z);
-
                 float speedXY;
                 float speedZ = 5;
 
                 speedXY = p_Clicker->GetExactDist2d(x, y) * 10.0f / speedZ;
-                p_Clicker->AddAura(SPELL_WARLOCK_DEMONIC_GATEWAY_TELEPORT_PURPLE);
+                p_Clicker->CastSpell(p_Clicker, eGatewaySpells::TeleportVisualPurple, true);
                 p_Clicker->GetMotionMaster()->MoveJump(x, y, z, p_Clicker->GetOrientation(), speedXY, speedZ);
+
                 break;
             }
         }
@@ -2431,21 +2452,41 @@ class spell_npc_warl_demonic_gateway_green : public CreatureScript
 {
 public:
     spell_npc_warl_demonic_gateway_green() : CreatureScript("spell_npc_warl_demonic_gateway_green") { }
-
+    enum eNpc
+    {
+        DELAY_TO_INTERACT = 50
+    };
     struct spell_npc_warl_demonic_gateway_greenAI : public CreatureAI
     {
-        spell_npc_warl_demonic_gateway_greenAI(Creature* p_Creature) : CreatureAI(p_Creature) 
-        { 
-            me->CastSpell((Unit*)nullptr, eGatewaySpells::PortalVisual, true);
+        spell_npc_warl_demonic_gateway_greenAI(Creature* p_Creature) : CreatureAI(p_Creature) { Init(); }
 
-            me->SetFlag(UNIT_FIELD_INTERACT_SPELLID, eGatewaySpells::GatewayInteract);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_REMOVE_CLIENT_CONTROL);
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-            me->SetReactState(ReactStates::REACT_PASSIVE);
-        }
+        EventMap m_events;
+        uint32 ready_to_jump;
 
-        void UpdateAI(uint32 /*diff*/) override
+        void UpdateAI(uint32 diff) override
         {
+            m_events.Update(diff);
+            while (uint32 eventId = m_events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case DELAY_TO_INTERACT:
+                {
+                    ready_to_jump = 1;
+                    me->SetFlag(UNIT_FIELD_INTERACT_SPELLID, eGatewaySpells::GatewayInteract);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_REMOVE_CLIENT_CONTROL);
+                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                    me->SetReactState(ReactStates::REACT_PASSIVE);
+                    break;
+                }
+                }
+            }
+        }
+        void Init()
+        {
+            me->CastSpell(me, eGatewaySpells::PortalVisual, true);
+            ready_to_jump = 0;
+            m_events.ScheduleEvent(DELAY_TO_INTERACT, 500);
         }
 
         void OnSpellClick(Unit* p_Clicker, bool& /*result*/) override
@@ -2496,13 +2537,13 @@ public:
                 // Init dest coordinates
                 float x, y, z;
                 itr->GetPosition(x, y, z);
-
                 float speedXY;
                 float speedZ = 5;
 
                 speedXY = p_Clicker->GetExactDist2d(x, y) * 10.0f / speedZ;
-                p_Clicker->AddAura(SPELL_WARLOCK_DEMONIC_GATEWAY_TELEPORT_GREEN);
+                p_Clicker->CastSpell(p_Clicker, eGatewaySpells::TeleportVisualGreen, true);
                 p_Clicker->GetMotionMaster()->MoveJump(x, y, z, p_Clicker->GetOrientation(), speedXY, speedZ);
+
                 break;
             }
         }
