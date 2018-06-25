@@ -4634,6 +4634,147 @@ class spell_item_brutal_kinship : public SpellScriptLoader
         }
 };
 
+enum WarbreakerSpells
+{
+    SPELL_WARBREAKER_DAMAGE = 209577,
+
+    SPELL_WARRIOR_COLOSSUS_SMASH = 167105
+};
+
+class spell_item_warbreaker : public SpellScriptLoader
+{
+public:
+    spell_item_warbreaker() : SpellScriptLoader("spell_item_warbreaker") { }
+
+    class spell_item_warbreaker_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_item_warbreaker_AuraScript);
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
+
+            Player* player = caster->ToPlayer();
+            if (!player)
+                return;
+
+            if (!player->HasSpell(SPELL_WARBREAKER_DAMAGE))
+                player->LearnSpell(SPELL_WARBREAKER_DAMAGE, false);
+        }
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
+
+            Player* player = caster->ToPlayer();
+            if (!player)
+                return;
+
+            if (player->HasSpell(SPELL_WARBREAKER_DAMAGE))
+                player->RemoveSpell(SPELL_WARBREAKER_DAMAGE);
+        }
+
+        void Register() override
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_item_warbreaker_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+            OnEffectRemove += AuraEffectRemoveFn(spell_item_warbreaker_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_item_warbreaker_AuraScript();
+    }
+};
+
+class spell_item_warbreaker_damage : public SpellScriptLoader
+{
+public:
+    spell_item_warbreaker_damage() : SpellScriptLoader("spell_item_warbreaker_damage") { }
+
+    class spell_item_warbreaker_damage_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_item_warbreaker_damage_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_WARRIOR_COLOSSUS_SMASH });
+        }
+
+        void HandleDamage(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            if (Unit* target = GetHitUnit())
+                caster->CastSpell(target, SPELL_WARRIOR_COLOSSUS_SMASH, true);
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_item_warbreaker_damage_SpellScript::HandleDamage, EFFECT_0, SPELL_EFFECT_WEAPON_PERCENT_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_item_warbreaker_damage_SpellScript();
+    }
+};
+
+enum Titanstrike
+{
+    SPELL_STORMBOUND  = 197388,
+    SPELL_BROKEN_BOND = 211117,
+
+    NPC_ENTRY_HATI    = 100324
+};
+
+class spell_item_titanstrike : public SpellScriptLoader
+{
+public:
+    spell_item_titanstrike() : SpellScriptLoader("spell_item_titanstrike") { }
+
+    class spell_item_titanstrike_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_item_titanstrike_AuraScript);
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
+
+            if (caster->HasAura(SPELL_BROKEN_BOND))
+                return;
+
+            caster->CastSpell(caster, SPELL_STORMBOUND, true);
+        }
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
+
+            caster->UnsummonCreatureByEntry(NPC_ENTRY_HATI);
+        }
+
+        void Register() override
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_item_titanstrike_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+            OnEffectRemove += AuraEffectRemoveFn(spell_item_titanstrike_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_item_titanstrike_AuraScript();
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     // 23074 Arcanite Dragonling
@@ -4750,4 +4891,7 @@ void AddSC_item_spell_scripts()
     new spell_item_world_queller_focus();
     new spell_item_water_strider();
     new spell_item_brutal_kinship();
+    new spell_item_warbreaker();
+    new spell_item_warbreaker_damage();
+    new spell_item_titanstrike();
 }

@@ -2310,6 +2310,37 @@ public:
     }
 };
 
+enum HatiSpells
+{
+    SPELL_BROKEN_BOND = 211117,
+    SPELL_HATIS_BOND  = 197401
+};
+
+class npc_hati : public CreatureScript
+{
+public:
+    npc_hati() : CreatureScript("npc_hati") { }
+
+    struct npc_hatiAI : public ScriptedAI
+    {
+        npc_hatiAI(Creature* creature) : ScriptedAI(creature)
+        {
+            me->CastSpell(me, SPELL_HATIS_BOND, true);
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            if (Unit* owner = me->GetOwner())
+                me->CastSpell(owner, SPELL_BROKEN_BOND, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_hatiAI(creature);
+    }
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -2332,4 +2363,5 @@ void AddSC_npcs_special()
     RegisterCreatureAI(npc_argent_squire_gruntling);
     new npc_creature_damage_limit();
     new npc_regzar();
+    new npc_hati();
 }

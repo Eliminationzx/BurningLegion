@@ -7035,7 +7035,28 @@ float Unit::GetUnitSpellCriticalChance(Unit* victim, Spell* spell, AuraEffect co
         case SPELL_DAMAGE_CLASS_RANGED:
         {
             if (victim)
+            {
+                switch (spellProto->Id)
+                {
+                    case 118000: // Dragon roar always crit
+                        crit_chance = 100.0f;
+                        break;
+                    case 23881: // Bloodthirst & Fresh Meat
+                        if (Aura* aura = GetAura(215568, GetGUID()))
+                        {
+                            int32 critPct = aura->GetEffect(EFFECT_0)->GetAmount();
+                            int32 healthPct = aura->GetEffect(EFFECT_1)->GetAmount();
+
+                            if (victim->GetHealthPct() > healthPct)
+                                AddPct(crit_chance, critPct);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
                 crit_chance += GetUnitCriticalChance(attackType, victim);
+            }
             break;
         }
         default:
