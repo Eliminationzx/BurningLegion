@@ -37,6 +37,7 @@
 #include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
+#include "TemporarySummon.h"
 
 // Generic script for handling item dummy effects which trigger another spell.
 class spell_item_trigger_spell : public SpellScriptLoader
@@ -4724,6 +4725,57 @@ public:
     }
 };
 
+enum Titanstrike
+{
+    SPELL_STORMBOUND  = 197388,
+    SPELL_BROKEN_BOND = 211117,
+
+    NPC_ENTRY_HATI    = 100324
+};
+
+class spell_item_titanstrike : public SpellScriptLoader
+{
+public:
+    spell_item_titanstrike() : SpellScriptLoader("spell_item_titanstrike") { }
+
+    class spell_item_titanstrike_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_item_titanstrike_AuraScript);
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
+
+            if (caster->HasAura(SPELL_BROKEN_BOND))
+                return;
+
+            caster->CastSpell(caster, SPELL_STORMBOUND, true);
+        }
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
+
+            caster->UnsummonCreatureByEntry(NPC_ENTRY_HATI);
+        }
+
+        void Register() override
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_item_titanstrike_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+            OnEffectRemove += AuraEffectRemoveFn(spell_item_titanstrike_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_item_titanstrike_AuraScript();
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     // 23074 Arcanite Dragonling
@@ -4842,4 +4894,5 @@ void AddSC_item_spell_scripts()
     new spell_item_brutal_kinship();
     new spell_item_warbreaker();
     new spell_item_warbreaker_damage();
+    new spell_item_titanstrike();
 }

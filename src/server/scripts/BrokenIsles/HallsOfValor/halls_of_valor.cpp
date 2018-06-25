@@ -57,7 +57,7 @@ struct boss_king_ranulf : public BossAI
             instance->SetBossState(DATA_GODKING_SKOVALD, NOT_STARTED);
     }
 
-    void Reset()
+    void Reset() override
     {
         events.Reset();
 
@@ -95,7 +95,7 @@ struct boss_king_ranulf : public BossAI
         _JustDied();
     }
 
-    void UpdateAI(uint32 diff)
+    void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
             return;
@@ -136,7 +136,7 @@ struct boss_king_haldor : public BossAI
             instance->SetBossState(DATA_KING_HALDOR, NOT_STARTED);
     }
 
-    void Reset()
+    void Reset() override
     {
         events.Reset();
 
@@ -175,7 +175,7 @@ struct boss_king_haldor : public BossAI
         _JustDied();
     }
 
-    void UpdateAI(uint32 diff)
+    void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
             return;
@@ -217,7 +217,7 @@ struct boss_king_bjorn : public BossAI
             instance->SetBossState(DATA_KING_BJORN, NOT_STARTED);
     }
 
-    void Reset()
+    void Reset() override
     {
         events.Reset();
 
@@ -256,7 +256,7 @@ struct boss_king_bjorn : public BossAI
         _JustDied();
     }
 
-    void UpdateAI(uint32 diff)
+    void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
             return;
@@ -298,7 +298,7 @@ struct boss_king_tor : public BossAI
 
     ObjectGuid targetGuid;
 
-    void Reset()
+    void Reset() override
     {
         events.Reset();
 
@@ -337,7 +337,7 @@ struct boss_king_tor : public BossAI
         _JustDied();
     }
 
-    void UpdateAI(uint32 diff)
+    void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
             return;

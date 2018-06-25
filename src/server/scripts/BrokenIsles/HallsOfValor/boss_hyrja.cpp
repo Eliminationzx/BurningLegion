@@ -134,7 +134,7 @@ struct boss_hyrja : public BossAI
             instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
     }
 
-    void DoAction(int32 action)
+    void DoAction(int32 action) override
     {
         if (action == ACTION_CAN_JOIN_COMBAT)
             CanJoinCombat();
