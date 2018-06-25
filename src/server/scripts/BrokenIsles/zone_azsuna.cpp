@@ -20,6 +20,12 @@
 #include "ScriptedCreature.h"
 #include "Player.h"
 #include "ObjectMgr.h"
+#include "MotionMaster.h"
+#include "MovementTypedefs.h"
+#include "ObjectAccessor.h"
+#include "PhasingHandler.h"
+#include "Position.h"
+#include "QuestDef.h"
 
 class scene_azsuna_runes : public SceneScript
 {
@@ -88,7 +94,92 @@ public:
 };
 
 
+enum Phases
+{
+    PHASE_RUNAS = 51
+};
+
+enum Quests
+{
+    QUEST_HUNGERS_END = 42756,
+    QUEST_DEATHOFTHE_ELDEST = 37853
+};
+
+enum Area
+{
+    AREA_RUNAS = 7340
+};
+
+enum Killcredit
+{
+    KILL_CREDIT = 179915
+};
+
+enum Itemquests
+{
+    ITEM_FOR_QUEST = 122095
+};
+//quest 42756
+class area_runes_tickt: public PlayerScript
+{
+public:
+    area_runes_tickt() : PlayerScript("area_runes_tickt") {}
+    
+void OnUpdateArea(Player* player, uint32 newAreaId, uint32 /*oldAreaID*/) override
+{
+    if (newAreaId == AREA_RUNAS)
+    {
+                       
+        if (player->GetQuestStatus(QUEST_HUNGERS_END) == QUEST_STATUS_INCOMPLETE)
+        {
+            PhasingHandler::AddPhase(player, PHASE_RUNAS, true);
+        }
+        else
+        {
+          player->GetQuestStatus(QUEST_HUNGERS_END) == QUEST_STATUS_COMPLETE;    
+          PhasingHandler::RemovePhase(player, PHASE_RUNAS, true);
+        }          
+
+    }
+}
+
+};
+
+// quest 37853
+class npc_killcredit : public CreatureScript
+{
+public:
+    npc_killcredit() : CreatureScript("npc_killcredit") { }
+
+    struct npc_killcreditAI : public ScriptedAI
+    {
+        npc_killcreditAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (Player* player = who->ToPlayer())
+            {
+                if (player->GetQuestStatus(QUEST_DEATHOFTHE_ELDEST) == QUEST_STATUS_INCOMPLETE)
+                {    
+                   if (player->HasItemCount(ITEM_FOR_QUEST, 6) && player->CastSpell(player, KILL_CREDIT, true))
+                   {
+                     player->IsInDist(me, 4.0f);
+                     player->KilledMonsterCredit(me->GetEntry());
+                   }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_killcreditAI(creature);
+    }
+};
+
 void AddSC_azsuna()
 {
     new scene_azsuna_runes();
+    new area_runes_tickt();
+    new npc_killcredit();
 }
