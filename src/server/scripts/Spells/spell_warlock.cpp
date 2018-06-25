@@ -780,8 +780,6 @@ class spell_warl_health_funnel : public AuraScript
 
         CustomSpellValues values;
         int32 damage = caster->CountPctFromMaxHealth(aurEff->GetAmount());
-        values.AddSpellMod(SPELLVALUE_BASE_POINT0, damage);
-        values.AddSpellMod(SPELLVALUE_BASE_POINT1, damage * 2);
 
         // do not kill health donator
         if (caster->GetHealth() < damage)
@@ -791,6 +789,10 @@ class spell_warl_health_funnel : public AuraScript
             return;
 
         caster->ModifyHealth(-damage);
+
+        values.AddSpellMod(SPELLVALUE_BASE_POINT0, damage);
+        values.AddSpellMod(SPELLVALUE_BASE_POINT1, damage * 2);
+
         caster->CastCustomSpell(SPELL_WARLOCK_HEALTH_FUNNEL_HEAL, values, target, TRIGGERED_FULL_MASK);
     }
 
