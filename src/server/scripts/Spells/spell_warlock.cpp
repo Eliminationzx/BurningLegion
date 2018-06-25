@@ -783,8 +783,14 @@ class spell_warl_health_funnel : public AuraScript
         values.AddSpellMod(SPELLVALUE_BASE_POINT0, damage);
         values.AddSpellMod(SPELLVALUE_BASE_POINT1, damage * 2);
 
-        CleanDamage cleanDamage = CleanDamage(0, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
-        caster->DealDamage(caster, damage, &cleanDamage, NODAMAGE, GetSpellInfo()->GetSchoolMask(), GetSpellInfo(), true);
+        // do not kill health donator
+        if (caster->GetHealth() < damage)
+            damage = caster->GetHealth() - 1;
+
+        if (!damage)
+            return;
+
+        caster->ModifyHealth(-damage);
         caster->CastCustomSpell(SPELL_WARLOCK_HEALTH_FUNNEL_HEAL, values, target, TRIGGERED_FULL_MASK);
     }
 
