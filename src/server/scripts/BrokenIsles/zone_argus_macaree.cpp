@@ -67,9 +67,10 @@ public:
     bool OnGossipHello(Player* player, GameObject* /*go*/) override
     {
         if (player->GetQuestStatus(QUEST_VINDICAAR_CORE) == QUEST_STATUS_INCOMPLETE)
+        {
             player->LearnSpell(LEARN_SPELL_CORE, true);
             player->KilledMonsterCredit(QUEST_CORE_KILL_CREDIT);
-
+        }
         return true;
     }
 };
