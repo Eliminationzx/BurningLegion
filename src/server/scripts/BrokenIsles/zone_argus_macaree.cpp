@@ -51,6 +51,13 @@ public:
     }
 };
 
+enum Spellqeustandnpc
+{
+    QUEST_VINDICAAR_CORE = 47287,
+    LEARN_SPELL_CORE = 247427,
+    QUEST_CORE_KILL_CREDIT = 122098
+};
+
 // quest 47287
 class go_matrix_core : public GameObjectScript
 {
@@ -59,9 +66,9 @@ public:
 
     bool OnGossipHello(Player* player, GameObject* /*go*/) override
     {
-        if (player->GetQuestStatus(47287) == QUEST_STATUS_INCOMPLETE)
-            player->LearnSpell(247427, true);
-            player->KilledMonsterCredit(122098);
+        if (player->GetQuestStatus(QUEST_VINDICAAR_CORE) == QUEST_STATUS_INCOMPLETE)
+            player->LearnSpell(LEARN_SPELL_CORE, true);
+            player->KilledMonsterCredit(QUEST_CORE_KILL_CREDIT);
 
         return true;
     }
