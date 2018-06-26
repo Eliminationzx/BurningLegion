@@ -49,6 +49,7 @@ enum eZoneGilneas
     NPC_RAMPAGING_WORGEN_34884                   = 34884,
     NPC_PRINCE_LIAM                              = 34913,
     NPC_FRIGHTENED_CITIZEN_34981                 = 34981,
+    NPC_GRAYMANE_HORSE_35905                     = 35905,
     NPC_KING_GREYMANE_35112                      = 35112,
     NPC_BLOODFANG_WORGEN_35118                   = 35118,
     NPC_WORGEN_ALPHA_C2                          = 35167,
@@ -72,7 +73,6 @@ enum eZoneGilneas
     NPC_KRENNAN_ARANAS_TREE                      = 35753,
     NPC_GILNEAS_EVACUATION_FACING_MARKER_35830   = 35830,
     NPC_FRIGHTENED_CITIZEN_WORGEN                = 35836,
-    NPC_GRAYMANE_HORSE_35905                     = 35905,
     NPC_KRENNAN_ARANAS                           = 35907,
     NPC_KING_GREYMANE                            = 35911,
     NPC_COMMANDEERED_CANNON                      = 35914,
@@ -3096,171 +3096,6 @@ public:
     }
 };
 
-// 35905
-class npc_king_greymanes_horse_35905 : public CreatureScript
-{
-public:
-    npc_king_greymanes_horse_35905() : CreatureScript("npc_king_greymanes_horse_35905") { }
-
-    enum eHorse
-    {
-        SAY_KRENNAN_TREE_HELP = 0,
-        SAY_HORSE_HOW_DO_HELP = 1,
-        SAY_KRENNAN_HORSE_THANKS = 2,
-        EVENT_SAY_KRENNAN_HELP = 101,   // krennan 35753 in tree
-        EVENT_STARTING_RESCUE_PART2,
-        EVENT_SAY_KRENNAN_THANKS,
-    };
-
-    struct npc_king_greymanes_horse_35905AI : public npc_escortAI
-    {
-        npc_king_greymanes_horse_35905AI(Creature* creature) : npc_escortAI(creature) {}
-
-        EventMap m_events;
-        ObjectGuid m_playerGUID;
-        ObjectGuid m_krennanHorseGUID;
-        ObjectGuid m_krennanTreeGUID;
-
-        void AttackStart(Unit* /*who*/) override {}
-        void EnterCombat(Unit* /*who*/) override {}
-        void OnCharmed(bool /*apply*/) override { }
-        void EnterEvadeMode(EvadeReason /*reason*/) override {}
-
-        void Reset() override
-        {
-            m_events.Reset();
-            m_playerGUID = ObjectGuid::Empty;
-            m_krennanHorseGUID = ObjectGuid::Empty;
-            m_krennanTreeGUID = ObjectGuid::Empty;
-            me->GetMotionMaster()->MoveIdle();
-            m_events.ScheduleEvent(EVENT_SAY_KRENNAN_HELP, 500);
-        }
-
-        void PassengerBoarded(Unit* who, int8 seatId, bool apply) override
-        {
-            if (apply)
-            {
-                if (Player* player = who->ToPlayer())
-                {
-                    if (!m_playerGUID)
-                    {
-                        m_playerGUID = player->GetGUID();
-                        Start(false, true, m_playerGUID);
-                        player->SetClientControl(me, false);
-                    }
-                }
-                else if (who->GetEntry() == NPC_KRENNAN_ARANAS && !m_krennanHorseGUID)
-                {
-                    m_krennanHorseGUID = who->GetGUID();
-                    if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
-                        player->RemoveAura(SPELL_GENERIC_QUEST_INVISIBILITY_DETECTION_1);
-                    m_events.ScheduleEvent(EVENT_STARTING_RESCUE_PART2, 400);
-                }
-            }
-            else if (seatId == 1)
-            {
-                m_events.ScheduleEvent(EVENT_SAY_KRENNAN_THANKS, 25);
-            }
-        }
-
-        void WaypointReached(uint32 point) override
-        {
-            switch (point)
-            {
-                case 5:
-                {
-                    if (me->GetVehicleKit()->HasEmptySeat(1))
-                    {
-                        SetEscortPaused(true);
-                        me->GetMotionMaster()->MoveJump(-1679.089f, 1348.42f, 15.31f, 0.0f, 25.0f, 15.0f);
-                        if (Player* player = GetPlayerForEscort())
-                        {
-                            Talk(SAY_HORSE_HOW_DO_HELP, player);
-                            player->SetClientControl(me, true);
-                        }
-                    }
-                    break;
-                }
-                case 6:
-                {
-                    if (Player* player = GetPlayerForEscort())
-                        player->SetClientControl(me, false);
-                    break;
-                }
-                case 12:
-                {
-                    if (Player* player = GetPlayerForEscort())
-                        player->ExitVehicle();
-                    break;
-                }
-            }
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (Player* player = GetPlayerForEscort())
-            {
-                player->FailQuest(QUEST_SAVE_KRENNAN_ARANAS);
-                player->RemoveAura(SPELL_GENERIC_QUEST_INVISIBILITY_DETECTION_1);
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            npc_escortAI::UpdateAI(diff);
-
-            m_events.Update(diff);
-
-            while (uint32 eventId = m_events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                case EVENT_SAY_KRENNAN_HELP:
-                {
-                    if (!m_krennanTreeGUID)
-                        if (Creature* krennan = me->FindNearestCreature(NPC_KRENNAN_ARANAS_TREE, 100.0f, true))
-                            m_krennanTreeGUID = krennan->GetGUID();
-
-                    if (!m_krennanHorseGUID)
-                    {
-                        if (Creature* krennan = ObjectAccessor::GetCreature(*me, m_krennanTreeGUID))
-                            if (Player* player = ObjectAccessor::GetPlayer(*me, m_playerGUID))
-                            {
-                                krennan->AI()->Talk(SAY_KRENNAN_TREE_HELP, player);
-                                m_events.ScheduleEvent(EVENT_SAY_KRENNAN_HELP, urand(6000, 9000));
-                                break;
-                            }
-                        m_events.ScheduleEvent(EVENT_SAY_KRENNAN_HELP, 500);
-                    }
-                    break;
-                }
-                case EVENT_STARTING_RESCUE_PART2:
-                {
-                    SetEscortPaused(false);
-                    break;
-                }
-                case EVENT_SAY_KRENNAN_THANKS:
-                {
-                    if (Creature* krennan = ObjectAccessor::GetCreature(*me, m_krennanHorseGUID))
-                    {
-                        krennan->AI()->Talk(0);
-                        krennan->NearTeleportTo(-1771.03f, 1433.41f, 19.85f, 3.598f);
-                        krennan->GetAI()->DoAction(0);
-                    }
-                    me->DespawnOrUnsummon(25);
-                    break;
-                }
-                }
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_king_greymanes_horse_35905AI(creature);
-    }
-};
-
 // 35907
 class npc_krennan_aranas_35907 : public CreatureScript
 {
@@ -4515,7 +4350,6 @@ void AddSC_zone_gilneas_city1()
     new npc_lord_godfrey_35906();
     new npc_gilnean_city_guard_35504();
     new npc_king_genn_greymane_35550();
-    new npc_king_greymanes_horse_35905();
     new npc_krennan_aranas_35907();
     new npc_commandeered_cannon_35914();
     new npc_bloodfang_stalker_35229();
