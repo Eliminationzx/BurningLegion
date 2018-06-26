@@ -51,7 +51,24 @@ public:
     }
 };
 
+// quest 47287
+class go_matrix_core : public GameObjectScript
+{
+public:
+    go_matrix_core() : GameObjectScript("go_matrix_core") { }
+
+    bool OnGossipHello(Player* player, GameObject* /*go*/) override
+    {
+        if (player->GetQuestStatus(47287) == QUEST_STATUS_INCOMPLETE)
+            player->LearnSpell(247427, true);
+            player->KilledMonsterCredit(122098);
+
+        return true;
+    }
+};
+
 void AddSC_zone_argus_macaree()
 {
     new zone_argus_macaree();
+    new go_matrix_core();
 }
