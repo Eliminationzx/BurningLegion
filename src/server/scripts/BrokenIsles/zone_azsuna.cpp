@@ -20,11 +20,7 @@
 #include "ScriptedCreature.h"
 #include "Player.h"
 #include "ObjectMgr.h"
-#include "MotionMaster.h"
-#include "MovementTypedefs.h"
-#include "ObjectAccessor.h"
 #include "PhasingHandler.h"
-#include "Position.h"
 #include "QuestDef.h"
 
 class scene_azsuna_runes : public SceneScript
@@ -128,32 +124,25 @@ public:
 void OnUpdateArea(Player* player, uint32 newAreaId, uint32 /*oldAreaID*/) override
 {
     if (newAreaId == AREA_RUNAS)
-    {
-                       
+    {                     
         if (player->GetQuestStatus(QUEST_HUNGERS_END) == QUEST_STATUS_INCOMPLETE)
-        {
             PhasingHandler::AddPhase(player, PHASE_RUNAS, true);
-        }
-        else
-        {
-          player->GetQuestStatus(QUEST_HUNGERS_END) == QUEST_STATUS_COMPLETE;    
+        else if (player->GetQuestStatus(QUEST_HUNGERS_END) == QUEST_STATUS_COMPLETE)
           PhasingHandler::RemovePhase(player, PHASE_RUNAS, true);
-        }          
-
     }
 }
 
 };
 
 // quest 37853
-class npc_killcredit : public CreatureScript
+class npc_killcredit_37853 : public CreatureScript
 {
 public:
-    npc_killcredit() : CreatureScript("npc_killcredit") { }
+    npc_killcredit_37853() : CreatureScript("npc_killcredit_37853") { }
 
-    struct npc_killcreditAI : public ScriptedAI
+    struct npc_killcredit_37853AI : public ScriptedAI
     {
-        npc_killcreditAI(Creature* creature) : ScriptedAI(creature) { }
+        npc_killcredit_37853AI(Creature* creature) : ScriptedAI(creature) { }
 
         void MoveInLineOfSight(Unit* who) override
         {
@@ -163,8 +152,8 @@ public:
                 {    
                    if (player->HasItemCount(ITEM_FOR_QUEST, 6) && player->CastSpell(player, KILL_CREDIT, true))
                    {
-                     player->IsInDist(me, 4.0f);
-                     player->KilledMonsterCredit(me->GetEntry());
+                       player->IsInDist(me, 4.0f);
+                       player->KilledMonsterCredit(me->GetEntry());
                    }
                 }
             }
@@ -173,7 +162,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_killcreditAI(creature);
+        return new npc_killcredit_37853AI(creature);
     }
 };
 
@@ -181,5 +170,5 @@ void AddSC_azsuna()
 {
     new scene_azsuna_runes();
     new area_runes_tickt();
-    new npc_killcredit();
+    new npc_killcredit_37853();
 }
