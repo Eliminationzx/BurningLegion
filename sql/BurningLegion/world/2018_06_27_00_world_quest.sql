@@ -41,3 +41,11 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES ('8888813', '31', '1068.48', '6303.83', '118.785', '0');
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES ('8888813', '32', '1068.41', '6291.06', '117.801', '0');
 
+---fix quest 37660
+DELETE FROM quest_objectives WHERE ID = 277154;
+DELETE FROM quest_objectives WHERE ID = 277151;
+DELETE FROM quest_objectives WHERE ID = 277153;
+DELETE FROM quest_objectives WHERE ID = 277157;
+DELETE FROM quest_objectives WHERE ID = 286117;
+UPDATE `creature` SET `spawntimesecs`=30 WHERE (`guid`=20501242);
+
