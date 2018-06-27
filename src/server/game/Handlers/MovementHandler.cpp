@@ -374,7 +374,10 @@ void WorldSession::HandleMovementOpcode(OpcodeClient opcode, MovementInfo& movem
         plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetMap()->IsUnderWater(plrMover->GetPhaseShift(), movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ()));
     }
 
-    int64 movementTime = (int64)movementInfo.time + plrMover != nullptr ? plrMover->GetTimeSyncClockDelta() : 0; // time of the event on the server clock.
+    int64 movementTime = (int64)movementInfo.time; // time of the event on the server clock.
+
+    if (plrMover)
+        movementTime += plrMover->GetTimeSyncClockDelta();
 
     if (movementTime < 0 || movementTime > 0xFFFFFFFF)
     {
