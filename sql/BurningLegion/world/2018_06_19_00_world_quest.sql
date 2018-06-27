@@ -169,8 +169,8 @@ UPDATE `quest_objectives` SET `ID`='278279', `QuestID`='38595', `Type`='0', `Ord
 ---fix quest 38225
 DELETE FROM creature_queststarter WHERE quest IN (38225);
 UPDATE `quest_objectives` SET `ID`='277541', `QuestID`='3822500', `Type`='0', `Order`='0', `StorageIndex`='1', `ObjectID`='91130', `Amount`='1', `Flags`='0', `Flags2`='0', `ProgressBarWeight`='0', `Description`='', `VerifiedBuild`='25996' WHERE (`ID`='277541');
-UPDATE `creature_queststarter` SET `id`='91066', `quest`='3822500' WHERE (`id`='91066') AND (`quest`='3822500');
-UPDATE `creature_questender` SET `id`='91066', `quest`='3822500' WHERE (`id`='91066') AND (`quest`='3822500');
+INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES ('91066', '3822500');
+INSERT INTO `creature_questender` (`id`, `quest`) VALUES ('91066', '3822500');
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `LogTitle`, `LogDescription`, `QuestDescription`, `AreaDescription`, `PortraitGiverText`, `PortraitGiverName`, `PortraitTurnInText`, `PortraitTurnInName`, `QuestCompletionLog`, `VerifiedBuild`) VALUES ('3822500', 'deDE', 'Tod der Hexenmutter!', 'Tötet Magula.', 'Die unzähligen Jahre meines Lebens habe ich dem Erlernen und Perfektionieren der Heil- und Regenerationskünste gewidmet.$b$bNichts in der Welt quält mich mehr, als Leben zu nehmen, $gReisender:Reisende;.$b$bUnd darum verurteile ich nur schweren Herzens Magula, die Anführerin der Harpyien, die diesen Hain bedrohen, zum Tode.$b$bMöge ihr Tod das Leben edlerer Lebewesen retten.', '', '', 'Magula', '', '', '', '25549');
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `LogTitle`, `LogDescription`, `QuestDescription`, `AreaDescription`, `PortraitGiverText`, `PortraitGiverName`, `PortraitTurnInText`, `PortraitTurnInName`, `QuestCompletionLog`, `VerifiedBuild`) VALUES ('3822500', 'itIT', 'Morte alla Strega Madre', 'Uccidi Magula.', 'Gli innumerevoli anni della mia vita sono stati dedicati all\'apprendimento e al perfezionamento delle arti di cura e rigenerazione.$b$bNiente in questo mondo mi arreca più dolore che uccidere qualcuno, viandante.$b$bÈ con grande rammarico che devo chiederti di uccidere Magula, la creatura a capo delle Arpie che minacciano questo boschetto.$b$bPossa la sua morte salvare quella di altri nobili esseri.', '', '', 'Magula', '', '', '', '25549');
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `LogTitle`, `LogDescription`, `QuestDescription`, `AreaDescription`, `PortraitGiverText`, `PortraitGiverName`, `PortraitTurnInText`, `PortraitTurnInName`, `QuestCompletionLog`, `VerifiedBuild`) VALUES ('3822500', 'esES', 'Matar a la bruja madre', 'Mata a Magula.', 'He dedicado innumerables años de mi vida a aprender y perfeccionar las artes de la sanación y la restauración.$B$BNada en este mundo me duele más que arrebatar una vida, $gviajero:viajera;.$B$BMuy a mi pesar, debo ordenar la muerte de Magula, la líder de las arpías que amenazan esta arboleda.$B$BOjalá su muerte salve la vida a seres más nobles.', '', '', 'Magula', '', '', '', '25549');
@@ -192,8 +192,8 @@ INSERT INTO `quest_template` (`ID`, `QuestType`, `QuestLevel`, `MaxScalingLevel`
 
 ---fix quest 38235
 DELETE FROM creature_queststarter WHERE quest IN (38235);
-UPDATE `creature_questender` SET `id`='91066', `quest`='3823500' WHERE (`id`='91066') AND (`quest`='3823500');
-UPDATE `creature_queststarter` SET `id`='91066', `quest`='3823500' WHERE (`id`='91066') AND (`quest`='3823500');
+INSERT INTO `creature_questender` (`id`, `quest`) VALUES ('91066', '3823500');
+INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES ('91066', '3823500');
 INSERT INTO `quest_poi_points` (`QuestID`, `Idx1`, `Idx2`, `X`, `Y`, `VerifiedBuild`) VALUES ('3823500', '4', '0', '2387', '6914', '22908');
 INSERT INTO `quest_poi_points` (`QuestID`, `Idx1`, `Idx2`, `X`, `Y`, `VerifiedBuild`) VALUES ('3823500', '3', '0', '2199', '7194', '22908');
 INSERT INTO `quest_poi_points` (`QuestID`, `Idx1`, `Idx2`, `X`, `Y`, `VerifiedBuild`) VALUES ('3823500', '2', '0', '2171', '7049', '22908');
@@ -248,8 +248,8 @@ DELETE FROM creature_queststarter WHERE quest IN (38381);
 DELETE FROM creature_queststarter WHERE quest IN (39384);
 UPDATE `quest_objectives` SET `ID`='279313', `QuestID`='3938400', `Type`='0', `Order`='1', `StorageIndex`='0', `ObjectID`='95320', `Amount`='1', `Flags`='3', `Flags2`='0', `ProgressBarWeight`='0', `Description`='', `VerifiedBuild`='25996' WHERE (`ID`='279313');
 UPDATE `quest_objectives` SET `ID`='280436', `QuestID`='3938400', `Type`='0', `Order`='0', `StorageIndex`='3', `ObjectID`='99074', `Amount`='1', `Flags`='0', `Flags2`='0', `ProgressBarWeight`='0', `Description`='Enter Moonclaw Cavern', `VerifiedBuild`='25996' WHERE (`ID`='280436');
-UPDATE `creature_questender` SET `id`='91650', `quest`='3938400' WHERE (`id`='91650') AND (`quest`='3938400');
-UPDATE `creature_queststarter` SET `id`='95396', `quest`='3938400' WHERE (`id`='95396') AND (`quest`='3938400');
+INSERT INTO `creature_questender` (`id`, `quest`) VALUES ('91650', '3938400');
+INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES ('95396', '3938400');
 INSERT INTO `quest_poi_points` (`QuestID`, `Idx1`, `Idx2`, `X`, `Y`, `VerifiedBuild`) VALUES ('3938400', '3', '0', '2331', '6146', '22908');
 INSERT INTO `quest_poi_points` (`QuestID`, `Idx1`, `Idx2`, `X`, `Y`, `VerifiedBuild`) VALUES ('3938400', '2', '0', '2481', '6017', '22908');
 INSERT INTO `quest_poi_points` (`QuestID`, `Idx1`, `Idx2`, `X`, `Y`, `VerifiedBuild`) VALUES ('3938400', '1', '0', '2449', '6138', '22908');
