@@ -769,6 +769,13 @@ bool VehicleJoinEvent::Execute(uint64, uint32)
 
     Target->RemovePendingEventsForSeat(Seat->first);
     Target->RemovePendingEventsForPassenger(Passenger);
+    
+    // Passenger might've died in the meantime - abort if this is the case
+    if (!Passenger->IsAlive())
+    {
+        Abort(0);
+        return true;
+    }
 
     Passenger->SetVehicle(Target);
     Seat->second.Passenger.Guid = Passenger->GetGUID();
