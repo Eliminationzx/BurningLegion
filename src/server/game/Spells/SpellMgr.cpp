@@ -2540,6 +2540,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         const_cast<SpellEffectInfo*>(spellInfo->GetEffect(EFFECT_0))->Effect = 0;
     });
+    
+    // fix spell 214482
+    ApplySpellFix({ 214482 }, [](SpellInfo* spellInfo)
+    {
+        const_cast<SpellEffectInfo*>(spellInfo->GetEffect(EFFECT_0))->TargetA = SpellImplicitTargetInfo(TARGET_SRC_CASTER);
+ spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(3); // 20yd
+    });
 
     ApplySpellFix({
         63665, // Charge (Argent Tournament emote on riders)
