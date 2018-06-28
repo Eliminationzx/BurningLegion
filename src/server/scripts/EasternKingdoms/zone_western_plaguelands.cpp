@@ -235,9 +235,123 @@ public:
     };
 };
 
+enum Defoplotpaly
+{
+    ZONE_HOLY  = 7638,
+    NPC_GUARD_PALLY = 92148,
+    SPELL_STUNED  = 195558,
+    EVENT_SELECT_TARGET  = 1,
+    EVENT_TELEPORT = 2,
+    EVENT_VANISH = 3    
+};
+
+/*const uint32 NpcPallyGuardsEntry[] =
+{
+    92148, 92151, 92150
+};*/
+
+class area_tick_pally_oplot : public PlayerScript
+{
+public:
+    area_tick_pally_oplot() : PlayerScript("area_tick_pally_oplot") {}
+
+    void OnUpdateArea(Player* player, uint32 newAreaId, uint32 /*oldAreaID*/) override
+    {
+        if (newAreaId == ZONE_HOLY)
+        {
+            if (player->getClass() == CLASS_PALADIN)
+                return;
+            
+            //int Random = rand32() % (sizeof(NpcPallyGuardsEntry) / sizeof(uint32));
+            
+            player->SummonCreature(NPC_GUARD_PALLY, 2323.780029f, -5352.020020f, 71.398804f, 4.088610f, TEMPSUMMON_TIMED_DESPAWN, 11000);
+        }
+    }
+};
+
+class npc_paladin_def : public CreatureScript
+{
+    public:
+        npc_paladin_def() : CreatureScript("npc_paladin_def") {}
+
+        struct npc_paladin_defAI : public ScriptedAI
+        {
+            npc_paladin_defAI(Creature* creature) : ScriptedAI(creature)
+            {
+                me->setActive(true);
+            }
+
+            void Reset()
+            {
+                me->SetVisible(false);
+                events.ScheduleEvent(EVENT_SELECT_TARGET, IN_MILLISECONDS);
+            }
+
+            Player* SelectTargetInPallyOplot()
+            {
+                std::list<Player*> PlayerInPallyOplotList;
+                PlayerInPallyOplotList.clear();
+
+                Map::PlayerList const &players = me->GetMap()->GetPlayers();
+                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                    if (Player* player = itr->GetSource()->ToPlayer())
+                        if (player->GetAreaId() == ZONE_HOLY)
+                            PlayerInPallyOplotList.push_back(player);
+
+                if (PlayerInPallyOplotList.empty())
+                    return NULL;
+                return Trinity::Containers::SelectRandomContainerElement(PlayerInPallyOplotList);
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                events.Update(diff);
+
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case EVENT_SELECT_TARGET:
+                            me->SetVisible(true);
+                            if (Player* player = SelectTargetInPallyOplot())
+                            {
+                                DoCast(player, SPELL_STUNED);
+                                Talk(0);
+                            }
+                            events.ScheduleEvent(EVENT_TELEPORT, 5*IN_MILLISECONDS);
+                            break;
+                        case EVENT_TELEPORT:
+                        if (Player* player = SelectTargetInPallyOplot())
+                        {
+                            player->TeleportTo(0, 2234.007393f, -5193.990723f, 74.571564f, 1.673643f);
+                        }
+                        events.ScheduleEvent(EVENT_VANISH, 5*IN_MILLISECONDS);
+                        break;
+                        case EVENT_VANISH:
+                            me->DespawnOrUnsummon();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
+        private:
+            EventMap events;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_paladin_defAI(creature);
+    }
+};
+
+
 void AddSC_western_plaguelands()
 {
     new npcs_dithers_and_arbington();
     new npc_the_scourge_cauldron();
     new npc_andorhal_tower();
+    new npc_paladin_def();
+    new area_tick_pally_oplot();
 }
