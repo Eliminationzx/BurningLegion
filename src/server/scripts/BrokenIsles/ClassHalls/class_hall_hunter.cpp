@@ -17,7 +17,35 @@
  */
 
 #include "ScriptMgr.h"
+#include "Player.h"
+#include "Language.h"
+
+enum TrueshotLodgeAreaGuard
+{
+    TRUESHOT_LODGE_AREA_ID = 7877,
+    SPELL_EAGLE_SENTINEL = 208643
+};
+
+class trueshot_lodge_area_guard : public PlayerScript
+{
+public:
+    trueshot_lodge_area_guard() : PlayerScript("trueshot_lodge_area_guard") {}
+
+    void OnUpdateArea(Player* player, uint32 newAreaId, uint32 /*oldAreaID*/) override
+    {
+        if (newAreaId == TRUESHOT_LODGE_AREA_ID)
+        {
+            // Skip action only for hunters
+            if (player->getClass() == CLASS_HUNTER)
+                return;
+
+            player->SendNotification(LANG_BREACHING_TRUESHOT_LODGE, CHAT_MSG_RAID_BOSS_EMOTE);
+            player->CastSpell((Unit*)nullptr, SPELL_EAGLE_SENTINEL);
+        }
+    }
+};
 
 void AddSC_class_hall_hunter()
 {
+    new trueshot_lodge_area_guard();
 }
