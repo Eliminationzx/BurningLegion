@@ -21,5 +21,5 @@ DELETE FROM creature_queststarter WHERE quest IN (44137, 38834);
 INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES ('93326', '4413700');
 INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES ('93337', '4413700');
 
-INSERT INTO `creature_questender` (`id`, `quest`) VALUES ('83362', '4413700');
+INSERT INTO `creature_questender` (`id`, `quest`) VALUES ('103591', '4413700');
 
