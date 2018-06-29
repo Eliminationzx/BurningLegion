@@ -98,7 +98,8 @@ enum Phases
 enum Quests
 {
     QUEST_HUNGERS_END = 42756,
-    QUEST_DEATHOFTHE_ELDEST = 37853
+    QUEST_DEATHOFTHE_ELDEST = 37853,
+    QUEST_APONI_TRAIL = 43490
 };
 
 enum Area
@@ -108,12 +109,15 @@ enum Area
 
 enum Killcredit
 {
-    KILL_CREDIT = 179915
+    KILL_CREDIT = 179915,
+    SPELL_TELE_NISCARA = 220767,
+    KILL_CREDIT_APONI_TELE = 6666664
 };
 
 enum Itemquests
 {
-    ITEM_FOR_QUEST = 122095
+    ITEM_FOR_QUEST = 122095,
+    ITEM_FOR_QUEST_APONI = 139540
 };
 //quest 42756
 class area_runes_tickt: public PlayerScript
@@ -166,9 +170,42 @@ public:
     }
 };
 
+// quest 43490
+class npc_tele_niscara : public CreatureScript
+{
+public:
+    npc_tele_niscara() : CreatureScript("npc_tele_niscara") { }
+
+    struct npc_tele_niscaraAI : public ScriptedAI
+    {
+        npc_tele_niscaraAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (Player* player = who->ToPlayer())
+            {
+                if (player->GetQuestStatus(QUEST_APONI_TRAIL) == QUEST_STATUS_INCOMPLETE)
+                {    
+                   if (player->HasItemCount(ITEM_FOR_QUEST_APONI, 8) && player->CastSpell(player, SPELL_TELE_NISCARA, true))
+                   {
+                       player->IsInDist(me, 2.0f);
+                       player->KilledMonsterCredit(KILL_CREDIT_APONI_TELE);
+                   }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_tele_niscaraAI(creature);
+    }
+};
+
 void AddSC_azsuna()
 {
     new scene_azsuna_runes();
     new area_runes_tickt();
     new npc_killcredit_37853();
+    new npc_tele_niscara();
 }
