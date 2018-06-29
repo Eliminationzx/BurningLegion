@@ -4727,9 +4727,7 @@ public:
 enum Titanstrike
 {
     SPELL_STORMBOUND  = 197388,
-    SPELL_BROKEN_BOND = 211117,
-
-    NPC_ENTRY_HATI    = 100324
+    SPELL_BROKEN_BOND = 211117
 };
 
 class spell_item_titanstrike : public SpellScriptLoader
@@ -4759,7 +4757,7 @@ public:
             if (!caster)
                 return;
 
-            caster->UnsummonCreatureByEntry(NPC_ENTRY_HATI);
+            caster->UnsummonCreatureByEntry(ENTRY_HATI);
         }
 
         void Register() override

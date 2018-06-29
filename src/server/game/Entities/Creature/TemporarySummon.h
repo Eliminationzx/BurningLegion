@@ -74,7 +74,9 @@ enum PetEntries
     ENTRY_NIUZAO                  = 73967,
     ENTRY_CHI_JI                  = 100868,
     // Druid Pet/Minion
-    ENTRY_TREANT                  = 1964
+    ENTRY_TREANT                  = 1964,
+    // Hunter Pet/Minion
+    ENTRY_HATI                    = 100324
 };
 
 class TC_GAME_API TempSummon : public Creature
