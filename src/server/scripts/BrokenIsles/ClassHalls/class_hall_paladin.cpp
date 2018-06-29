@@ -85,7 +85,7 @@ class npc_sanctum_of_light_guard : public CreatureScript
                         case EVENT_CATCH_INTRUDER:
                         {
                             if (!_target)
-                                return;
+                                break;
 
                             // Send message
                             Talk(0);
