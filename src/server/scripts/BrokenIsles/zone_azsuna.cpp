@@ -99,7 +99,8 @@ enum Quests
 {
     QUEST_HUNGERS_END = 42756,
     QUEST_DEATHOFTHE_ELDEST = 37853,
-    QUEST_APONI_TRAIL = 43490
+    QUEST_APONI_TRAIL = 43490,
+    QUEST_YOU_SCRATH_MY_BACK = 37860
 };
 
 enum Area
@@ -111,7 +112,15 @@ enum Killcredit
 {
     KILL_CREDIT = 179915,
     SPELL_TELE_NISCARA = 220767,
-    KILL_CREDIT_APONI_TELE = 6666664
+    KILL_CREDIT_APONI_TELE = 6666664,
+    NPC_PILON_RELEASE_1 = 90263,
+    NPC_PILON_RELEASE_2 = 100383,
+    NPC_PILON_RELEASE_3 = 100384,
+    NPC_PILON_RELEASE_4 = 100385,
+    KILL_CREDIT_PILON_1 = 444443,
+    KILL_CREDIT_PILON_2 = 444444,
+    KILL_CREDIT_PILON_3 = 444445,
+    KILL_CREDIT_PILON_4 = 444446
 };
 
 enum Itemquests
@@ -202,10 +211,64 @@ public:
     }
 };
 
+// quest 37860
+class spell_release_whelplings : public SpellScriptLoader
+{
+    public:
+        spell_release_whelplings() : SpellScriptLoader("spell_release_whelplings") { }
+
+        class spell_release_whelplings_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_release_whelplings_SpellScript);
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+                if (Creature* unitTarget = GetHitCreature())
+                {
+                    if (Player* player = GetCaster()->ToPlayer())
+                    {
+                        if (player->GetQuestStatus(QUEST_YOU_SCRATH_MY_BACK) == QUEST_STATUS_INCOMPLETE)
+                        {
+                            switch (unitTarget->GetEntry())
+                            {
+                                 case NPC_PILON_RELEASE_1:
+                                     player->KilledMonsterCredit(KILL_CREDIT_PILON_1);
+                                     break;
+                                 case NPC_PILON_RELEASE_2:
+                                     player->KilledMonsterCredit(KILL_CREDIT_PILON_2);
+                                     break;
+                                 case NPC_PILON_RELEASE_3:
+                                     player->KilledMonsterCredit(KILL_CREDIT_PILON_3);
+                                     break;
+                                 case NPC_PILON_RELEASE_4:
+                                     player->KilledMonsterCredit(KILL_CREDIT_PILON_4);
+                                     break;
+                                 default:
+                                     break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            void Register() override
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_release_whelplings_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const override
+        {
+            return new spell_release_whelplings_SpellScript();
+        }
+};
+
+
 void AddSC_azsuna()
 {
     new scene_azsuna_runes();
     new area_runes_tickt();
     new npc_killcredit_37853();
     new npc_tele_niscara();
+    new spell_release_whelplings();
 }
