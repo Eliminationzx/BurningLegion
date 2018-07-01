@@ -2730,6 +2730,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         const_cast<SpellEffectInfo*>(spellInfo->GetEffect(EFFECT_0))->ApplyAuraPeriod = 3000;
     });
+    
 
     // Nether Portal - Perseverence
     ApplySpellFix({ 30421 }, [](SpellInfo* spellInfo)
@@ -2836,6 +2837,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         //! HACK: This spell break quest complete for alliance and on retail not used
         const_cast<SpellEffectInfo*>(spellInfo->GetEffect(EFFECT_0))->Effect = 0;
+    });
+    
+    //Shot drenor
+    ApplySpellFix({ 161198, 161500 }, [](SpellInfo* spellInfo)
+    {
+        const_cast<SpellEffectInfo*>(spellInfo->GetEffect(EFFECT_0))->RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS);
     });
 
     // Siege Cannon (Tol Barad)
@@ -3477,6 +3484,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         const_cast<SpellEffectInfo*>(spellInfo->GetEffect(EFFECT_0))->MiscValueB = 161;
     });
+   
 
     // Taste of Iron Game Aura
     ApplySpellFix({ 164042 }, [](SpellInfo* spellInfo)
