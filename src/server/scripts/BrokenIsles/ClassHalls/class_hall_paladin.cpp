@@ -31,7 +31,7 @@ enum SanctumOfLightGuard
     EVENT_TELE_OUT                   = 2
 };
 
-const Position teleOutPos = { 2257.110107f, -5259.580078f, 94.622704f, 0.453786f };
+const Position teleOutPos = { 2283.130127f, -5322.016113f, 89.130798f, 2.468338f };
 
 class npc_sanctum_of_light_guard : public CreatureScript
 {
@@ -91,7 +91,7 @@ class npc_sanctum_of_light_guard : public CreatureScript
                             Talk(0);
 
                             // Add visual channeling
-                            me->AddAura(SPELL_HOLY_CHANNELING);
+                            DoCastSelf(SPELL_HOLY_CHANNELING);
 
                             events.ScheduleEvent(EVENT_TELE_OUT, 4s);
 

@@ -945,7 +945,7 @@ void CriteriaHandler::SetCriteriaProgress(Criteria const* criteria, uint64 chang
 
     progress->Changed = true;
     progress->Date = time(NULL); // set the date to the latest update.
-    progress->PlayerGUID = referencePlayer ? referencePlayer->GetGUID() : ObjectGuid::Empty;
+    progress->OwnerGUID = referencePlayer ? referencePlayer->GetGUID() : ObjectGuid::Empty;
 
     uint32 timeElapsed = 0;
 
@@ -1810,6 +1810,11 @@ bool CriteriaHandler::AdditionalRequirementsSatisfied(ModifierTreeNode const* tr
     return true;
 }
 
+CriteriaProgressMap const& CriteriaHandler::GetCriteriaProgress() const
+{
+    return _criteriaProgress;
+}
+
 char const* CriteriaMgr::GetCriteriaTypeString(uint32 type)
 {
     return GetCriteriaTypeString(CriteriaTypes(type));
@@ -2338,7 +2343,8 @@ void CriteriaMgr::LoadCriteriaList()
     }
 
     // Load criteria
-    uint32 criterias = 0;
+    uint32 playerCriterias = 0;
+    uint32 accountCriterias = 0;
     uint32 guildCriterias = 0;
     uint32 scenarioCriterias = 0;
     uint32 questObjectiveCriterias = 0;
@@ -2377,10 +2383,16 @@ void CriteriaMgr::LoadCriteriaList()
                 criteria->FlagsCu |= CRITERIA_FLAG_CU_QUEST_OBJECTIVE;
         }
 
-        if (criteria->FlagsCu & (CRITERIA_FLAG_CU_PLAYER | CRITERIA_FLAG_CU_ACCOUNT))
+        if (criteria->FlagsCu & CRITERIA_FLAG_CU_PLAYER)
         {
-            ++criterias;
-            _criteriasByType[criteriaEntry->Type].push_back(criteria);
+            ++playerCriterias;
+            _playerCriteriasByType[criteriaEntry->Type].push_back(criteria);
+        }
+
+        if (criteria->FlagsCu & CRITERIA_FLAG_CU_ACCOUNT)
+        {
+            ++accountCriterias;
+            _accountCriteriasByType[criteriaEntry->Type].push_back(criteria);
         }
 
         if (criteria->FlagsCu & CRITERIA_FLAG_CU_GUILD)
@@ -2408,7 +2420,7 @@ void CriteriaMgr::LoadCriteriaList()
     for (auto& p : _criteriaTrees)
         const_cast<CriteriaTree*>(p.second)->Criteria = GetCriteria(p.second->Entry->CriteriaID);
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u criteria, %u guild criteria, %u scenario criteria and %u quest objective criteria in %u ms.", criterias, guildCriterias, scenarioCriterias, questObjectiveCriterias, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded %u player criteria, %u account criteria, %u guild criteria, %u scenario criteria and %u quest objective criteria in %u ms.", playerCriterias, accountCriterias, guildCriterias, scenarioCriterias, questObjectiveCriterias, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void CriteriaMgr::LoadCriteriaData()

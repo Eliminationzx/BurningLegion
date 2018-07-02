@@ -766,14 +766,14 @@ class spell_pal_shield_of_vengeance : public AuraScript
     int32 absorb;
     int32 currentAbsorb;
 
-    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
+    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated)
     {
         if (Unit* caster = GetCaster())
         {
             canBeRecalculated = false;
 
             float ap = caster->GetTotalAttackPowerValue(BASE_ATTACK);
-            absorb = (ap * 20);
+            absorb = aurEff->GetSpellEffectInfo()->BasePoints > 0 ? aurEff->GetSpellEffectInfo()->BasePoints : (ap * 20);
             amount += absorb;
         }
     }
@@ -799,7 +799,7 @@ class spell_pal_shield_of_vengeance : public AuraScript
         std::list<Unit*> targets;
         caster->GetAttackableUnitListInRange(targets, 8.0f);
         
-		if (uint32 targetSize = targets.size())
+        if (uint32 targetSize = targets.size())
            absorb /= targetSize;
 
         caster->CastCustomSpell(SPELL_PALADIN_SHIELD_OF_VENGEANCE_DAMAGE, SPELLVALUE_BASE_POINT0, absorb, caster, true);
@@ -808,8 +808,8 @@ class spell_pal_shield_of_vengeance : public AuraScript
     void Register() override
     {
         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pal_shield_of_vengeance::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
-        OnEffectRemove += AuraEffectRemoveFn(spell_pal_shield_of_vengeance::OnRemove, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
         OnEffectAbsorb += AuraEffectAbsorbFn(spell_pal_shield_of_vengeance::Absorb, EFFECT_0);
+        OnEffectRemove += AuraEffectRemoveFn(spell_pal_shield_of_vengeance::OnRemove, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
