@@ -387,6 +387,9 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId original
         uint32 maxPlayersPerTeam = 0;
         switch (arenaType)
         {
+            case SLOT_ARENA_1V1:
+                maxPlayersPerTeam = 1;
+                break;
             case SLOT_ARENA_2V2:
                 maxPlayersPerTeam = 2;
                 break;
@@ -673,21 +676,114 @@ BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgType
         case BATTLEGROUND_WS:
             return BATTLEGROUND_QUEUE_WS;
         case BATTLEGROUND_AA:
+            switch (arenaType)
+            {
+                case ArenaType::Arena1v1:
+                    return BATTLEGROUND_QUEUE_AA_1v1;
+                case ArenaType::Arena2v2:
+                    return BATTLEGROUND_QUEUE_AA_2v2;
+                case ArenaType::Arena3v3:
+                    return BATTLEGROUND_QUEUE_AA_3v3;
+               case ArenaType::Arena5v5:
+                    return BATTLEGROUND_QUEUE_AA_5v5;
+                default:
+                    return BATTLEGROUND_QUEUE_NONE;
+            }
         case BATTLEGROUND_BE:
+            switch (arenaType)
+            {
+               case ArenaType::Arena1v1:
+                    return BATTLEGROUND_QUEUE_BE_1v1;
+               case ArenaType::Arena2v2:
+                    return BATTLEGROUND_QUEUE_BE_2v2;
+               case ArenaType::Arena3v3:
+                    return BATTLEGROUND_QUEUE_BE_3v3;
+               case ArenaType::Arena5v5:
+                    return BATTLEGROUND_QUEUE_BE_5v5;
+                default:
+                    return BATTLEGROUND_QUEUE_NONE;
+            }
         case BATTLEGROUND_DS:
+            switch (arenaType)
+            {
+               case ArenaType::Arena1v1:
+                    return BATTLEGROUND_QUEUE_DS_1v1;
+               case ArenaType::Arena2v2:
+                    return BATTLEGROUND_QUEUE_DS_2v2;
+               case ArenaType::Arena3v3:
+                    return BATTLEGROUND_QUEUE_DS_3v3;
+               case ArenaType::Arena5v5:
+                    return BATTLEGROUND_QUEUE_DS_5v5;
+                default:
+                    return BATTLEGROUND_QUEUE_NONE;
+            }
         case BATTLEGROUND_NA:
+            switch (arenaType)
+            {
+               case ArenaType::Arena1v1:
+                    return BATTLEGROUND_QUEUE_NA_1v1;
+               case ArenaType::Arena2v2:
+                    return BATTLEGROUND_QUEUE_NA_2v2;
+               case ArenaType::Arena3v3:
+                    return BATTLEGROUND_QUEUE_NA_3v3;
+               case ArenaType::Arena5v5:
+                    return BATTLEGROUND_QUEUE_NA_5v5;
+                default:
+                    return BATTLEGROUND_QUEUE_NONE;
+            }
         case BATTLEGROUND_RL:
+            switch (arenaType)
+            {
+               case ArenaType::Arena1v1:
+                    return BATTLEGROUND_QUEUE_RL_1v1;
+               case ArenaType::Arena2v2:
+                    return BATTLEGROUND_QUEUE_RL_2v2;
+               case ArenaType::Arena3v3:
+                    return BATTLEGROUND_QUEUE_RL_3v3;
+               case ArenaType::Arena5v5:
+                    return BATTLEGROUND_QUEUE_RL_5v5;
+                default:
+                    return BATTLEGROUND_QUEUE_NONE;
+            }
         case BATTLEGROUND_RV:
+            switch (arenaType)
+            {
+               case ArenaType::Arena1v1:
+                    return BATTLEGROUND_QUEUE_RV_1v1;
+               case ArenaType::Arena2v2:
+                    return BATTLEGROUND_QUEUE_RV_2v2;
+               case ArenaType::Arena3v3:
+                    return BATTLEGROUND_QUEUE_RV_3v3;
+               case ArenaType::Arena5v5:
+                    return BATTLEGROUND_QUEUE_RV_5v5;
+                default:
+                    return BATTLEGROUND_QUEUE_NONE;
+            }
         case BATTLEGROUND_TTP:
+            switch (arenaType)
+            {
+               case ArenaType::Arena1v1:
+                    return BATTLEGROUND_QUEUE_TTP_1v1;
+               case ArenaType::Arena2v2:
+                    return BATTLEGROUND_QUEUE_TTP_2v2;
+               case ArenaType::Arena3v3:
+                    return BATTLEGROUND_QUEUE_TTP_3v3;
+               case ArenaType::Arena5v5:
+                    return BATTLEGROUND_QUEUE_TTP_5v5;
+                default:
+                    return BATTLEGROUND_QUEUE_NONE;
+            }
         case BATTLEGROUND_TVA:
             switch (arenaType)
             {
-                case ArenaType::Arena2v2:
-                    return BATTLEGROUND_QUEUE_2v2;
-                case ArenaType::Arena3v3:
-                    return BATTLEGROUND_QUEUE_3v3;
-                case ArenaType::Arena5v5:
-                    return BATTLEGROUND_QUEUE_5v5;
+               case ArenaType::Arena1v1:
+                    return BATTLEGROUND_QUEUE_TVA_1v1;
+               case ArenaType::Arena2v2:
+                    return BATTLEGROUND_QUEUE_TVA_2v2;
+               case ArenaType::Arena3v3:
+                    return BATTLEGROUND_QUEUE_TVA_3v3;
+               case ArenaType::Arena5v5:
+                    return BATTLEGROUND_QUEUE_TVA_5v5;
                 default:
                     return BATTLEGROUND_QUEUE_NONE;
             }
@@ -718,10 +814,46 @@ BattlegroundTypeId BattlegroundMgr::BGTemplateId(BattlegroundQueueTypeId bgQueue
             return BATTLEGROUND_BFG;
         case BATTLEGROUND_QUEUE_RB:
             return BATTLEGROUND_RB;
-        case BATTLEGROUND_QUEUE_2v2:
-        case BATTLEGROUND_QUEUE_3v3:
-        case BATTLEGROUND_QUEUE_5v5:
+        case BATTLEGROUND_QUEUE_BE_1v1:
+        case BATTLEGROUND_QUEUE_BE_2v2:
+        case BATTLEGROUND_QUEUE_BE_3v3:
+        case BATTLEGROUND_QUEUE_BE_5v5:
+            return BATTLEGROUND_BE;
+        case BATTLEGROUND_QUEUE_DS_1v1:
+        case BATTLEGROUND_QUEUE_DS_2v2:
+        case BATTLEGROUND_QUEUE_DS_3v3:
+        case BATTLEGROUND_QUEUE_DS_5v5:
+            return BATTLEGROUND_DS;
+        case BATTLEGROUND_QUEUE_NA_1v1:
+        case BATTLEGROUND_QUEUE_NA_2v2:
+        case BATTLEGROUND_QUEUE_NA_3v3:
+        case BATTLEGROUND_QUEUE_NA_5v5:
+            return BATTLEGROUND_NA;
+        case BATTLEGROUND_QUEUE_RL_1v1:
+        case BATTLEGROUND_QUEUE_RL_2v2:
+        case BATTLEGROUND_QUEUE_RL_3v3:
+        case BATTLEGROUND_QUEUE_RL_5v5:
+            return BATTLEGROUND_RL;
+        case BATTLEGROUND_QUEUE_RV_1v1:
+        case BATTLEGROUND_QUEUE_RV_2v2:
+        case BATTLEGROUND_QUEUE_RV_3v3:
+        case BATTLEGROUND_QUEUE_RV_5v5:
+            return BATTLEGROUND_RV;
+        case BATTLEGROUND_QUEUE_AA_1v1:
+        case BATTLEGROUND_QUEUE_AA_2v2:
+        case BATTLEGROUND_QUEUE_AA_3v3:
+        case BATTLEGROUND_QUEUE_AA_5v5:
             return BATTLEGROUND_AA;
+        case BATTLEGROUND_QUEUE_TTP_1v1:
+        case BATTLEGROUND_QUEUE_TTP_2v2:
+        case BATTLEGROUND_QUEUE_TTP_3v3:
+        case BATTLEGROUND_QUEUE_TTP_5v5:
+            return BATTLEGROUND_TTP;
+        case BATTLEGROUND_QUEUE_TVA_1v1:
+        case BATTLEGROUND_QUEUE_TVA_2v2:
+        case BATTLEGROUND_QUEUE_TVA_3v3:
+        case BATTLEGROUND_QUEUE_TVA_5v5:
+            return BATTLEGROUND_TVA;
         default:
             return BattlegroundTypeId(0);                   // used for unknown template (it exists and does nothing)
     }
@@ -731,11 +863,41 @@ uint8 BattlegroundMgr::BGArenaType(BattlegroundQueueTypeId bgQueueTypeId)
 {
     switch (bgQueueTypeId)
     {
-        case BATTLEGROUND_QUEUE_2v2:
+        case BATTLEGROUND_QUEUE_AA_1v1:
+        case BATTLEGROUND_QUEUE_BE_1v1:
+        case BATTLEGROUND_QUEUE_DS_1v1:
+        case BATTLEGROUND_QUEUE_NA_1v1:
+        case BATTLEGROUND_QUEUE_RL_1v1:
+        case BATTLEGROUND_QUEUE_RV_1v1:
+        case BATTLEGROUND_QUEUE_TTP_1v1:
+        case BATTLEGROUND_QUEUE_TVA_1v1:
+            return SLOT_ARENA_1V1;
+        case BATTLEGROUND_QUEUE_AA_2v2:
+        case BATTLEGROUND_QUEUE_BE_2v2:
+        case BATTLEGROUND_QUEUE_DS_2v2:
+        case BATTLEGROUND_QUEUE_NA_2v2:
+        case BATTLEGROUND_QUEUE_RL_2v2:
+        case BATTLEGROUND_QUEUE_RV_2v2:
+        case BATTLEGROUND_QUEUE_TTP_2v2:
+        case BATTLEGROUND_QUEUE_TVA_2v2:
             return SLOT_ARENA_2V2;
-        case BATTLEGROUND_QUEUE_3v3:
+        case BATTLEGROUND_QUEUE_AA_3v3:
+        case BATTLEGROUND_QUEUE_BE_3v3:
+        case BATTLEGROUND_QUEUE_DS_3v3:
+        case BATTLEGROUND_QUEUE_NA_3v3:
+        case BATTLEGROUND_QUEUE_RL_3v3:
+        case BATTLEGROUND_QUEUE_RV_3v3:
+        case BATTLEGROUND_QUEUE_TTP_3v3:
+        case BATTLEGROUND_QUEUE_TVA_3v3:
             return SLOT_ARENA_3V3;
-        case BATTLEGROUND_QUEUE_5v5:
+        case BATTLEGROUND_QUEUE_AA_5v5:
+        case BATTLEGROUND_QUEUE_BE_5v5:
+        case BATTLEGROUND_QUEUE_DS_5v5:
+        case BATTLEGROUND_QUEUE_NA_5v5:
+        case BATTLEGROUND_QUEUE_RL_5v5:
+        case BATTLEGROUND_QUEUE_RV_5v5:
+        case BATTLEGROUND_QUEUE_TTP_5v5:
+        case BATTLEGROUND_QUEUE_TVA_5v5:
             return SLOT_ARENA_5V5;
         default:
             return 0;

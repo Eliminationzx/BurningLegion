@@ -39,6 +39,7 @@ enum ArenaGroupCommandTypes
 enum ArenaType
 {
     ArenaNone = 0,
+    Arena1v1  = 1,
     Arena2v2  = 2,
     Arena3v3  = 3,
     Arena5v5  = 5
@@ -121,11 +122,12 @@ struct ArenaGroupStats
 
 enum ArenaSlots
 {
-    SLOT_ARENA_2V2 = 0,
-    SLOT_ARENA_3V3 = 1,
-    SLOT_ARENA_5V5 = 2,
-    MAX_ARENA_SLOT = 3,
-    SLOT_RBG       = 3,
+    SLOT_ARENA_1V1 = 0,
+    SLOT_ARENA_2V2 = 1,
+    SLOT_ARENA_3V3 = 2,
+    SLOT_ARENA_5V5 = 3,
+    MAX_ARENA_SLOT = 4,
+    SLOT_RBG       = 4,
     MAX_PVP_SLOT   = 6
 };
 
