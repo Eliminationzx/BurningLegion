@@ -4773,6 +4773,69 @@ public:
     }
 };
 
+enum AegisjalmurTheArmguardsOfAwe
+{
+    SPELL_ARMGUARDS_MARK      = 225056,
+    SPELL_SHIELD_OF_VENGEANCE = 184662
+};
+
+class spell_item_aegisjalmur_the_armguards_of_awe : public SpellScriptLoader
+{
+public:
+    spell_item_aegisjalmur_the_armguards_of_awe() : SpellScriptLoader("spell_item_aegisjalmur_the_armguards_of_awe") { }
+
+    class spell_item_aegisjalmur_the_armguards_of_awe_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_item_aegisjalmur_the_armguards_of_awe_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo(
+            {
+                SPELL_ARMGUARDS_MARK,
+                SPELL_SHIELD_OF_VENGEANCE
+            });
+        }
+
+        bool Load() override
+        {
+            return GetUnitOwner()->GetTypeId() == TYPEID_PLAYER;
+        }
+
+        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool & /*canBeRecalculated*/)
+        {
+            // Set absorbtion amount to unlimited
+            amount = -1;
+        }
+
+        void Absorb(AuraEffect* /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
+        {
+            Player* target = GetTarget()->ToPlayer();
+
+            if (dmgInfo.GetDamage() < target->GetHealth() || target->HasAura(SPELL_ARMGUARDS_MARK))
+                return;
+
+            int32 hp = GetSpellInfo()->GetEffect(EFFECT_1)->BasePoints;
+            int32 bp = CalculatePct(dmgInfo.GetDamage(), GetSpellInfo()->GetEffect(EFFECT_2)->BasePoints);
+            target->CastCustomSpell(target, SPELL_SHIELD_OF_VENGEANCE, &bp, NULL, NULL, true);
+            target->CastSpell(target, SPELL_ARMGUARDS_MARK, true);
+            target->SetHealth(hp);
+            absorbAmount = dmgInfo.GetDamage();
+        }
+
+        void Register() override
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_item_aegisjalmur_the_armguards_of_awe_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+            OnEffectAbsorb += AuraEffectAbsorbFn(spell_item_aegisjalmur_the_armguards_of_awe_AuraScript::Absorb, EFFECT_0);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_item_aegisjalmur_the_armguards_of_awe_AuraScript();
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     // 23074 Arcanite Dragonling
@@ -4892,4 +4955,5 @@ void AddSC_item_spell_scripts()
     new spell_item_warbreaker();
     new spell_item_warbreaker_damage();
     new spell_item_titanstrike();
+    new spell_item_aegisjalmur_the_armguards_of_awe();
 }
