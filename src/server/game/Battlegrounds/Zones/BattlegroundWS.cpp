@@ -239,7 +239,7 @@ void BattlegroundWS::StartingEventOpenDoors()
 
     // players joining later are not eligibles
     StartCriteriaTimer(CRITERIA_TIMED_TYPE_EVENT, WS_EVENT_START_BATTLE);
-	
+    
     // Send start timer
     m_EndTimestamp = time(nullptr) + 1500;
 

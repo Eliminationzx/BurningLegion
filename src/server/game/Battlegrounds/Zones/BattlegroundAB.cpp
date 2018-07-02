@@ -274,7 +274,7 @@ void BattlegroundAB::_ChangeBanner(uint8 node, uint8 type, uint8 teamIndex, bool
             SpellVisualID = SPELL_VISUAL_ALLIANCE_CONTESTED;
             worldstateValue = AB_ALLIANCE_CONTESTED;
         }
-		else
+        else
         {
             SpellVisualID = SPELL_VISUAL_HORDE_CONTESTED;
             worldstateValue = AB_HORDE_CONTESTED;
@@ -289,7 +289,7 @@ void BattlegroundAB::_ChangeBanner(uint8 node, uint8 type, uint8 teamIndex, bool
             SpellVisualID = SPELL_VISUAL_ALLIANCE_OCCUPIED;
             worldstateValue = AB_ALLIANCE_OCCUPIED;
         }
-		else
+        else
         {
             SpellVisualID = SPELL_VISUAL_HORDE_OCCUPIED;
             worldstateValue = AB_HORDE_OCCUPIED;

@@ -49,7 +49,11 @@ enum ScoreType
 
     // SOTA
     SCORE_DESTROYED_DEMOLISHER  = 16,
-    SCORE_DESTROYED_WALL        = 17
+    SCORE_DESTROYED_WALL        = 17,
+
+    //TK
+    SCORE_ORB_POSSESIONS		= 18,
+    SCORE_POINTS_SCORED			= 19
 };
 
 struct BattlegroundScore

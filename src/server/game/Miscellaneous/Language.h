@@ -1141,6 +1141,22 @@ enum TrinityStrings
     LANG_LIST_QUESTS                              = 11022,
     LANG_LIST_QUESTS_DETAIL                       = 11023,
 
-    LANG_BREACHING_TRUESHOT_LODGE                 = 11024
+    LANG_BREACHING_TRUESHOT_LODGE                 = 11024,
+
+    // Battleground TK
+    LANG_BG_TK_START_TWO_MINUTES                  = 2200,
+    LANG_BG_TK_START_ONE_MINUTE                   = 2201,
+    LANG_BG_TK_START_HALF_MINUTE                  = 2202,
+    LANG_BG_TK_HAS_BEGUN                          = 2203,
+    LANG_BG_TK_PICKEDUP_ORB_BLUE                  = 2205,
+    LANG_BG_TK_PICKEDUP_ORB_PURPLE                = 2206,
+    LANG_BG_TK_PICKEDUP_ORB_GREEN                 = 2207,
+    LANG_BG_TK_PICKEDUP_ORB_ORANGE                = 2208,
+    LANG_BG_TK_ORB_BLUE_RESPAWN                   = 2212,
+    LANG_BG_TK_ORB_ORANGE_RESPAWN                 = 2213,
+    LANG_BG_TK_ORB_GREEN_RESPAWN                  = 2214,
+    LANG_BG_TK_ORB_PURPLE_RESPAWN                 = 2215,
+    LANG_BG_TK_A_NEAR_VICTORY                     = 2216,
+    LANG_BG_TK_H_NEAR_VICTORY                     = 2217
 };
 #endif

@@ -4927,6 +4927,13 @@ enum BattlegroundTeamId : uint8
     BG_TEAM_NEUTRAL     = 2  // Battleground: Neutral,  Arena: None
 };
 
+enum BattlegroundWinner
+{
+    WINNER_HORDE            = 0,
+    WINNER_ALLIANCE         = 1,
+    WINNER_NONE             = 2
+};
+
 #define BG_TEAMS_COUNT  2
 
 // indexes of BattlemasterList.dbc (7.1.5.23360)
@@ -4951,9 +4958,9 @@ enum BattlegroundTypeId : uint32
     BATTLEGROUND_RATED_25_VS_25 = 102, // Rated Battleground 25 vs 25
     BATTLEGROUND_TP             = 108, // Twin Peaks
     BATTLEGROUND_BFG            = 120, // Battle For Gilneas
-    // 656 = "Rated Eye of the Storm"
+    BATTLEGROUND_RES            = 656, // Rated Eye of the Storm
     BATTLEGROUND_TK             = 699, // Temple of Kotmogu
-    // 706 = "CTF3"
+    BATTLEGROUND_CTF            = 706, // CTF3
     BATTLEGROUND_SM             = 708, // Silvershard Mines
     BATTLEGROUND_TVA            = 719, // Tol'Viron Arena
     BATTLEGROUND_DG             = 754, // Deepwind Gorge
@@ -4961,9 +4968,9 @@ enum BattlegroundTypeId : uint32
     BATTLEGROUND_SS_VS_TM       = 789, // Southshore vs. Tarren Mill
     BATTLEGROUND_SMALL_D        = 803, // Small Battleground D
     BATTLEGROUND_BRH            = 808, // Black Rook Hold Arena
-    // 809 = "New Nagrand Arena (Legion)"
+    BATTLEGROUND_NNA            = 809, // New Nagrand Arena (Legion)
     BATTLEGROUND_AF             = 816, // Ashamane's Fall
-    // 844 = "New Blade's Edge Arena (Legion)"
+    BATTLEGROUND_NBE            = 844  // New Blade's Edge Arena (Legion)
 };
 
 #define MAX_BATTLEGROUND_TYPE_ID 845
@@ -5125,38 +5132,39 @@ enum BattlegroundQueueTypeId
     BATTLEGROUND_QUEUE_TP       = 7,
     BATTLEGROUND_QUEUE_BFG      = 8,
     BATTLEGROUND_QUEUE_RB       = 9,
-    BATTLEGROUND_QUEUE_AA_1v1   = 10,
-    BATTLEGROUND_QUEUE_BE_1v1   = 11,
-    BATTLEGROUND_QUEUE_DS_1v1   = 12,
-    BATTLEGROUND_QUEUE_NA_1v1   = 13,
-    BATTLEGROUND_QUEUE_RL_1v1   = 14,
-    BATTLEGROUND_QUEUE_RV_1v1   = 15,
-    BATTLEGROUND_QUEUE_AA_2v2   = 16,
-    BATTLEGROUND_QUEUE_BE_2v2   = 17,
-    BATTLEGROUND_QUEUE_DS_2v2   = 18,
-    BATTLEGROUND_QUEUE_NA_2v2   = 19,
-    BATTLEGROUND_QUEUE_RL_2v2   = 20,
-    BATTLEGROUND_QUEUE_RV_2v2   = 21,
-    BATTLEGROUND_QUEUE_AA_3v3   = 22,
-    BATTLEGROUND_QUEUE_BE_3v3   = 23,
-    BATTLEGROUND_QUEUE_DS_3v3   = 24,
-    BATTLEGROUND_QUEUE_NA_3v3   = 25,
-    BATTLEGROUND_QUEUE_RL_3v3   = 26,
-    BATTLEGROUND_QUEUE_RV_3v3   = 27,
-    BATTLEGROUND_QUEUE_AA_5v5   = 28,
-    BATTLEGROUND_QUEUE_BE_5v5   = 29,
-    BATTLEGROUND_QUEUE_DS_5v5   = 30,
-    BATTLEGROUND_QUEUE_NA_5v5   = 31,
-    BATTLEGROUND_QUEUE_RL_5v5   = 32,
-    BATTLEGROUND_QUEUE_RV_5v5   = 33,
-    BATTLEGROUND_QUEUE_TTP_1v1  = 34,
-    BATTLEGROUND_QUEUE_TVA_1v1  = 35,
-    BATTLEGROUND_QUEUE_TTP_2v2  = 36,
-    BATTLEGROUND_QUEUE_TVA_2v2  = 37,
-    BATTLEGROUND_QUEUE_TTP_3v3  = 38,
-    BATTLEGROUND_QUEUE_TVA_3v3  = 39,
-    BATTLEGROUND_QUEUE_TTP_5v5  = 40,
-    BATTLEGROUND_QUEUE_TVA_5v5  = 41,
+    BATTLEGROUND_QUEUE_TK       = 10,
+    BATTLEGROUND_QUEUE_AA_1v1   = 11,
+    BATTLEGROUND_QUEUE_BE_1v1   = 12,
+    BATTLEGROUND_QUEUE_DS_1v1   = 13,
+    BATTLEGROUND_QUEUE_NA_1v1   = 14,
+    BATTLEGROUND_QUEUE_RL_1v1   = 15,
+    BATTLEGROUND_QUEUE_RV_1v1   = 16,
+    BATTLEGROUND_QUEUE_AA_2v2   = 17,
+    BATTLEGROUND_QUEUE_BE_2v2   = 18,
+    BATTLEGROUND_QUEUE_DS_2v2   = 19,
+    BATTLEGROUND_QUEUE_NA_2v2   = 20,
+    BATTLEGROUND_QUEUE_RL_2v2   = 21,
+    BATTLEGROUND_QUEUE_RV_2v2   = 22,
+    BATTLEGROUND_QUEUE_AA_3v3   = 23,
+    BATTLEGROUND_QUEUE_BE_3v3   = 24,
+    BATTLEGROUND_QUEUE_DS_3v3   = 25,
+    BATTLEGROUND_QUEUE_NA_3v3   = 26,
+    BATTLEGROUND_QUEUE_RL_3v3   = 27,
+    BATTLEGROUND_QUEUE_RV_3v3   = 28,
+    BATTLEGROUND_QUEUE_AA_5v5   = 29,
+    BATTLEGROUND_QUEUE_BE_5v5   = 30,
+    BATTLEGROUND_QUEUE_DS_5v5   = 31,
+    BATTLEGROUND_QUEUE_NA_5v5   = 32,
+    BATTLEGROUND_QUEUE_RL_5v5   = 33,
+    BATTLEGROUND_QUEUE_RV_5v5   = 34,
+    BATTLEGROUND_QUEUE_TTP_1v1  = 35,
+    BATTLEGROUND_QUEUE_TVA_1v1  = 36,
+    BATTLEGROUND_QUEUE_TTP_2v2  = 37,
+    BATTLEGROUND_QUEUE_TVA_2v2  = 38,
+    BATTLEGROUND_QUEUE_TTP_3v3  = 39,
+    BATTLEGROUND_QUEUE_TVA_3v3  = 40,
+    BATTLEGROUND_QUEUE_TTP_5v5  = 41,
+    BATTLEGROUND_QUEUE_TVA_5v5  = 42,
     MAX_BATTLEGROUND_QUEUE_TYPES
 };
 
