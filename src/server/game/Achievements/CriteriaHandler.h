@@ -79,7 +79,7 @@ struct CriteriaProgress
 {
     uint64 Counter = 0;
     std::time_t Date = std::time_t(0);                      // latest update time.
-    ObjectGuid PlayerGUID;                                  // GUID of the player that last updated the criteria
+    ObjectGuid OwnerGUID;                                   // GUID of the player or Battlenet account that last updated the criteria
     bool Changed = false;
 };
 
@@ -282,11 +282,13 @@ public:
     bool IsCompletedCriteria(Criteria const* criteria, uint64 requiredAmount);
     bool IsCompletedCriteriaTree(CriteriaTree const* tree);
 
+    CriteriaProgressMap const& GetCriteriaProgress() const;
+
 protected:
     virtual void SendCriteriaUpdate(Criteria const* criteria, CriteriaProgress const* progress, uint32 timeElapsed, bool timedCompleted) const = 0;
 
     CriteriaProgress* GetCriteriaProgress(Criteria const* entry);
-    void SetCriteriaProgress(Criteria const* criteria, uint64 changeValue, Player* referencePlayer, ProgressType progressType = PROGRESS_SET);
+    virtual void SetCriteriaProgress(Criteria const* criteria, uint64 changeValue, Player* referencePlayer, ProgressType progressType = PROGRESS_SET);
     void RemoveCriteriaProgress(Criteria const* criteria);
     virtual void SendCriteriaProgressRemoved(uint32 criteriaId) = 0;
 
@@ -324,7 +326,12 @@ public:
 
     CriteriaList const& GetPlayerCriteriaByType(CriteriaTypes type) const
     {
-        return _criteriasByType[type];
+        return _playerCriteriasByType[type];
+    }
+
+    CriteriaList const& GetAccountCriteriaByType(CriteriaTypes type) const
+    {
+        return _accountCriteriasByType[type];
     }
 
     CriteriaList const& GetGuildCriteriaByType(CriteriaTypes type) const
@@ -403,7 +410,8 @@ private:
     std::unordered_map<uint32, CriteriaTreeList> _criteriaTreeByCriteria;
 
     // store criterias by type to speed up lookup
-    CriteriaList _criteriasByType[CRITERIA_TYPE_TOTAL];
+    CriteriaList _playerCriteriasByType[CRITERIA_TYPE_TOTAL];
+    CriteriaList _accountCriteriasByType[CRITERIA_TYPE_TOTAL];
     CriteriaList _guildCriteriasByType[CRITERIA_TYPE_TOTAL];
     CriteriaList _scenarioCriteriasByType[CRITERIA_TYPE_TOTAL];
     CriteriaList _questObjectiveCriteriasByType[CRITERIA_TYPE_TOTAL];
