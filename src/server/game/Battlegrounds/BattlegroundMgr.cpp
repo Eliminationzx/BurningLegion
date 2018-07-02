@@ -155,11 +155,10 @@ void BattlegroundMgr::Update(uint32 diff)
         {
             // forced update for rated arenas (scan all, but skipped non rated)
             TC_LOG_TRACE("bg.arena", "BattlegroundMgr: UPDATING ARENA QUEUES");
-            for (int qtype = BATTLEGROUND_QUEUE_2v2; qtype <= BATTLEGROUND_QUEUE_5v5; ++qtype)
+            for (uint32 qtype = BATTLEGROUND_QUEUE_AA_1v1; qtype <= BATTLEGROUND_QUEUE_RV_5v5; ++qtype)
                 for (int bracket = BG_BRACKET_ID_FIRST; bracket < MAX_BATTLEGROUND_BRACKETS; ++bracket)
-                    m_BattlegroundQueues[qtype].BattlegroundQueueUpdate(diff,
-                        BATTLEGROUND_AA, BattlegroundBracketId(bracket),
-                        BattlegroundMgr::BGArenaType(BattlegroundQueueTypeId(qtype)), true, 0);
+                    m_BattlegroundQueues[qtype].BattlegroundQueueUpdate(diff, BGTemplateId(BattlegroundQueueTypeId(qtype)), BattlegroundBracketId(bracket), 
+                BattlegroundMgr::BGArenaType(BattlegroundQueueTypeId(qtype)), true, 0);
 
             m_NextRatedArenaUpdate = sWorld->getIntConfig(CONFIG_ARENA_RATED_UPDATE_TIMER);
         }
@@ -355,6 +354,9 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId original
         case BATTLEGROUND_BFG:
             bg = new BattlegroundBFG(*(BattlegroundBFG*)bg_template);
             break;
+        case BATTLEGROUND_TK:
+            bg = new BattlegroundTK(*(BattlegroundTK*)bg_template);
+            break;
         case BATTLEGROUND_TTP:
             bg = new BattlegroundTTP(*(BattlegroundTTP*)bg_template);
             break;
@@ -459,6 +461,9 @@ bool BattlegroundMgr::CreateBattleground(BattlegroundTemplate const* bgTemplate)
                 break;
             case BATTLEGROUND_TP:
                 bg = new BattlegroundTP;
+                break;
+            case BATTLEGROUND_TK:
+                bg = new BattlegroundTK;
                 break;
             case BATTLEGROUND_BFG:
                 bg = new BattlegroundBFG;
@@ -669,6 +674,8 @@ BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgType
             return BATTLEGROUND_QUEUE_TP;
         case BATTLEGROUND_BFG:
             return BATTLEGROUND_QUEUE_BFG;
+        case BATTLEGROUND_TK:
+            return BATTLEGROUND_QUEUE_TK;
         case BATTLEGROUND_RB:
             return BATTLEGROUND_QUEUE_RB;
         case BATTLEGROUND_SA:
