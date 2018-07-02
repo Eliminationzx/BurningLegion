@@ -354,9 +354,9 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId original
         case BATTLEGROUND_BFG:
             bg = new BattlegroundBFG(*(BattlegroundBFG*)bg_template);
             break;
-        case BATTLEGROUND_TK:
+        /*case BATTLEGROUND_TK:
             bg = new BattlegroundTK(*(BattlegroundTK*)bg_template);
-            break;
+            break;*/
         case BATTLEGROUND_TTP:
             bg = new BattlegroundTTP(*(BattlegroundTTP*)bg_template);
             break;
@@ -462,9 +462,9 @@ bool BattlegroundMgr::CreateBattleground(BattlegroundTemplate const* bgTemplate)
             case BATTLEGROUND_TP:
                 bg = new BattlegroundTP;
                 break;
-            case BATTLEGROUND_TK:
+            /*case BATTLEGROUND_TK:
                 bg = new BattlegroundTK;
-                break;
+                break;*/
             case BATTLEGROUND_BFG:
                 bg = new BattlegroundBFG;
                 break;
@@ -674,8 +674,8 @@ BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgType
             return BATTLEGROUND_QUEUE_TP;
         case BATTLEGROUND_BFG:
             return BATTLEGROUND_QUEUE_BFG;
-        case BATTLEGROUND_TK:
-            return BATTLEGROUND_QUEUE_TK;
+        /*case BATTLEGROUND_TK:
+            return BATTLEGROUND_QUEUE_TK;*/
         case BATTLEGROUND_RB:
             return BATTLEGROUND_QUEUE_RB;
         case BATTLEGROUND_SA:
