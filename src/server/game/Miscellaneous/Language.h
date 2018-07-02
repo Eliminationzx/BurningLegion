@@ -1141,7 +1141,8 @@ enum TrinityStrings
     LANG_LIST_QUESTS                              = 11022,
     LANG_LIST_QUESTS_DETAIL                       = 11023,
 
-    LANG_BREACHING_TRUESHOT_LODGE                 = 11024,
+    LANG_DEBUG_LFG_ON                             = 11024,
+    LANG_DEBUG_LFG_OFF                            = 11025,
 
     // Battleground TK
     LANG_BG_TK_START_TWO_MINUTES                  = 2200,
@@ -1157,6 +1158,8 @@ enum TrinityStrings
     LANG_BG_TK_ORB_GREEN_RESPAWN                  = 2214,
     LANG_BG_TK_ORB_PURPLE_RESPAWN                 = 2215,
     LANG_BG_TK_A_NEAR_VICTORY                     = 2216,
-    LANG_BG_TK_H_NEAR_VICTORY                     = 2217
+    LANG_BG_TK_H_NEAR_VICTORY                     = 2217,
+
+    LANG_BREACHING_TRUESHOT_LODGE                 = 2300
 };
 #endif

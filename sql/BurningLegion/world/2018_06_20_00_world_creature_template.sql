@@ -17,4 +17,4 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 
 INSERT INTO `gossip_menu_option_locale` (`MenuId`, `OptionIndex`, `Locale`, `OptionText`, `BoxText`) VALUES ('999912', '0', 'ruRU', 'Хочу долететь на орле до Приюта стрелка.', NULL);
 
-INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES ('11024', 'This sacred peak is for hunters alone. Turn back, or the eagle spirit will carry you away!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'На эту священную вершину допускаются только охотники, Поворачивайте назад, или дух орла унесет вас отсюда!');
+INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES ('2300', 'This sacred peak is for hunters alone. Turn back, or the eagle spirit will carry you away!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'На эту священную вершину допускаются только охотники, Поворачивайте назад, или дух орла унесет вас отсюда!');
