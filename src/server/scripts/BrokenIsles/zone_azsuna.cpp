@@ -192,16 +192,10 @@ public:
         void MoveInLineOfSight(Unit* who) override
         {
             if (Player* player = who->ToPlayer())
-            {
                 if (player->GetQuestStatus(QUEST_APONI_TRAIL) == QUEST_STATUS_INCOMPLETE)
-                {    
                    if (player->HasItemCount(ITEM_FOR_QUEST_APONI, 8) && player->CastSpell(player, SPELL_TELE_NISCARA, true))
-                   {
-                       player->IsInDist(me, 2.0f);
-                       player->KilledMonsterCredit(KILL_CREDIT_APONI_TELE);
-                   }
-                }
-            }
+                       if (player->IsInDist(me, 2.0f))
+                           player->KilledMonsterCredit(KILL_CREDIT_APONI_TELE);
         }
     };
 

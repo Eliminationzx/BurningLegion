@@ -873,8 +873,12 @@ void AccountAchievementMgr::SendAllData(Player const* /*receiver*/) const
 
 void AccountAchievementMgr::CompletedAchievement(AchievementEntry const* achievement, Player* referencePlayer)
 {
+    Player* player = _owner->GetPlayer();
+    if (!player)
+        return;
+
     // disable for gamemasters with GM-mode enabled
-    if (_owner->GetPlayer()->IsGameMaster())
+    if (player->IsGameMaster())
         return;
 
     if ((achievement->Faction == ACHIEVEMENT_FACTION_HORDE && referencePlayer->GetTeam() != HORDE) ||
@@ -895,7 +899,7 @@ void AccountAchievementMgr::CompletedAchievement(AchievementEntry const* achieve
 
     CompletedAchievementData& ca = _completedAchievements[achievement->ID];
     ca.Date = time(NULL);
-    ca.CompletingPlayers.insert(_owner->GetPlayer()->GetGUID());
+    ca.CompletingPlayers.insert(player->GetGUID());
     ca.Changed = true;
 
     if (achievement->Flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL))
@@ -904,8 +908,8 @@ void AccountAchievementMgr::CompletedAchievement(AchievementEntry const* achieve
     if (!(achievement->Flags & ACHIEVEMENT_FLAG_TRACKING_FLAG))
         _achievementPoints += achievement->Points;
 
-    _owner->GetPlayer()->UpdateCriteria(CRITERIA_TYPE_COMPLETE_ACHIEVEMENT, 0, 0, 0, NULL);
-    _owner->GetPlayer()->UpdateCriteria(CRITERIA_TYPE_EARN_ACHIEVEMENT_POINTS, achievement->Points, 0, 0, NULL);
+    player->UpdateCriteria(CRITERIA_TYPE_COMPLETE_ACHIEVEMENT, 0, 0, 0, NULL);
+    player->UpdateCriteria(CRITERIA_TYPE_EARN_ACHIEVEMENT_POINTS, achievement->Points, 0, 0, NULL);
 
     // reward items and titles if any
     AchievementReward const* reward = sAchievementMgr->GetAchievementReward(achievement);
@@ -919,9 +923,9 @@ void AccountAchievementMgr::CompletedAchievement(AchievementEntry const* achieve
     //! Since no common attributes were found, (not even in titleRewardFlags field)
     //! we explicitly check by ID. Maybe in the future we could move the achievement_reward
     //! condition fields to the condition system.
-    if (uint32 titleId = reward->TitleId[achievement->ID == 1793 ? _owner->GetPlayer()->GetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_GENDER) : (_owner->GetPlayer()->GetTeam() == ALLIANCE ? 0 : 1)])
+    if (uint32 titleId = reward->TitleId[achievement->ID == 1793 ? player->GetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_GENDER) : (player->GetTeam() == ALLIANCE ? 0 : 1)])
         if (CharTitlesEntry const* titleEntry = sCharTitlesStore.LookupEntry(titleId))
-            _owner->GetPlayer()->SetTitle(titleEntry);
+            player->SetTitle(titleEntry);
 
     // mail
     if (reward->SenderCreatureId)
@@ -934,7 +938,7 @@ void AccountAchievementMgr::CompletedAchievement(AchievementEntry const* achieve
             std::string subject = reward->Subject;
             std::string text = reward->Body;
 
-            LocaleConstant localeConstant = _owner->GetPlayer()->GetSession()->GetSessionDbLocaleIndex();
+            LocaleConstant localeConstant = _owner->GetSessionDbLocaleIndex();
             if (localeConstant != LOCALE_enUS)
             {
                 if (AchievementRewardLocale const* loc = sAchievementMgr->GetAchievementRewardLocale(achievement))
@@ -949,7 +953,7 @@ void AccountAchievementMgr::CompletedAchievement(AchievementEntry const* achieve
 
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
-        Item* item = reward->ItemId ? Item::CreateItem(reward->ItemId, 1, _owner->GetPlayer()) : NULL;
+        Item* item = reward->ItemId ? Item::CreateItem(reward->ItemId, 1, player) : NULL;
         if (item)
         {
             // save new item before send
@@ -959,7 +963,7 @@ void AccountAchievementMgr::CompletedAchievement(AchievementEntry const* achieve
             draft.AddItem(item);
         }
 
-        draft.SendMailTo(trans, _owner->GetPlayer(), MailSender(MAIL_CREATURE, uint64(reward->SenderCreatureId)));
+        draft.SendMailTo(trans, player, MailSender(MAIL_CREATURE, uint64(reward->SenderCreatureId)));
         CharacterDatabase.CommitTransaction(trans);
     }
 }
