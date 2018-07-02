@@ -78,17 +78,25 @@ void BattlegroundTK::PostUpdateImpl(uint32 diff)
             if (Player* player = ObjectAccessor::FindPlayer(itr->first))
             {
                 if (player->GetGUID() == m_orbOwners[0])
+                {
                     if (player->IsMounted() || !player->HasAura(BG_TK_AURA_ORB_BLUE))
                         BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_BLUE);
+                }
                 else if (player->GetGUID() == m_orbOwners[1])
+                {
                     if (player->IsMounted() || !player->HasAura(BG_TK_AURA_ORB_PURPLE))
                         BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_PURPLE);
+                }
                 else if (player->GetGUID() == m_orbOwners[2])
+                {
                     if (player->IsMounted() || !player->HasAura(BG_TK_AURA_ORB_GREEN))
                         BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_GREEN);
+                }
                 else if (player->GetGUID() == m_orbOwners[3])
+                {
                     if (player->IsMounted() || !player->HasAura(BG_TK_AURA_ORB_ORANGE))
                         BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_ORANGE);
+                }
             }
     }
 }
