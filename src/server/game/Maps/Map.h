@@ -365,7 +365,6 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         void MoveAllAreaTriggersInMoveList();
         void RemoveAllObjectsInRemoveList();
         virtual void RemoveAllPlayers();
-        virtual void SetObjectVisibility(float p_Visibility);
 
         // used only in MoveAllCreaturesInMoveList and ObjectGridUnloader
         bool CreatureRespawnRelocation(Creature* c, bool diffGridOnly);

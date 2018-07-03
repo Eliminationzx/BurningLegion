@@ -3874,11 +3874,6 @@ void BattlegroundMap::InitVisibilityDistance()
     m_VisibilityNotifyPeriod = World::GetVisibilityNotifyPeriodInBGArenas();
 }
 
-void Map::SetObjectVisibility(float p_Visibility)
-{
-    m_VisibleDistance = p_Visibility;
-}
-
 Map::EnterState BattlegroundMap::CannotEnter(Player* player)
 {
     if (player->GetMapRef().getTarget() == this)
