@@ -29,8 +29,6 @@
 #include "WorldStatePackets.h"
 #include "SpellInfo.h"
 
-// Debuff spell
-
 BattlegroundTK::BattlegroundTK()
 {
     BgObjects.resize(BG_TK_OBJECT_MAX);
@@ -111,7 +109,7 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
         {
             if (Player* player = ObjectAccessor::FindPlayer(itr->first))
             {
-                for (uint8 i = 0; i < BG_TK_MaxOrbCount; ++i)
+                for (uint8 i = 0; i < BG_TK_MAX_ORBS; ++i)
                 {
                     if (m_orbOwners[i] == player->GetGUID())
                     {
@@ -143,7 +141,7 @@ void BattlegroundTK::Reset()
 
     pointsTimer			= 4 * IN_MILLISECONDS;
 
-    for (uint8 i = 0; i < BG_TK_MaxOrbCount; ++i)
+    for (uint8 i = 0; i < BG_TK_MAX_ORBS; ++i)
         m_orbOwners[i] = ObjectGuid::Empty;
 
     _orbState[0]        = BG_TK_ORB_STATE_ON_BASE;
@@ -413,16 +411,12 @@ void BattlegroundTK::UpdateScore(uint16 team, int16 points)
         else
         {
             m_Team_Scores[teamindex] += points;
-            UpdateWorldState(((teamindex == TEAM_ALLIANCE)?BG_TK_RESOURCES_ALLIANCE:BG_TK_RESOURCES_HORDE), m_Team_Scores[teamindex]);
+            UpdateWorldState(((teamindex == TEAM_ALLIANCE)? BG_TK_RESOURCES_ALLIANCE : BG_TK_RESOURCES_HORDE), m_Team_Scores[teamindex]);
         }
 
         if (!m_IsInformedNearVictory && m_Team_Scores[teamindex] > BG_TK_WARNING_NEAR_VICTORY_SCORE)
         {
-            if (team == ALLIANCE)
-                SendMessageToAll(LANG_BG_TK_A_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
-            else
-                SendMessageToAll(LANG_BG_TK_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
-
+            SendMessageToAll(team == ALLIANCE ? LANG_BG_TK_A_NEAR_VICTORY : LANG_BG_TK_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
             PlaySoundToAll(BG_TK_SOUND_NEAR_VICTORY);
             m_IsInformedNearVictory = true;
         }
@@ -431,11 +425,7 @@ void BattlegroundTK::UpdateScore(uint16 team, int16 points)
 
 WorldSafeLocsEntry const* BattlegroundTK::GetClosestGraveYard(Player* player)
 {
-    if (player->GetTeam() == ALLIANCE)
-        return sWorldSafeLocsStore.LookupEntry(BG_TK_GraveyardIds[0]);
-
-    else
-        return sWorldSafeLocsStore.LookupEntry(BG_TK_GraveyardIds[1]);
+    return sWorldSafeLocsStore.LookupEntry(BG_TK_GraveyardIds[player->GetTeam() == ALLIANCE ? 0 : 1]);
 }
 
 bool BattlegroundTK::SetupBattleground()
@@ -476,10 +466,7 @@ bool BattlegroundTK::SetupBattleground()
 
 void BattlegroundTK::EndBattleground(uint32 winner)
 {
-    if (winner == WINNER_ALLIANCE)
-        RewardHonorToTeam(GetBonusHonorFromKill(1), ALLIANCE);
-    if (winner == WINNER_HORDE)
-        RewardHonorToTeam(GetBonusHonorFromKill(1), HORDE);
+    RewardHonorToTeam(GetBonusHonorFromKill(1), winner == WINNER_ALLIANCE ? ALLIANCE : HORDE);
 
     RewardHonorToTeam(GetBonusHonorFromKill(1), HORDE);
     RewardHonorToTeam(GetBonusHonorFromKill(1), ALLIANCE);
@@ -532,7 +519,7 @@ bool BattlegroundTK::UpdatePlayerScore(Player* player, uint32 type, uint32 value
 
 bool BattlegroundTK::HasAnOrb(Player* player)
 {
-    for (uint8 i = 0; i < BG_TK_MaxOrbCount; ++i)
+    for (uint8 i = 0; i < BG_TK_MAX_ORBS; ++i)
         if (m_orbOwners[i] == player->GetGUID())
             return true;
     return false;

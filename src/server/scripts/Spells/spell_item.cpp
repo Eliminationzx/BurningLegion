@@ -4817,6 +4817,10 @@ public:
 
             int32 hp = GetSpellInfo()->GetEffect(EFFECT_1)->BasePoints;
             int32 bp = CalculatePct(dmgInfo.GetDamage(), GetSpellInfo()->GetEffect(EFFECT_2)->BasePoints);
+           
+            if (target->GetSpellHistory()->HasCooldown(SPELL_SHIELD_OF_VENGEANCE))
+                target->GetSpellHistory()->ResetCooldown(SPELL_SHIELD_OF_VENGEANCE, true);
+
             target->CastCustomSpell(target, SPELL_SHIELD_OF_VENGEANCE, &bp, NULL, NULL, true);
             target->CastSpell(target, SPELL_ARMGUARDS_MARK, true);
             target->SetHealth(hp);

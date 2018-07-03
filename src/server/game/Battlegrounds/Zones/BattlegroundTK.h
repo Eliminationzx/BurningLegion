@@ -87,14 +87,25 @@ enum BG_TK_GameObjectId
     BG_OBJECT_TK_ORB_ORANGE		= 400423
 };
 
-const uint8 BG_TK_MaxOrbCount = 4;
+#define BG_TK_MAX_ORBS  4
+
 const uint32 BG_TK_GraveyardIds[2] = {3552, 3553};
 
 class BattlegroundTKScore final : public BattlegroundScore
 {
     public:
         BattlegroundTKScore(ObjectGuid playerGuid, uint32 team): BattlegroundScore(playerGuid, team), OrbPossesions(0), PointsScored(0) {};
-        virtual ~BattlegroundTKScore() {};
+
+        void BuildPvPLogPlayerDataPacket(WorldPackets::Battleground::PVPLogData::PlayerData& playerData) const override
+        {
+            BattlegroundScore::BuildPvPLogPlayerDataPacket(playerData);
+
+            playerData.Stats.push_back(OrbPossesions);
+            playerData.Stats.push_back(PointsScored);
+        }
+
+        uint32 GetAttr1() const final override { return OrbPossesions; }
+        uint32 GetAttr2() const final override { return PointsScored; }
 
         uint32 OrbPossesions;
         uint32 PointsScored;
@@ -121,7 +132,6 @@ class BattlegroundTK : public Battleground
         void Reset() override;
         void EndBattleground(uint32 winner) override;
         WorldSafeLocsEntry const* GetClosestGraveYard(Player* player) override;
-        void GetZonePlayerWithOrb(Player* player);
 
         /* BG Orbs*/
         ObjectGuid GetOrbPickerGUID(int32 team) const
@@ -138,7 +148,6 @@ class BattlegroundTK : public Battleground
         uint8 GetOrbState(uint32 orb)             { return _orbState[orb]; }
         void RespawnOrbAfterDrop(uint32 orb);
         bool HasAnOrb(Player* player);
-        uint32 GetOrbOwners(Player* player);
 
         uint32 GetPrematureWinner() override;
         void UpdateScore(uint16 team, int16 points);
@@ -147,7 +156,7 @@ class BattlegroundTK : public Battleground
         /* Scorekeeping */
         void AddPoint(uint32 TeamID, uint32 Points)     { m_Team_Scores[GetTeamIndexByTeamId(TeamID)] += Points; }
 
-        private:
+    private:
         ObjectGuid m_orbOwners[4];                        // 0 = orb 1, 1 = orb 2, 2 = orb 3, 3 = orb 4 (for player's guids)
         uint8 _orbState[4];                               // for checking orb state (on player, on base)
 
