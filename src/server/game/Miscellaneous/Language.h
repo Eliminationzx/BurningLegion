@@ -1167,6 +1167,9 @@ enum TrinityStrings
     LANG_BG_SM_A_NEAR_VICTORY                     = 2229,
     LANG_BG_SM_H_NEAR_VICTORY                     = 2230,
 
-    LANG_BREACHING_TRUESHOT_LODGE                 = 2300
+    LANG_BREACHING_TRUESHOT_LODGE                 = 2300,
+    LANG_EXP_NPC_COMBAT                           = 2301,
+    LANG_EXP_NPC_LEVEL_UP                         = 2302,
+    LANG_EXP_NPC_LEVEL_ERROR                      = 2303
 };
 #endif
