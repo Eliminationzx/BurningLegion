@@ -286,9 +286,7 @@ private:
     uint32 GetMineCartTeamKeeper(uint8 p_MineCart);
     uint32 m_HonorScoreTics[2];
 
-    uint32 m_MineCartsTrigger[SM_MINE_CART_MAX]; ///< m_MineCartsTrigger is not used
     int32 m_MineCartsProgressBar[SM_MINE_CART_MAX];
-    uint32 m_MineCartTeamKeeper[SM_MINE_CART_MAX]; // keepers team ///< m_MineCartTeamKeeper is not used
     int32 m_FirstMineCartSummonTimer;
     int32 m_MineCartCheckTimer;
     int32 m_DepotCloseTimer[4];
