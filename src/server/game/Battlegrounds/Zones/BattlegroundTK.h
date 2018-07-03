@@ -129,7 +129,6 @@ class BattlegroundTK : public Battleground
         void RemovePlayer(Player* player, ObjectGuid guid, uint32 team) override;
         void HandleKillPlayer(Player* player, Player* killer) override;
         bool SetupBattleground() override;
-        void Reset() override;
         void EndBattleground(uint32 winner) override;
         WorldSafeLocsEntry const* GetClosestGraveYard(Player* player) override;
 

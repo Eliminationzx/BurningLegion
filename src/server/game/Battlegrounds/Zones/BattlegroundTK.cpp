@@ -38,6 +38,33 @@ BattlegroundTK::BattlegroundTK()
     StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_TK_START_ONE_MINUTE;
     StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_TK_START_HALF_MINUTE;
     StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_TK_HAS_BEGUN;
+
+    pointsTimer = 4 * IN_MILLISECONDS;
+
+    for (uint8 i = 0; i < BG_TK_MAX_ORBS; ++i)
+        m_orbOwners[i] = ObjectGuid::Empty;
+
+    _orbState[0] = BG_TK_ORB_STATE_ON_BASE;
+    _orbState[1] = BG_TK_ORB_STATE_ON_BASE;
+    _orbState[2] = BG_TK_ORB_STATE_ON_BASE;
+    _orbState[3] = BG_TK_ORB_STATE_ON_BASE;
+
+    m_Team_Scores[TEAM_ALLIANCE] = 0;
+    m_Team_Scores[TEAM_HORDE] = 0;
+
+    if (sBattlegroundMgr->IsBGWeekend(GetTypeID()))
+    {
+        m_HonorWinKills = 3;
+        m_HonorEndKills = 4;
+    }
+    else
+    {
+        m_HonorWinKills = 1;
+        m_HonorEndKills = 2;
+    }
+
+    m_IsInformedNearVictory = false;
+    bgEnd = false;
 }
 
 BattlegroundTK::~BattlegroundTK()
@@ -133,38 +160,6 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
             }
         }
     } else pointsTimer -= diff;
-}
-
-void BattlegroundTK::Reset()
-{
-    Battleground::Reset();
-
-    pointsTimer			= 4 * IN_MILLISECONDS;
-
-    for (uint8 i = 0; i < BG_TK_MAX_ORBS; ++i)
-        m_orbOwners[i] = ObjectGuid::Empty;
-
-    _orbState[0]        = BG_TK_ORB_STATE_ON_BASE;
-    _orbState[1]        = BG_TK_ORB_STATE_ON_BASE;
-    _orbState[2]        = BG_TK_ORB_STATE_ON_BASE;
-    _orbState[3]        = BG_TK_ORB_STATE_ON_BASE;
-
-    m_Team_Scores[TEAM_ALLIANCE]      = 0;
-    m_Team_Scores[TEAM_HORDE]         = 0;
-
-    if (sBattlegroundMgr->IsBGWeekend(GetTypeID()))
-    {
-        m_HonorWinKills = 3;
-        m_HonorEndKills = 4;
-    }
-    else
-    {
-        m_HonorWinKills = 1;
-        m_HonorEndKills = 2;
-    }
-
-    m_IsInformedNearVictory		= false;
-    bgEnd = false;
 }
 
 void BattlegroundTK::StartingEventCloseDoors()
