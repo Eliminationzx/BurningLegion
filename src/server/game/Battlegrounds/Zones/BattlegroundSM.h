@@ -220,18 +220,21 @@ const uint32 BG_SM_CartTypes[3]
 
 struct BattlegroundSMScore final : public BattlegroundScore
 {
-    BattlegroundSMScore(ObjectGuid playerGuid, uint32 team) : BattlegroundScore(playerGuid, team), MineCartCaptures(0) { }
+    friend class BattlegroundSM;
+    
+    protected:
+        BattlegroundSMScore(ObjectGuid playerGuid, uint32 team) : BattlegroundScore(playerGuid, team), MineCartCaptures(0) { }
 
-    void BuildPvPLogPlayerDataPacket(WorldPackets::Battleground::PVPLogData::PlayerData& playerData) const override
-    {
-        BattlegroundScore::BuildPvPLogPlayerDataPacket(playerData);
+        void BuildPvPLogPlayerDataPacket(WorldPackets::Battleground::PVPLogData::PlayerData& playerData) const override
+        {
+            BattlegroundScore::BuildPvPLogPlayerDataPacket(playerData);
 
-        playerData.Stats.push_back(MineCartCaptures);
-    }
+            playerData.Stats.push_back(MineCartCaptures);
+        }
 
-    uint32 GetAttr1() const final override { return MineCartCaptures; }
+        uint32 GetAttr1() const final override { return MineCartCaptures; }
 
-    uint32 MineCartCaptures;
+        uint32 MineCartCaptures;
 };
 
 class BattlegroundSM : public Battleground
@@ -248,7 +251,7 @@ public:
     void HandleKillPlayer(Player* p_Player, Player* p_Killer) override;
     bool SetupBattleground() override;
     void Reset() override;
-    WorldSafeLocsEntry const* GetClosestGraveYard(Player* p_Player);
+    WorldSafeLocsEntry const* GetClosestGraveYard(Player* p_Player) override;
     void PostUpdateImpl(uint32 p_Diff) override;
     void UpdateTeamScore(uint32 p_Team);
     void EndBattleground(uint32 p_Winner) override;

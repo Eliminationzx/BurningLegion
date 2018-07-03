@@ -1177,7 +1177,7 @@ bool BattlegroundSM::UpdatePlayerScore(Player* player, uint32 type, uint32 value
             ((BattlegroundSMScore*)l_Iter->second)->MineCartCaptures += value;
             break;
         default:
-            Battleground::UpdatePlayerScore(player, type, value);
+            Battleground::UpdatePlayerScore(player, type, value, doAddHonor);
             break;
     }
 

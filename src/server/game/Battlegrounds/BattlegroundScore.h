@@ -52,8 +52,8 @@ enum ScoreType
     SCORE_DESTROYED_WALL        = 17,
 
     //TK
-    SCORE_ORB_POSSESIONS		= 18,
-    SCORE_POINTS_SCORED			= 19,
+    SCORE_ORB_HANDLES           = 18,
+    SCORE_ORB_SCORE             = 19,
 
     //SM
     SCORE_CART_CONTROLLED		= 20
