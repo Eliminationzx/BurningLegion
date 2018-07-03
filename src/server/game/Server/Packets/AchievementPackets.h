@@ -51,26 +51,6 @@ namespace WorldPackets
             std::vector<CriteriaProgress> Progress;
         };
 
-        class AccountCriteriaUpdate final : public ServerPacket
-        {
-        public:
-            AccountCriteriaUpdate() : ServerPacket(SMSG_ACCOUNT_CRITERIA_UPDATE, 4 + 8 + 16 + 4 + 4 + 4 + 4) { }
-
-            WorldPacket const* Write() override;
-
-            CriteriaProgress Progress;
-        };
-
-        class AllAccountCriteria final : public ServerPacket
-        {
-        public:
-            AllAccountCriteria() : ServerPacket(SMSG_ALL_ACCOUNT_CRITERIA) { }
-
-            WorldPacket const* Write() override;
-
-            std::vector<CriteriaProgress> Progress;
-        };
-
         class AllAchievementData final : public ServerPacket
         {
         public:

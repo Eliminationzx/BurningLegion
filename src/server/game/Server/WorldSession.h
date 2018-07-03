@@ -34,7 +34,6 @@
 #include <unordered_map>
 #include <unordered_set>
 
-class AccountAchievementMgr;
 class BattlePetMgr;
 class BigNumber;
 class BlackMarketEntry;
@@ -1146,8 +1145,6 @@ class TC_GAME_API WorldSession
 
         CollectionMgr* GetCollectionMgr() const { return _collectionMgr.get(); }
 
-        AccountAchievementMgr* GetAccountAchievementMgr() const { return _accountAchievementMgr.get(); }
-
     public:                                                 // opcodes handlers
 
         void Handle_NULL(WorldPackets::Null& null);          // not used
@@ -1926,7 +1923,6 @@ class TC_GAME_API WorldSession
         std::unique_ptr<BattlePetMgr> _battlePetMgr;
 
         std::unique_ptr<CollectionMgr> _collectionMgr;
-        std::unique_ptr<AccountAchievementMgr> _accountAchievementMgr;
 
         ConnectToKey _instanceConnectKey;
 

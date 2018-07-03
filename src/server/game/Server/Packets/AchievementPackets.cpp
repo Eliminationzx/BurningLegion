@@ -54,25 +54,6 @@ ByteBuffer& operator<<(ByteBuffer& data, WorldPackets::Achievement::AllAchieveme
     return data;
 }
 
-WorldPacket const* WorldPackets::Achievement::AccountCriteriaUpdate::Write()
-{
-    _worldPacket << Progress;
-
-    return &_worldPacket;
-}
-
-WorldPacket const* WorldPackets::Achievement::AllAccountCriteria::Write()
-{
-    _worldPacket << uint32(Progress.size());
-
-    for (CriteriaProgress const& progress : Progress)
-    {
-        _worldPacket << progress;
-    }
-
-    return &_worldPacket;
-}
-
 WorldPacket const* WorldPackets::Achievement::AllAchievementData::Write()
 {
     _worldPacket << Data;
