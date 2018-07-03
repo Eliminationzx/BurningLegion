@@ -1160,6 +1160,21 @@ enum TrinityStrings
     LANG_BG_TK_A_NEAR_VICTORY                     = 2216,
     LANG_BG_TK_H_NEAR_VICTORY                     = 2217,
 
+    // Battleground SM
+    LANG_BG_SM_START_TWO_MINUTES                  = 2218,
+    LANG_BG_SM_START_ONE_MINUTE                   = 2219,
+    LANG_BG_SM_START_HALF_MINUTE                  = 2220,
+    LANG_BG_SM_HAS_BEGUN                          = 2221,
+    LANG_BG_SM_ALLIANCE_CONTROLLED_MINE_CART      = 2222,
+    LANG_BG_SM_HORDE_CONTROLLED_MINE_CART         = 2223,
+    LANG_BG_SM_MINE_CART_SPAWNED                  = 2224,
+    LANG_BG_SM_ALLIANCE_CAPTURED_MINE_CART        = 2225,
+    LANG_BG_SM_HORDE_CAPTURED_MINE_CART           = 2226,
+    LANG_BG_SM_EAST_DIRECTION_CHANGED             = 2227,
+    LANG_BG_SM_NORTH_DIRECTION_CHANGED            = 2228,
+    LANG_BG_SM_A_NEAR_VICTORY                     = 2229,
+    LANG_BG_SM_H_NEAR_VICTORY                     = 2230,
+
     LANG_BREACHING_TRUESHOT_LODGE                 = 2300
 };
 #endif

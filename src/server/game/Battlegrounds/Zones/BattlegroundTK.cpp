@@ -29,6 +29,20 @@
 #include "WorldStatePackets.h"
 #include "SpellInfo.h"
 
+enum BG_TK_Rewards
+{
+    BG_TK_WIN = 0,
+    BG_TK_FLAG_CAP,
+    BG_TK_MAP_COMPLETE,
+    BG_TK_REWARD_NUM
+};
+
+uint32 BG_TK_Honor[BG_HONOR_MODE_NUM][BG_TK_REWARD_NUM] =
+{
+    {20, 40, 40}, // normal honor
+    {60, 40, 80}  // holiday
+};
+
 BattlegroundTK::BattlegroundTK()
 {
     BgObjects.resize(BG_TK_OBJECT_MAX);
@@ -44,10 +58,8 @@ BattlegroundTK::BattlegroundTK()
     for (uint8 i = 0; i < BG_TK_MAX_ORBS; ++i)
         m_orbOwners[i] = ObjectGuid::Empty;
 
-    _orbState[0] = BG_TK_ORB_STATE_ON_BASE;
-    _orbState[1] = BG_TK_ORB_STATE_ON_BASE;
-    _orbState[2] = BG_TK_ORB_STATE_ON_BASE;
-    _orbState[3] = BG_TK_ORB_STATE_ON_BASE;
+    for (uint8 i = 0; i < BG_TK_MAX_ORBS; ++i)
+        _orbState[i] = BG_TK_ORB_STATE_ON_BASE;
 
     m_Team_Scores[TEAM_ALLIANCE] = 0;
     m_Team_Scores[TEAM_HORDE] = 0;
@@ -461,10 +473,11 @@ bool BattlegroundTK::SetupBattleground()
 
 void BattlegroundTK::EndBattleground(uint32 winner)
 {
-    RewardHonorToTeam(GetBonusHonorFromKill(1), winner == WINNER_ALLIANCE ? ALLIANCE : HORDE);
+    RewardHonorToTeam(GetBonusHonorFromKill(m_HonorEndKills), winner == WINNER_ALLIANCE ? ALLIANCE : HORDE);
+    RewardHonorToTeam(BG_TK_Honor[m_HonorMode][BG_TK_WIN], winner == WINNER_ALLIANCE ? ALLIANCE : HORDE);
 
-    RewardHonorToTeam(GetBonusHonorFromKill(1), HORDE);
-    RewardHonorToTeam(GetBonusHonorFromKill(1), ALLIANCE);
+    RewardHonorToTeam(GetBonusHonorFromKill(m_HonorEndKills), HORDE);
+    RewardHonorToTeam(GetBonusHonorFromKill(m_HonorEndKills), ALLIANCE);
 
     Battleground::EndBattleground(winner);
 }

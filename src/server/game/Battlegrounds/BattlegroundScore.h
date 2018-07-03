@@ -53,7 +53,10 @@ enum ScoreType
 
     //TK
     SCORE_ORB_POSSESIONS		= 18,
-    SCORE_POINTS_SCORED			= 19
+    SCORE_POINTS_SCORED			= 19,
+
+    //SM
+    SCORE_CART_CONTROLLED		= 20
 };
 
 struct BattlegroundScore
