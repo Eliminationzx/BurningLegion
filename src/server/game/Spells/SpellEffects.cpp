@@ -550,6 +550,10 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
     if (!unitTarget && !gameObjTarget && !itemTarget)
         return;
 
+    // Capture point
+    if ((m_spellInfo->Id == 97388 || m_spellInfo->Id == 97372) && m_caster->IsPlayer() && m_caster->ToPlayer()->GetBattleground())
+        m_caster->ToPlayer()->GetBattleground()->EventPlayerClickedOnFlag(m_caster->ToPlayer(), unitTarget);
+
     // selection by spell family
     switch (m_spellInfo->SpellFamilyName)
     {

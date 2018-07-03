@@ -442,6 +442,7 @@ class TC_GAME_API Battleground
         // Battleground events
         virtual void EventPlayerDroppedFlag(Player* /*player*/) { }
         virtual void EventPlayerClickedOnFlag(Player* /*player*/, GameObject* /*target_obj*/) { }
+        virtual void EventPlayerClickedOnFlag(Player* /*player*/, Unit* /*target_unit*/) { }
         void EventPlayerLoggedIn(Player* player);
         void EventPlayerLoggedOut(Player* player);
         virtual void ProcessEvent(WorldObject* /*obj*/, uint32 /*eventId*/, WorldObject* /*invoker*/ = NULL) { }
