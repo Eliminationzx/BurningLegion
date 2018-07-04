@@ -1,2 +1,2 @@
 ---crash fix
-UPDATE `gameobject_template` `Data6`=5 WHERE (`entry`=209626);
+UPDATE `gameobject_template` SET `Data6`=5 WHERE (`entry`=209626);
