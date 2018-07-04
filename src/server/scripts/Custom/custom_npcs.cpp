@@ -298,46 +298,42 @@ public:
     Exp_NPC() : CreatureScript("Exp_NPC") { }
 
     bool OnGossipHello(Player* player, Creature* creature) override
-	{
-		if (player->IsInCombat())
-        {
-            player->SendNotification(LANG_EXP_NPC_COMBAT, CHAT_MSG_RAID_BOSS_EMOTE);
-            return true;
-        }
-        else
     {
+        if (player->IsInCombat())
+            player->SendNotification(LANG_EXP_NPC_COMBAT, CHAT_MSG_RAID_BOSS_EMOTE);
+        else
+        {
             AddGossipItemFor(player, GOSSIP_MENU_ID_EXP_NPC, 0, GOSSIP_SENDER_MAIN, 1);
             SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-            return true;
-          
-    }
+        }
 
         CloseGossipMenuFor(player);        
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
         
-            switch(action)
-            {                                              
-			case 1: 
+        switch(action)
+        {                                              
+            case 1: 
+            {
                 if (player->getLevel() < 100)
                 {
                     player->GiveLevel(100);
                     player->SendNotification(LANG_EXP_NPC_LEVEL_UP, CHAT_MSG_RAID_BOSS_EMOTE);
-                    CloseGossipMenuFor(player); 
 
                 }
                 else
-                {
                     player->SendNotification(LANG_EXP_NPC_LEVEL_ERROR, CHAT_MSG_RAID_BOSS_EMOTE);
-                    CloseGossipMenuFor(player); 
-                    return false;
-                }
+
                 break;
-            }  
+            }
+        }  
+
+        CloseGossipMenuFor(player);
+        return true;
     } 
 };
 
