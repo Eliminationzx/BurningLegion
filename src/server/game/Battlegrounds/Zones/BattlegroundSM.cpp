@@ -254,10 +254,10 @@ void BattlegroundSM::FirstMineCartSummon(uint32 /*p_Diff*/)
 void BattlegroundSM::StartingEventOpenDoors()
 {
     //Open doors
-    for (int l_DoorType = BG_SM_OBJECT_DOOR_A_1; l_DoorType <= BG_SM_OBJECT_DOOR_H_2; ++l_DoorType)
+    for (uint32 l_DoorType = BG_SM_OBJECT_DOOR_A_1; l_DoorType <= BG_SM_OBJECT_DOOR_H_2; ++l_DoorType)
         DoorOpen(l_DoorType);
 
-    for (uint8 l_Iter = BG_SM_OBJECT_WATERFALL_DEPOT; l_Iter < BG_SM_OBJECT_MAX; ++l_Iter)
+    for (uint32 l_Iter = BG_SM_OBJECT_WATERFALL_DEPOT; l_Iter < BG_SM_OBJECT_MAX; ++l_Iter)
         SpawnBGObject(l_Iter, RESPAWN_IMMEDIATELY);
 }
 

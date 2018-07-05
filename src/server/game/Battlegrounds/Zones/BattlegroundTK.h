@@ -212,12 +212,12 @@ class BattlegroundTK : public Battleground
         void PostUpdateImpl(uint32 diff) override;
 
         /* inherited from BattlegroundClass */
-        virtual void AddPlayer(Player* plr) override;
-        virtual void StartingEventCloseDoors() override;
-        virtual void StartingEventOpenDoors() override;
+        void AddPlayer(Player* plr) override;
+        void StartingEventCloseDoors() override;
+        void StartingEventOpenDoors() override;
 
         /* Battleground Events */
-        virtual void EventPlayerDroppedOrb(Player* source);
+        void EventPlayerDroppedOrb(Player* source);
 
         void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj) override;
 

@@ -525,8 +525,6 @@ bool Player::Create(ObjectGuid::LowType guidlow, WorldPackets::Character::Charac
         start_level = sWorld->getIntConfig(CONFIG_START_DEATH_KNIGHT_PLAYER_LEVEL);
     else if (getClass() == CLASS_DEMON_HUNTER)
         start_level = sWorld->getIntConfig(CONFIG_START_DEMON_HUNTER_PLAYER_LEVEL);
-    else if (getRace() >= RACE_NIGHTBORNE)
-        start_level = 20;
 
     if (createInfo->TemplateSet)
     {
@@ -4877,6 +4875,9 @@ void Player::RepopAtGraveyard()
 
 bool Player::CanJoinConstantChannelInZone(ChatChannelsEntry const* channel, AreaTableEntry const* zone) const
 {
+    if (channel->Flags & CHANNEL_DBC_FLAG_LFG && sWorld->getBoolConfig(CONFIG_LFG_LOCATION_ALL))
+        return true;
+    
     if (channel->Flags & CHANNEL_DBC_FLAG_ZONE_DEP && zone->Flags[0] & AREA_FLAG_ARENA_INSTANCE)
         return false;
 
