@@ -4875,7 +4875,7 @@ void Player::RepopAtGraveyard()
 
 bool Player::CanJoinConstantChannelInZone(ChatChannelsEntry const* channel, AreaTableEntry const* zone) const
 {
-    if (channel->flags & CHANNEL_DBC_FLAG_LFG && sWorld->getBoolConfig(CONFIG_LFG_LOCATION_ALL))
+    if (channel->Flags & CHANNEL_DBC_FLAG_LFG && sWorld->getBoolConfig(CONFIG_LFG_LOCATION_ALL))
         return true;
     
     if (channel->Flags & CHANNEL_DBC_FLAG_ZONE_DEP && zone->Flags[0] & AREA_FLAG_ARENA_INSTANCE)
