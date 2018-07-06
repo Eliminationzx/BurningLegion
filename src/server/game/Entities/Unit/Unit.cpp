@@ -7041,13 +7041,21 @@ float Unit::GetUnitSpellCriticalChance(Unit* victim, Spell* spell, AuraEffect co
                     case 118000: // Dragon roar always crit
                         crit_chance = 100.0f;
                         break;
+                    case 20271: // Judgement
+                        if (Aura* aura = GetAura(218178, GetGUID())) // Greater judgement
+                        {
+                            int32 healthPct = aura->GetEffect(EFFECT_0)->GetAmount();
+                            if (victim->HealthAbovePct(healthPct))
+                                crit_chance = 100.0f;
+                        }
+                        break;
                     case 23881: // Bloodthirst & Fresh Meat
                         if (Aura* aura = GetAura(215568, GetGUID()))
                         {
                             int32 critPct = aura->GetEffect(EFFECT_0)->GetAmount();
                             int32 healthPct = aura->GetEffect(EFFECT_1)->GetAmount();
 
-                            if (victim->HealthBelowPct(healthPct))
+                            if (victim->HealthAbovePct(healthPct))
                                 AddPct(crit_chance, critPct);
                         }
                         break;
