@@ -7047,7 +7047,7 @@ float Unit::GetUnitSpellCriticalChance(Unit* victim, Spell* spell, AuraEffect co
                             int32 critPct = aura->GetEffect(EFFECT_0)->GetAmount();
                             int32 healthPct = aura->GetEffect(EFFECT_1)->GetAmount();
 
-                            if (victim->GetHealthPct() > healthPct)
+                            if (victim->HealthBelowPct(healthPct))
                                 AddPct(crit_chance, critPct);
                         }
                         break;

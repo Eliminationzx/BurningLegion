@@ -3580,7 +3580,7 @@ public:
             return eventInfo.GetActor()->HealthBelowPctDamaged(GetEffectInfo(EFFECT_0)->BasePoints, eventInfo.GetDamageInfo()->GetDamage());
         }
 
-        void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+        void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
         {
             PreventDefaultAction();
 
