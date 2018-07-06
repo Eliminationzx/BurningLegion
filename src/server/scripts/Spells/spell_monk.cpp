@@ -3697,7 +3697,7 @@ public:
 
         void Register() override
         {
-            OnEffectHit += SpellEffectFn(spell_growth_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_CREATE_AREATRIGGER);
+            OnEffectHit += SpellEffectFn(spell_monk_song_of_chi_ji_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_CREATE_AREATRIGGER);
         }
     };
 
