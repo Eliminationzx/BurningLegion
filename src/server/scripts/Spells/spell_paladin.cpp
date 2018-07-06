@@ -126,6 +126,7 @@ enum PaladinSpells
     SPELL_PALADIN_WORD_OF_GLORY                 = 210191,
     SPELL_PALADIN_WORD_OF_GLORY_HEAL            = 214894,
     SPELL_PALDIN_BLESSED_HAMMER                 = 204019,
+    SPELL_PALADIN_GREATER_JUDGEMENT             = 218178
 };
 
 enum PaladinNPCs
@@ -1318,6 +1319,12 @@ class spell_pal_judgment : public SpellScript
             case TALENT_SPEC_PALADIN_RETRIBUTION:
             {
                 caster->CastSpell(target, SPELL_PALADIN_JUDGMENT_RETRI_DEBUFF);
+
+                if (caster->HasAura(SPELL_PALADIN_GREATER_JUDGEMENT))
+                {
+                    if (Unit* nearbyTarget = caster->SelectNearbyTarget(target))
+                        caster->CastSpell(nearbyTarget, SPELL_PALADIN_JUDGMENT, true);
+                }
                 break;
             }
             case TALENT_SPEC_PALADIN_HOLY:
