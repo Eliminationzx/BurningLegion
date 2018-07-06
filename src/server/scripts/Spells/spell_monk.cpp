@@ -3570,32 +3570,31 @@ class spell_monk_healing_elixirs_aura : public SpellScriptLoader
 {
 public:
     spell_monk_healing_elixirs_aura() : SpellScriptLoader("spell_monk_healing_elixirs_aura") { }
+   
     class spell_monk_healing_elixirs_aura_AuraScript : public AuraScript
     {
         PrepareAuraScript(spell_monk_healing_elixirs_aura_AuraScript);
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            return eventInfo.GetActor()->HealthBelowPctDamaged(GetEffectInfo(EFFECT_0)->BasePoints, eventInfo.GetDamageInfo()->GetDamage());
+        }
+
         void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            if (!GetCaster())
-                return;
-            if (!eventInfo.GetDamageInfo())
-                return;
-            if (!eventInfo.GetDamageInfo()->GetDamage())
-                return;
-            if (Unit* caster = GetCaster())
-            {
-                if (caster->HealthBelowPctDamaged(35, eventInfo.GetDamageInfo()->GetDamage()))
-                {
-                    caster->CastSpell(caster, SPELL_MONK_HEALING_ELIXIRS_RESTORE_HEALTH, true);
-                    caster->GetSpellHistory()->ConsumeCharge(SPELL_MONK_HEALING_ELIXIRS_RESTORE_HEALTH);
-                }
-            }
+
+            GetCaster()->CastSpell(GetCaster(), SPELL_MONK_HEALING_ELIXIRS_RESTORE_HEALTH, true);
+            GetCaster()->GetSpellHistory()->ConsumeCharge(SPELL_MONK_HEALING_ELIXIRS_RESTORE_HEALTH);
         }
+
         void Register() override
         {
-            OnEffectProc += AuraEffectProcFn(spell_monk_healing_elixirs_aura_AuraScript::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+            OnEffectProc += AuraEffectProcFn(spell_monk_healing_elixirs_aura_AuraScript::OnProc, EFFECT_0, SPELL_AURA_DUMMY);
+            DoCheckProc += AuraCheckProcFn(spell_monk_healing_elixirs_aura_AuraScript::CheckProc);
         }
     };
+
     AuraScript* GetAuraScript() const override
     {
         return new spell_monk_healing_elixirs_aura_AuraScript();
