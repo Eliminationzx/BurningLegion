@@ -151,6 +151,7 @@ enum MonkSpells
     SPELL_MONK_ZEN_PILGRIMAGE_RETURN                    = 126895,
     SPELL_MONK_ZEN_PULSE_DAMAGE                         = 124081,
     SPELL_MONK_ZEN_PULSE_HEAL                           = 198487,
+    SPELL_MONK_SONG_OF_CHI_JI_STUN                      = 198909
 };
 
 enum StormEarthAndFireSpells
@@ -1639,6 +1640,7 @@ public:
         return new spell_monk_power_strikes_SpellScript();
     }
 };
+
 // 116844 - Ring of Peace Aura
 class spell_monk_ring_of_peace : public SpellScriptLoader
 {
@@ -3670,6 +3672,41 @@ class spell_monk_whirling_dragon_punch : public AuraScript
     }
 };
 
+// 198898 - Song of Chi-Ji
+class spell_monk_song_of_chi_ji : public SpellScriptLoader
+{
+public:
+    spell_monk_song_of_chi_ji() : SpellScriptLoader("spell_monk_song_of_chi_ji") {}
+
+    class spell_monk_song_of_chi_ji_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_monk_song_of_chi_ji_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_MONK_SONG_OF_CHI_JI_STUN))
+                return false;
+            return true;
+        }
+
+        void HandleEffect(SpellEffIndex /*effIndex*/)
+        {
+            if (WorldLocation* dest = GetHitDest())
+                GetCaster()->CastSpell(dest->GetPositionX(), dest->GetPositionY(), dest->GetPositionZ(), SPELL_MONK_SONG_OF_CHI_JI_STUN, true);
+        }
+
+        void Register() override
+        {
+            OnEffectHit += SpellEffectFn(spell_growth_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_CREATE_AREATRIGGER);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_monk_song_of_chi_ji_SpellScript();
+    }
+};
+
 void AddSC_monk_spell_scripts()
 {
     RegisterAreaTriggerAI(at_monk_gift_of_the_ox_sphere);
@@ -3734,6 +3771,7 @@ void AddSC_monk_spell_scripts()
     new spell_monk_stagger_damage();
     new spell_monk_stagger_visual();
     new spell_monk_stance_of_the_sturdy_ox();
+    new spell_monk_song_of_chi_ji();
     RegisterAuraScript(spell_monk_storm_earth_and_fire);
     new spell_monk_surging_mist();
     new spell_monk_surging_mist_glyphed();
