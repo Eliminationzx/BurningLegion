@@ -106,8 +106,7 @@ enum MonkSpells
     SPELL_MONK_RENEWING_MIST_HOT                        = 119611,
     SPELL_MONK_RENEWING_MIST_JUMP_AURA                  = 119607,
     SPELL_MONK_RENEWING_MIST_PERIODIC                   = 119611,
-    SPELL_MONK_RING_OF_PEACE_DISARM                     = 137461,
-    SPELL_MONK_RING_OF_PEACE_SILENCE                    = 137460,
+    SPELL_MONK_RING_OF_PEACE_KNOCKBACK                  = 237371,
     SPELL_MONK_RISING_SUN_KICK                          = 107428,
     SPELL_MONK_RISING_THUNDER                           = 210804,
     SPELL_MONK_ROLL                                     = 109132,
@@ -1640,42 +1639,38 @@ public:
         return new spell_monk_power_strikes_SpellScript();
     }
 };
-// 140023 - Ring of Peace Aura
-class spell_monk_ring_of_peace_aura : public SpellScriptLoader
+// 116844 - Ring of Peace Aura
+class spell_monk_ring_of_peace : public SpellScriptLoader
 {
 public:
-    spell_monk_ring_of_peace_aura() : SpellScriptLoader("spell_monk_ring_of_peace_aura") {}
+    spell_monk_ring_of_peace() : SpellScriptLoader("spell_monk_ring_of_peace") {}
 
-    class spell_monk_ring_of_peace_aura_AuraScript : public AuraScript
+    class spell_monk_ring_of_peace_SpellScript : public SpellScript
     {
-        PrepareAuraScript(spell_monk_ring_of_peace_aura_AuraScript);
+        PrepareSpellScript(spell_monk_ring_of_peace_SpellScript);
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            return sSpellMgr->GetSpellInfo(SPELL_MONK_RING_OF_PEACE_SILENCE)
-                && sSpellMgr->GetSpellInfo(SPELL_MONK_RING_OF_PEACE_DISARM);
+            if (!sSpellMgr->GetSpellInfo(SPELL_MONK_RING_OF_PEACE_KNOCKBACK))
+                return false;
+            return true;
         }
 
-        void HandleDummyProc(AuraEffect const* /*auraEffect*/, ProcEventInfo& /*eventInfo*/)
+        void HandleDummy(SpellEffIndex /*effIndex*/)
         {
-            Unit* caster = GetCaster();
-            Unit* target = GetTarget();
-            if (!caster)
-                return;
-
-            caster->CastSpell(target, SPELL_MONK_RING_OF_PEACE_SILENCE, true);
-            caster->CastSpell(target, SPELL_MONK_RING_OF_PEACE_DISARM, true);
+            if (WorldLocation const* pos = GetExplTargetDest())
+                GetCaster()->CastSpell(pos->GetPositionX(), pos->GetPositionY(), pos->GetPositionZ(), SPELL_MONK_RING_OF_PEACE_KNOCKBACK, true);
         }
 
         void Register() override
         {
-            OnEffectProc += AuraEffectProcFn(spell_monk_ring_of_peace_aura_AuraScript::HandleDummyProc, EFFECT_0, SPELL_AURA_DUMMY);
+            OnEffectHitTarget += SpellEffectFn(spell_monk_ring_of_peace_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const override
+    SpellScript* GetSpellScript() const override
     {
-        return new spell_monk_ring_of_peace_aura_AuraScript();
+        return new spell_monk_ring_of_peace_SpellScript();
     }
 };
 
@@ -3728,7 +3723,7 @@ void AddSC_monk_spell_scripts()
     new spell_monk_purifying_brew();
     new spell_monk_renewing_mist();
     new spell_monk_renewing_mist_periodic();
-    new spell_monk_ring_of_peace_aura();
+    new spell_monk_ring_of_peace();
     new spell_monk_rising_sun_kick();
     new spell_monk_rising_thunder();
     new spell_monk_roll();
