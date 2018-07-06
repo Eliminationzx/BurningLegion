@@ -1733,19 +1733,7 @@ bool SpellInfo::CanDispelAura(SpellInfo const* auraSpellInfo) const
 
 bool SpellInfo::IsSingleTarget() const
 {
-    // all other single target spells have if it has AttributesEx5
-    if (HasAttribute(SPELL_ATTR5_SINGLE_TARGET_SPELL))
-        return true;
-
-    switch (GetSpellSpecific())
-    {
-        case SPELL_SPECIFIC_JUDGEMENT:
-            return true;
-        default:
-            break;
-    }
-
-    return false;
+    return HasAttribute(SPELL_ATTR5_SINGLE_TARGET_SPELL);
 }
 
 bool SpellInfo::IsAuraExclusiveBySpecificWith(SpellInfo const* spellInfo) const

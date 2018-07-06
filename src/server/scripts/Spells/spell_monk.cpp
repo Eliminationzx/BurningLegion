@@ -153,10 +153,8 @@ enum MonkSpells
     SPELL_MONK_ZEN_PULSE_DAMAGE                         = 124081,
     SPELL_MONK_ZEN_PULSE_HEAL                           = 198487,
     SPELL_MONK_SONG_OF_CHI_JI_STUN                      = 198909,
-    SPELL_MONK_ENVELOPING_MIST                          = 124682,
     SPELL_MONK_LIFE_COCOON                              = 116849,
-    SPELL_MONK_EFFUSE                                   = 116694,
-    SPELL_MONK_VIVIFY                                   = 116670
+    SPELL_MONK_EFFUSE                                   = 116694
 };
 
 enum StormEarthAndFireSpells
