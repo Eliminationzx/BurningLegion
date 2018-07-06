@@ -3093,7 +3093,7 @@ void AddSC_mage_spell_scripts()
     RegisterAreaTriggerAI(at_mage_flame_patch);
     RegisterAreaTriggerAI(at_mage_cinderstorm);
 
-    new spell_mage_blink();
+    RegisterSpellScript(spell_mage_blink);
     new spell_mage_displacement();
 
     // NPC Scripts
