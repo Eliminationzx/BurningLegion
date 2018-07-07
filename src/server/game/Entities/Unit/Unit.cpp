@@ -10810,35 +10810,6 @@ Unit* Unit::SelectNearbyTarget(Unit* exclude, float dist) const
     return Trinity::Containers::SelectRandomContainerElement(targets);
 }
 
-std::list<Unit*>* Unit::SelectNearbyFriendlyTargets(Unit* exclude, uint32 count, float dist) const
-{
-    std::list<Unit*> targets;
-    Trinity::AnyFriendlyUnitInObjectRangeCheck u_check(this, this, dist);
-    Trinity::UnitListSearcher<Trinity::AnyFriendlyUnitInObjectRangeCheck> searcher(this, targets, u_check);
-    Cell::VisitAllObjects(this, searcher, dist);
-
-    if (exclude)
-        targets.remove(exclude);
-
-    // remove not LoS targets
-    for (std::list<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
-    {
-        if (!IsWithinLOSInMap(*tIter) || (*tIter)->IsTotem() || (*tIter)->IsSpiritService() || (*tIter)->IsCritter())
-            targets.erase(tIter++);
-        else
-            ++tIter;
-    }
-
-    // no appropriate targets
-    if (targets.empty())
-        return NULL;
-
-    // Resize
-    Trinity::Containers::RandomResize(targets, count);
-
-    return &targets;
-}
-
 uint32 Unit::GetBaseAttackTime(WeaponAttackType att) const
 {
     return m_baseAttackSpeed[att];

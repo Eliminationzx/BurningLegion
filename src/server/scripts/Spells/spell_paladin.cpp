@@ -1332,9 +1332,9 @@ class spell_pal_judgment : public SpellScript
             {
                 caster->CastSpell(target, SPELL_PALADIN_JUDGMENT_RETRI_DEBUFF);
 
-                std::list<Unit*>* targets = target->SelectNearbyFriendlyTargets(target, 1 + (caster->HasAura(SPELL_PALADIN_GREATER_JUDGEMENT) ? sSpellMgr->GetSpellInfo(SPELL_PALADIN_GREATER_JUDGEMENT)->GetEffect(EFFECT_1)->BasePoints : 0));
+                /*std::list<Unit*>* targets = target->SelectNearbyFriendlyTargets(target, 1 + (caster->HasAura(SPELL_PALADIN_GREATER_JUDGEMENT) ? sSpellMgr->GetSpellInfo(SPELL_PALADIN_GREATER_JUDGEMENT)->GetEffect(EFFECT_1)->BasePoints : 0));
                 for (auto nearbyTarget : *targets)
-                    target->CastSpell(nearbyTarget, SPELL_PALADIN_JUDGMENT, true, nullptr, nullptr, caster->GetGUID());
+                    target->CastSpell(nearbyTarget, SPELL_PALADIN_JUDGMENT, true, nullptr, nullptr, caster->GetGUID());*/
                 break;
             }
             case TALENT_SPEC_PALADIN_HOLY:
