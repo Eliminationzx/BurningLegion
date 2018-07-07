@@ -1309,6 +1309,18 @@ class spell_pal_judgment : public SpellScript
 {
     PrepareSpellScript(spell_pal_judgment);
 
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ 
+            SPELL_PALADIN_GREATER_JUDGEMENT, 
+            SPELL_PALADIN_JUDGMENT,
+            SPELL_PALADIN_JUDGMENT_RETRI_DEBUFF, 
+            SPELL_PALADIN_JUDGMENT_HOLY_DEBUFF, 
+            SPELL_PALADIN_FIST_OF_JUSTICE,
+            SPELL_PALADIN_HAMMER_OF_JUSTICE
+        });
+    }
+
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
@@ -1320,11 +1332,9 @@ class spell_pal_judgment : public SpellScript
             {
                 caster->CastSpell(target, SPELL_PALADIN_JUDGMENT_RETRI_DEBUFF);
 
-                if (caster->HasAura(SPELL_PALADIN_GREATER_JUDGEMENT))
-                {
-                    if (Unit* nearbyTarget = caster->SelectNearbyTarget(target))
-                        caster->CastSpell(nearbyTarget, SPELL_PALADIN_JUDGMENT, true);
-                }
+                std::list<Unit*>* targets = target->SelectNearbyFriendlyTargets(target, 1 + (caster->HasAura(SPELL_PALADIN_GREATER_JUDGEMENT) ? sSpellMgr->GetSpellInfo(SPELL_PALADIN_GREATER_JUDGEMENT)->GetEffect(EFFECT_1)->BasePoints : 0));
+                for (auto nearbyTarget : *targets)
+                    target->CastSpell(nearbyTarget, SPELL_PALADIN_JUDGMENT, true, nullptr, nullptr, caster->GetGUID());
                 break;
             }
             case TALENT_SPEC_PALADIN_HOLY:
