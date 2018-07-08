@@ -126,7 +126,8 @@ enum PaladinSpells
     SPELL_PALADIN_WORD_OF_GLORY                 = 210191,
     SPELL_PALADIN_WORD_OF_GLORY_HEAL            = 214894,
     SPELL_PALDIN_BLESSED_HAMMER                 = 204019,
-    SPELL_PALADIN_GREATER_JUDGEMENT             = 218178
+    SPELL_PALADIN_GREATER_JUDGEMENT             = 218178,
+    SPELL_PALADIN_AEGIS_OF_LIGHT                = 204335
 };
 
 enum PaladinNPCs
@@ -2344,6 +2345,29 @@ class spell_pal_light_of_the_titans : public AuraScript
     }
 };
 
+class spell_pal_aegis_of_light : public AuraScript
+{
+    PrepareAuraScript(spell_pal_aegis_of_light);
+
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+            GetCaster()->CastSpell(target, SPELL_PALADIN_AEGIS_OF_LIGHT, true);
+    }
+
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+            target->RemoveAura(SPELL_PALADIN_AEGIS_OF_LIGHT);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectRemoveFn(spell_pal_aegis_of_light::HandleApply, EFFECT_0, SPELL_AURA_AREA_TRIGGER, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_pal_aegis_of_light::HandleRemove, EFFECT_0, SPELL_AURA_AREA_TRIGGER, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     new spell_pal_bastion_of_light();
@@ -2402,6 +2426,7 @@ void AddSC_paladin_spell_scripts()
     RegisterCastSpellOnProcAuraScript("spell_pal_fervent_martyr", EFFECT_0, SPELL_AURA_DUMMY, SPELL_PALADIN_FERVENT_MARTYR_BUFF); // 196923
     RegisterAuraScript(spell_pal_crusade);
     RegisterAuraScript(spell_pal_consecration);
+    RegisterAuraScript(spell_pal_aegis_of_light);
 
     new spell_pal_consecration_heal();
 
