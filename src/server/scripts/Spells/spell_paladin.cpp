@@ -2363,7 +2363,7 @@ class spell_pal_aegis_of_light : public AuraScript
 
     void Register() override
     {
-        OnEffectApply += AuraEffectRemoveFn(spell_pal_aegis_of_light::HandleApply, EFFECT_0, SPELL_AURA_AREA_TRIGGER, AURA_EFFECT_HANDLE_REAL);
+        OnEffectApply += AuraEffectApplyFn(spell_pal_aegis_of_light::HandleApply, EFFECT_0, SPELL_AURA_AREA_TRIGGER, AURA_EFFECT_HANDLE_REAL);
         OnEffectRemove += AuraEffectRemoveFn(spell_pal_aegis_of_light::HandleRemove, EFFECT_0, SPELL_AURA_AREA_TRIGGER, AURA_EFFECT_HANDLE_REAL);
     }
 };
