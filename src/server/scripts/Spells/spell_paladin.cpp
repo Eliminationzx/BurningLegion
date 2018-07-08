@@ -1346,9 +1346,6 @@ class spell_pal_judgment : public SpellScript
                     Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck> searcher(tempSumm, targets, u_check);
                     Cell::VisitAllObjects(tempSumm, searcher, judgmenetDist);
 
-                    if (tempSumm->GetVictim())
-                        targets.remove(tempSumm->GetVictim());
-
                     targets.remove(target);
 
                     for (std::list<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
