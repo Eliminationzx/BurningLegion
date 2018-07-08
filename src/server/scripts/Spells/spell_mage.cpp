@@ -2961,28 +2961,22 @@ class spell_mage_blink : public SpellScript
 {
     PrepareSpellScript(spell_mage_blink);
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_MAGE_DISPLACEMENT_BEACON });
-    }
-
     void HandleOnCast()
     {
-        if (Player* caster = GetCaster()->ToPlayer())
+        Unit* caster = GetCaster();
+
+        if (caster->HasSpell(SPELL_MAGE_DISPLACEMENT))
         {
-            if (caster->HasSpell(SPELL_MAGE_DISPLACEMENT))
+            caster->CastSpell(caster, SPELL_MAGE_DISPLACEMENT_BEACON, true);
+
+            DespawnDisplacement(caster);
+
+            if (TempSummon* tempSumm = caster->SummonCreature(WORLD_TRIGGER, caster->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 10 * IN_MILLISECONDS))
             {
-                caster->CastSpell(caster, SPELL_MAGE_DISPLACEMENT_BEACON, true);
-
-                DespawnDisplacement(caster);
-
-                if (TempSummon* tempSumm = caster->SummonCreature(WORLD_TRIGGER, caster->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 10 * IN_MILLISECONDS))
-                {
-                    tempSumm->setFaction(caster->getFaction());
-                    tempSumm->SetGuidValue(UNIT_FIELD_SUMMONEDBY, caster->GetGUID());
-                    PhasingHandler::InheritPhaseShift(tempSumm, caster);
-                    caster->Variables.Set(MAGE_DISPLACEMENT_GUID, tempSumm->GetGUID());
-                }
+                tempSumm->setFaction(caster->getFaction());
+                tempSumm->SetGuidValue(UNIT_FIELD_SUMMONEDBY, caster->GetGUID());
+                PhasingHandler::InheritPhaseShift(tempSumm, caster);
+                caster->Variables.Set(MAGE_DISPLACEMENT_GUID, tempSumm->GetGUID());
             }
         }
     }
