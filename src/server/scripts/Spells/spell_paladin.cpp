@@ -1340,21 +1340,21 @@ class spell_pal_judgment : public SpellScript
                     tempSumm->SetGuidValue(UNIT_FIELD_SUMMONEDBY, caster->GetGUID());
                     PhasingHandler::InheritPhaseShift(tempSumm, caster);
 
+                    float judgmenetDist = 30.0f;
                     std::list<Unit*> targets;
-                    Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(tempSumm, tempSumm, NOMINAL_MELEE_RANGE);
-                    Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(tempSumm, targets, u_check);
-                    Cell::VisitAllObjects(tempSumm, searcher, NOMINAL_MELEE_RANGE);
+                    Trinity::AnyUnitInObjectRangeCheck u_check(tempSumm, judgmenetDist);
+                    Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck> searcher(tempSumm, targets, u_check);
+                    Cell::VisitAllObjects(tempSumm, searcher, judgmenetDist);
 
-                    // remove current target
                     if (tempSumm->GetVictim())
                         targets.remove(tempSumm->GetVictim());
 
                     targets.remove(target);
 
-                    // remove not LoS targets
                     for (std::list<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
                     {
-                        if (!tempSumm->IsWithinLOSInMap(*tIter) || (*tIter)->IsTotem() || (*tIter)->IsSpiritService() || (*tIter)->IsCritter())
+                        if (!tempSumm->IsWithinLOSInMap(*tIter) || (*tIter)->IsTotem() || (*tIter)->IsSpiritService() || (*tIter)->IsCritter() ||
+                            !caster->IsValidAttackTarget(*tIter))
                             targets.erase(tIter++);
                         else
                             ++tIter;
@@ -1365,7 +1365,7 @@ class spell_pal_judgment : public SpellScript
                     if (!targets.empty())
                     {
                         for (auto nearbyTarget : targets)
-                            tempSumm->CastSpell(nearbyTarget, SPELL_PALADIN_JUDGMENT, true);
+                             tempSumm->CastSpell(nearbyTarget, SPELL_PALADIN_JUDGMENT, true, nullptr, nullptr, caster->GetGUID());
                     }
                 }
                 break;
