@@ -2293,6 +2293,25 @@ class spell_pal_consecration : public AuraScript
     }
 };
 
+class spell_pal_light_of_the_titans : public AuraScript
+{
+    PrepareAuraScript(spell_pal_light_of_the_titans);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_LIGHT_OF_THE_PROTECTOR ||
+            eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_HAND_OF_THE_PROTECTOR)
+            return true;
+
+        return false;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_pal_light_of_the_titans::CheckProc);
+    }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     new spell_pal_bastion_of_light();
@@ -2354,6 +2373,8 @@ void AddSC_paladin_spell_scripts()
 
     // NPC Scripts
     RegisterCreatureAI(npc_pal_lights_hammer);
+
+    RegisterAuraScript(spell_pal_light_of_the_titans);
 
     // Area Trigger scripts
 }
