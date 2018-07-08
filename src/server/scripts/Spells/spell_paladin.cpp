@@ -26,6 +26,7 @@
 #include "AreaTriggerAI.h"
 #include "Creature.h"
 #include "Group.h"
+#include "GridNotifiers.h"
 #include "PhasingHandler.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -1333,9 +1334,40 @@ class spell_pal_judgment : public SpellScript
             {
                 caster->CastSpell(target, SPELL_PALADIN_JUDGMENT_RETRI_DEBUFF);
 
-                /*std::list<Unit*>* targets = target->SelectNearbyFriendlyTargets(target, 1 + (caster->HasAura(SPELL_PALADIN_GREATER_JUDGEMENT) ? sSpellMgr->GetSpellInfo(SPELL_PALADIN_GREATER_JUDGEMENT)->GetEffect(EFFECT_1)->BasePoints : 0));
-                for (auto nearbyTarget : *targets)
-                    target->CastSpell(nearbyTarget, SPELL_PALADIN_JUDGMENT, true, nullptr, nullptr, caster->GetGUID());*/
+                if (Creature* tempSumm = caster->SummonCreature(WORLD_TRIGGER, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 200))
+                {
+                    tempSumm->setFaction(caster->getFaction());
+                    tempSumm->SetGuidValue(UNIT_FIELD_SUMMONEDBY, caster->GetGUID());
+                    PhasingHandler::InheritPhaseShift(tempSumm, caster);
+
+                    std::list<Unit*> targets;
+                    Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(tempSumm, tempSumm, NOMINAL_MELEE_RANGE);
+                    Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(tempSumm, targets, u_check);
+                    Cell::VisitAllObjects(tempSumm, searcher, NOMINAL_MELEE_RANGE);
+
+                    // remove current target
+                    if (tempSumm->GetVictim())
+                        targets.remove(tempSumm->GetVictim());
+
+                    targets.remove(target);
+
+                    // remove not LoS targets
+                    for (std::list<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
+                    {
+                        if (!tempSumm->IsWithinLOSInMap(*tIter) || (*tIter)->IsTotem() || (*tIter)->IsSpiritService() || (*tIter)->IsCritter())
+                            targets.erase(tIter++);
+                        else
+                            ++tIter;
+                    }
+
+                    Trinity::Containers::RandomResize(targets, 1 + (caster->HasAura(SPELL_PALADIN_GREATER_JUDGEMENT) ? sSpellMgr->GetSpellInfo(SPELL_PALADIN_GREATER_JUDGEMENT)->GetEffect(EFFECT_1)->BasePoints : 0));
+
+                    if (!targets.empty())
+                    {
+                        for (auto nearbyTarget : targets)
+                            tempSumm->CastSpell(nearbyTarget, SPELL_PALADIN_JUDGMENT, true);
+                    }
+                }
                 break;
             }
             case TALENT_SPEC_PALADIN_HOLY:
@@ -2351,8 +2383,12 @@ class spell_pal_aegis_of_light : public AuraScript
 
     void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (Unit* target = GetTarget())
-            GetCaster()->CastSpell(target, SPELL_PALADIN_AEGIS_OF_LIGHT, true);
+        Unit* target = GetTarget();
+        Unit* caster = GetCaster();
+        if (!target || !caster)
+            return;
+
+        caster->CastSpell(target, SPELL_PALADIN_AEGIS_OF_LIGHT, true);
     }
 
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
