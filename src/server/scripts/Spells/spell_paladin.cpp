@@ -57,7 +57,7 @@ enum PaladinSpells
     SPELL_PALADIN_CONSECRATION                  = 26573,
     SPELL_PALADIN_CONSECRATION_DAMAGE           = 81297,
     SPELL_PALADIN_CONSECRATION_HEAL             = 204241,
-    SPELL_PALADIN_CONSECRATION_INCREASE_SPEED   = 204242, // Need impentation
+    SPELL_PALADIN_CONSECRATION_DECREASE_SPEED   = 204242,
     SPELL_PALADIN_CRUSADERS_JUDGMENT            = 204023,
     SPELL_PALADIN_CRUSADERS_MIGHT               = 196926,
     SPELL_PALADIN_CRUSADER_STRIKE               = 35395,
@@ -2283,6 +2283,12 @@ class spell_pal_consecration : public AuraScript
             for (AreaTrigger* at : ATList)
             {
                 caster->CastSpell(at->GetPosition(), SPELL_PALADIN_CONSECRATION_DAMAGE, true);
+
+                if (caster->HasAura(SPELL_PALADIN_CONSECRATED_GROUND))
+                {
+                    caster->CastSpell(at->GetPosition(), SPELL_PALADIN_CONSECRATION_HEAL, true);
+                    caster->CastSpell(at->GetPosition(), SPELL_PALADIN_CONSECRATION_DECREASE_SPEED, true);
+                }
             }
         }
     }
@@ -2290,6 +2296,32 @@ class spell_pal_consecration : public AuraScript
     void Register() override
     {
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_pal_consecration::OnTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
+class spell_pal_consecration_heal : public SpellScriptLoader
+{
+public:
+    spell_pal_consecration_heal() : SpellScriptLoader("spell_pal_consecration_heal") { }
+
+    class spell_pal_consecration_heal_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_pal_consecration_heal_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+            Trinity::Containers::RandomResize(targets, 6);
+        }
+
+        void Register() override
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_pal_consecration_heal_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ALLY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_pal_consecration_heal_SpellScript();
     }
 };
 
@@ -2370,6 +2402,8 @@ void AddSC_paladin_spell_scripts()
     RegisterCastSpellOnProcAuraScript("spell_pal_fervent_martyr", EFFECT_0, SPELL_AURA_DUMMY, SPELL_PALADIN_FERVENT_MARTYR_BUFF); // 196923
     RegisterAuraScript(spell_pal_crusade);
     RegisterAuraScript(spell_pal_consecration);
+
+    new spell_pal_consecration_heal();
 
     // NPC Scripts
     RegisterCreatureAI(npc_pal_lights_hammer);
