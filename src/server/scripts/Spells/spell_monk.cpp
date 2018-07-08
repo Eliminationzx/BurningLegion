@@ -1656,22 +1656,21 @@ public:
     {
         at_monk_ring_of_peaceAI(AreaTrigger* areatrigger) : AreaTriggerAI(areatrigger) { }
 
-        void OnUnitEnter(Unit* /*unit*/) override
+        uint32 knockBackInterval = 200;
+
+        void OnUpdate(uint32 diff) override
         {
             Unit* caster = at->GetCaster();
-            if (!caster)
+            if (!caster || !caster->IsPlayer())
                 return;
 
-            if (caster->GetTypeId() != TYPEID_PLAYER)
-                return;
-
-            if (Creature* tempSumm = caster->SummonCreature(WORLD_TRIGGER, at->GetPositionX(), at->GetPositionY(), at->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 200))
+            if (knockBackInterval <= diff)
             {
-                tempSumm->setFaction(caster->getFaction());
-                tempSumm->SetGuidValue(UNIT_FIELD_SUMMONEDBY, caster->GetGUID());
-                PhasingHandler::InheritPhaseShift(tempSumm, caster);
-                tempSumm->CastSpell(tempSumm, SPELL_MONK_RING_OF_PEACE_KNOCKBACK, true);
+                caster->CastSpell(at->GetPosition(), SPELL_MONK_RING_OF_PEACE_KNOCKBACK, true);
+                knockBackInterval = 200;
             }
+            else
+                knockBackInterval -= 200;
         }
     };
 
