@@ -153,6 +153,8 @@ enum RogueSpells
     SPELL_ROGUE_VENOM_RUSH                          = 152152,
     SPELL_ROGUE_WEAKENED_ARMOR                      = 113746,
     SPELL_ROGUE_WOUND_POISON                        = 8679,
+    SPELL_ROGUE_BAG_OF_TRICKS_AREATRIGGER           = 192661,
+    SPELL_ROGUE_BAG_OF_TRICKS_DAMAGE                = 192660
 };
 
 enum RollTheBones
@@ -2655,10 +2657,88 @@ public:
     }
 };
 
+class spell_rog_bag_of_tricks : public SpellScriptLoader
+{
+public:
+    spell_rog_bag_of_tricks() : SpellScriptLoader("spell_rog_bag_of_tricks") {}
+
+    class spell_rog_bag_of_tricks_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_rog_bag_of_tricks_AuraScript);
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            if (eventInfo.GetSpellInfo()->Id == SPELL_ROGUE_ENVENOM ||
+                eventInfo.GetSpellInfo()->Id == SPELL_ROGUE_RUPTURE)
+                return true;
+            return false;
+        }
+
+        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            Unit* caster = eventInfo.GetActor();
+            Unit* target = eventInfo.GetActionTarget();
+            if (!caster || !target)
+                return;
+
+            caster->CastSpell(target, SPELL_ROGUE_BAG_OF_TRICKS_AREATRIGGER, true);
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(spell_rog_bag_of_tricks_AuraScript::CheckProc);
+            OnEffectProc += AuraEffectProcFn(spell_rog_bag_of_tricks_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_rog_bag_of_tricks_AuraScript();
+    }
+};
+
+class at_rog_bag_of_tricks_areatrigger : public AreaTriggerEntityScript
+{
+public:
+
+    at_rog_bag_of_tricks_areatrigger() : AreaTriggerEntityScript("at_rog_bag_of_tricks_areatrigger") { }
+
+    struct at_rog_bag_of_tricks_areatriggerAI : AreaTriggerAI
+    {
+        at_rog_bag_of_tricks_areatriggerAI(AreaTrigger* areatrigger) : AreaTriggerAI(areatrigger) { }
+
+        uint32 damageInterval = 1000;
+
+        void OnUpdate(uint32 diff) override
+        {
+            Unit* caster = at->GetCaster();
+            if (!caster || !caster->IsPlayer())
+                return;
+
+            if (damageInterval <= diff)
+            {
+                caster->CastSpell(at->GetPosition(), SPELL_ROGUE_BAG_OF_TRICKS_DAMAGE, true);
+
+                damageInterval = 1000;
+            }
+            else
+                damageInterval -= 1000;
+        }
+    };
+
+    AreaTriggerAI* GetAI(AreaTrigger* areatrigger) const override
+    {
+        return new at_rog_bag_of_tricks_areatriggerAI(areatrigger);
+    }
+};
+
 void AddSC_rogue_spell_scripts()
 {
     ///AreaTriggerScript
     new at_rog_smoke_bomb();
+    new at_rog_bag_of_tricks_areatrigger();
 
     ///SpellScripts
     new spell_rog_alacrity();
@@ -2709,4 +2789,5 @@ void AddSC_rogue_spell_scripts()
     new spell_rogue_blade_flurry();
     new spell_rogue_combat_potency();
     new spell_rog_weaponmaster();
+    new spell_rog_bag_of_tricks();
 }
