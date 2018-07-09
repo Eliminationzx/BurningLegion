@@ -2317,7 +2317,9 @@ class spell_pal_consecration : public AuraScript
                 if (caster->HasAura(SPELL_PALADIN_CONSECRATED_GROUND))
                 {
                     caster->CastSpell(at->GetPosition(), SPELL_PALADIN_CONSECRATION_HEAL, true);
-                    caster->CastSpell(at->GetPosition(), SPELL_PALADIN_CONSECRATION_DECREASE_SPEED, true);
+
+                    if (Unit* target = at->GetTarget())
+                        caster->CastSpell(target, SPELL_PALADIN_CONSECRATION_DECREASE_SPEED, true);
                 }
             }
         }
@@ -2374,31 +2376,36 @@ class spell_pal_light_of_the_titans : public AuraScript
     }
 };
 
-class spell_pal_aegis_of_light : public AuraScript
+class at_pal_aegis_of_light : public AreaTriggerEntityScript
 {
-    PrepareAuraScript(spell_pal_aegis_of_light);
+public:
+    at_pal_aegis_of_light() : AreaTriggerEntityScript("at_pal_aegis_of_light") {}
 
-    void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    struct at_pal_aegis_of_lightAI : AreaTriggerAI
     {
-        Unit* target = GetTarget();
-        Unit* caster = GetCaster();
-        if (!target || !caster)
-            return;
+        at_pal_aegis_of_lightAI(AreaTrigger* areatrigger) : AreaTriggerAI(areatrigger) { }
 
-        caster->CastSpell(target, SPELL_PALADIN_AEGIS_OF_LIGHT, true, nullptr, aurEff);
-    }
+        void OnUnitEnter(Unit* unit) override
+        {
+            Unit* caster = at->GetCaster();
+            if (!caster || !unit)
+                return;
 
-    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        if (Unit* target = GetTarget())
-            target->RemoveAura(SPELL_PALADIN_AEGIS_OF_LIGHT);
-    }
+            if (caster->GetTypeId() != TYPEID_PLAYER)
+                return;
 
-    void Register() override
-    {
-        OnEffectApply += AuraEffectApplyFn(spell_pal_aegis_of_light::HandleApply, EFFECT_0, SPELL_AURA_AREA_TRIGGER, AURA_EFFECT_HANDLE_REAL);
-        OnEffectRemove += AuraEffectRemoveFn(spell_pal_aegis_of_light::HandleRemove, EFFECT_0, SPELL_AURA_AREA_TRIGGER, AURA_EFFECT_HANDLE_REAL);
-    }
+            caster->CastSpell(unit, SPELL_PALADIN_AEGIS_OF_LIGHT, true);
+        }
+
+        void OnUnitExit(Unit* unit) override
+        {
+            if (!unit)
+                return;
+
+            if (unit->HasAura(SPELL_PALADIN_AEGIS_OF_LIGHT))
+                unit->RemoveAura(SPELL_PALADIN_AEGIS_OF_LIGHT);
+        }
+    };
 };
 
 class spell_pal_aura_of_sacrifice : public SpellScriptLoader
@@ -2423,6 +2430,9 @@ public:
             Unit* target = GetTarget();
             Unit* caster = GetCaster();
             if (!target || !caster)
+                return;
+            
+            if (target == caster)
                 return;
 
             if (!caster->HealthAbovePct(75)) // hp above 75%
@@ -2536,11 +2546,13 @@ void AddSC_paladin_spell_scripts()
     RegisterCastSpellOnProcAuraScript("spell_pal_fervent_martyr", EFFECT_0, SPELL_AURA_DUMMY, SPELL_PALADIN_FERVENT_MARTYR_BUFF); // 196923
     RegisterAuraScript(spell_pal_crusade);
     RegisterAuraScript(spell_pal_consecration);
-    RegisterAuraScript(spell_pal_aegis_of_light);
 
     new spell_pal_consecration_heal();
     new spell_pal_aura_of_sacrifice();
     new spell_pal_retribution_aura();
+
+    // Areatriggers
+    new at_pal_aegis_of_light();
 
     // NPC Scripts
     RegisterCreatureAI(npc_pal_lights_hammer);

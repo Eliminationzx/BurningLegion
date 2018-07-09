@@ -4,5 +4,6 @@ INSERT INTO spell_script_names (spell_id, ScriptName) VALUES (209539, 'spell_pal
 DELETE FROM spell_script_names WHERE spell_id = 204241;
 INSERT INTO spell_script_names (spell_id, ScriptName) VALUES (204241, 'spell_pal_consecration_heal');
 
-DELETE FROM spell_script_names WHERE spell_id = 204150;
-INSERT INTO spell_script_names (spell_id, ScriptName) VALUES (204150, 'spell_pal_aegis_of_light');
+DELETE FROM areatrigger_scripts WHERE entry = 6013;
+INSERT INTO areatrigger_scripts (entry, ScriptName) VALUES 
+(6013, 'at_pal_aegis_of_light');
