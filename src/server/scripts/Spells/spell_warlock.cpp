@@ -2365,9 +2365,7 @@ public:
                 {
                     ready_to_jump = 1;
                     me->SetFlag(UNIT_FIELD_INTERACT_SPELLID, eGatewaySpells::GatewayInteract);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_REMOVE_CLIENT_CONTROL);
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-                    me->SetReactState(ReactStates::REACT_PASSIVE);
                     break;
                 }
                 }
@@ -2375,6 +2373,8 @@ public:
         }
         void Init()
         {
+            me->SetReactState(ReactStates::REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_REMOVE_CLIENT_CONTROL);
             me->CastSpell(me, eGatewaySpells::PortalVisual, true);
             ready_to_jump = 0;
             m_events.ScheduleEvent(DELAY_TO_INTERACT, 500);
@@ -2474,9 +2474,7 @@ public:
                 {
                     ready_to_jump = 1;
                     me->SetFlag(UNIT_FIELD_INTERACT_SPELLID, eGatewaySpells::GatewayInteract);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_REMOVE_CLIENT_CONTROL);
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-                    me->SetReactState(ReactStates::REACT_PASSIVE);
                     break;
                 }
                 }
@@ -2484,6 +2482,8 @@ public:
         }
         void Init()
         {
+            me->SetReactState(ReactStates::REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_REMOVE_CLIENT_CONTROL);
             me->CastSpell(me, eGatewaySpells::PortalVisual, true);
             ready_to_jump = 0;
             m_events.ScheduleEvent(DELAY_TO_INTERACT, 500);
