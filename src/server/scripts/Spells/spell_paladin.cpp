@@ -2305,21 +2305,23 @@ class spell_pal_consecration : public AuraScript
 {
     PrepareAuraScript(spell_pal_consecration);
 
-    void OnTick(AuraEffect const* /*auraEff*/)
+    void OnTick(AuraEffect const* aurEff)
     {
         if (Unit* caster = GetCaster())
         {
             std::vector<AreaTrigger*> ATList = caster->GetAreaTriggers(GetSpellInfo()->Id);
             for (AreaTrigger* at : ATList)
             {
-                caster->CastSpell(at->GetPosition(), SPELL_PALADIN_CONSECRATION_DAMAGE, true);
+                caster->CastSpell(at->GetPosition(), SPELL_PALADIN_CONSECRATION_DAMAGE, true, nullptr, aurEff);
 
                 if (caster->HasAura(SPELL_PALADIN_CONSECRATED_GROUND))
                 {
-                    caster->CastSpell(at->GetPosition(), SPELL_PALADIN_CONSECRATION_HEAL, true);
+                    caster->CastSpell(at->GetPosition(), SPELL_PALADIN_CONSECRATION_HEAL, true, nullptr, aurEff);
 
-                    if (Unit* target = at->GetTarget())
-                        caster->CastSpell(target, SPELL_PALADIN_CONSECRATION_DECREASE_SPEED, true);
+                    for (auto obj : at->GetInsideUnits())
+                        if (Unit* unit = ObjectAccessor::GetUnit(*caster, obj))
+                            if (caster->IsValidAttackTarget(unit))
+                                caster->CastSpell(unit, SPELL_PALADIN_CONSECRATION_DECREASE_SPEED, true, nullptr, aurEff);
                 }
             }
         }
