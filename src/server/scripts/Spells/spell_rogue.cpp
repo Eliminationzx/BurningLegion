@@ -2671,7 +2671,9 @@ public:
             if (eventInfo.GetSpellInfo()->Id == SPELL_ROGUE_ENVENOM ||
                 eventInfo.GetSpellInfo()->Id == SPELL_ROGUE_RUPTURE)
                 return true;
-            return false;
+            
+            float mainRollChance = 2.5f * eventInfo.GetActor()->GetPower(POWER_COMBO_POINTS);
+            return roll_chance_f(mainRollChance);
         }
 
         void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
