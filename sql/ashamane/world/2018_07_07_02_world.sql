@@ -72,7 +72,7 @@ UPDATE `gameobject_template` SET `size` = 1 WHERE (entry = 259095);
 
 
 -- Table `creature_equip_template`
-UPDATE `creature_equip_template` SET `ItemID1`='45123' WHERE  `CreatureID`=86087 
+UPDATE `creature_equip_template` SET `ItemID1`='45123' WHERE  `CreatureID`=86087;
 
 
 -- Table `creature_addon` 
