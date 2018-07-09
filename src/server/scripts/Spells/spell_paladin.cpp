@@ -26,6 +26,7 @@
 #include "AreaTriggerAI.h"
 #include "Creature.h"
 #include "Group.h"
+#include "GridNotifiers.h"
 #include "PhasingHandler.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -57,7 +58,7 @@ enum PaladinSpells
     SPELL_PALADIN_CONSECRATION                  = 26573,
     SPELL_PALADIN_CONSECRATION_DAMAGE           = 81297,
     SPELL_PALADIN_CONSECRATION_HEAL             = 204241,
-    SPELL_PALADIN_CONSECRATION_INCREASE_SPEED   = 204242, // Need impentation
+    SPELL_PALADIN_CONSECRATION_DECREASE_SPEED   = 204242,
     SPELL_PALADIN_CRUSADERS_JUDGMENT            = 204023,
     SPELL_PALADIN_CRUSADERS_MIGHT               = 196926,
     SPELL_PALADIN_CRUSADER_STRIKE               = 35395,
@@ -126,6 +127,8 @@ enum PaladinSpells
     SPELL_PALADIN_WORD_OF_GLORY                 = 210191,
     SPELL_PALADIN_WORD_OF_GLORY_HEAL            = 214894,
     SPELL_PALDIN_BLESSED_HAMMER                 = 204019,
+    SPELL_PALADIN_GREATER_JUDGEMENT             = 218178,
+    SPELL_PALADIN_AEGIS_OF_LIGHT                = 204335
 };
 
 enum PaladinNPCs
@@ -1308,6 +1311,18 @@ class spell_pal_judgment : public SpellScript
 {
     PrepareSpellScript(spell_pal_judgment);
 
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ 
+            SPELL_PALADIN_GREATER_JUDGEMENT, 
+            SPELL_PALADIN_JUDGMENT,
+            SPELL_PALADIN_JUDGMENT_RETRI_DEBUFF, 
+            SPELL_PALADIN_JUDGMENT_HOLY_DEBUFF, 
+            SPELL_PALADIN_FIST_OF_JUSTICE,
+            SPELL_PALADIN_HAMMER_OF_JUSTICE
+        });
+    }
+
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
@@ -1318,6 +1333,38 @@ class spell_pal_judgment : public SpellScript
             case TALENT_SPEC_PALADIN_RETRIBUTION:
             {
                 caster->CastSpell(target, SPELL_PALADIN_JUDGMENT_RETRI_DEBUFF);
+
+                if (Creature* tempSumm = caster->SummonCreature(WORLD_TRIGGER, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 200))
+                {
+                    tempSumm->setFaction(caster->getFaction());
+                    tempSumm->SetGuidValue(UNIT_FIELD_SUMMONEDBY, caster->GetGUID());
+                    PhasingHandler::InheritPhaseShift(tempSumm, caster);
+
+                    float judgmenetDist = 30.0f;
+                    std::list<Unit*> targets;
+                    Trinity::AnyUnitInObjectRangeCheck u_check(tempSumm, judgmenetDist);
+                    Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck> searcher(tempSumm, targets, u_check);
+                    Cell::VisitAllObjects(tempSumm, searcher, judgmenetDist);
+
+                    targets.remove(target);
+
+                    for (std::list<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
+                    {
+                        if (!tempSumm->IsWithinLOSInMap(*tIter) || (*tIter)->IsTotem() || (*tIter)->IsSpiritService() || (*tIter)->IsCritter() ||
+                            !caster->IsValidAttackTarget(*tIter))
+                            targets.erase(tIter++);
+                        else
+                            ++tIter;
+                    }
+
+                    Trinity::Containers::RandomResize(targets, 1 + (caster->HasAura(SPELL_PALADIN_GREATER_JUDGEMENT) ? sSpellMgr->GetSpellInfo(SPELL_PALADIN_GREATER_JUDGEMENT)->GetEffect(EFFECT_1)->BasePoints : 0));
+
+                    if (!targets.empty())
+                    {
+                        for (auto nearbyTarget : targets)
+                             tempSumm->CastSpell(nearbyTarget, SPELL_PALADIN_JUDGMENT, true, nullptr, nullptr, caster->GetGUID());
+                    }
+                }
                 break;
             }
             case TALENT_SPEC_PALADIN_HOLY:
@@ -2266,6 +2313,12 @@ class spell_pal_consecration : public AuraScript
             for (AreaTrigger* at : ATList)
             {
                 caster->CastSpell(at->GetPosition(), SPELL_PALADIN_CONSECRATION_DAMAGE, true);
+
+                if (caster->HasAura(SPELL_PALADIN_CONSECRATED_GROUND))
+                {
+                    caster->CastSpell(at->GetPosition(), SPELL_PALADIN_CONSECRATION_HEAL, true);
+                    caster->CastSpell(at->GetPosition(), SPELL_PALADIN_CONSECRATION_DECREASE_SPEED, true);
+                }
             }
         }
     }
@@ -2273,6 +2326,155 @@ class spell_pal_consecration : public AuraScript
     void Register() override
     {
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_pal_consecration::OnTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
+class spell_pal_consecration_heal : public SpellScriptLoader
+{
+public:
+    spell_pal_consecration_heal() : SpellScriptLoader("spell_pal_consecration_heal") { }
+
+    class spell_pal_consecration_heal_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_pal_consecration_heal_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+            Trinity::Containers::RandomResize(targets, 6);
+        }
+
+        void Register() override
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_pal_consecration_heal_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ALLY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_pal_consecration_heal_SpellScript();
+    }
+};
+
+class spell_pal_light_of_the_titans : public AuraScript
+{
+    PrepareAuraScript(spell_pal_light_of_the_titans);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_LIGHT_OF_THE_PROTECTOR ||
+            eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_HAND_OF_THE_PROTECTOR)
+            return true;
+
+        return false;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_pal_light_of_the_titans::CheckProc);
+    }
+};
+
+class spell_pal_aegis_of_light : public AuraScript
+{
+    PrepareAuraScript(spell_pal_aegis_of_light);
+
+    void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+        Unit* caster = GetCaster();
+        if (!target || !caster)
+            return;
+
+        caster->CastSpell(target, SPELL_PALADIN_AEGIS_OF_LIGHT, true, nullptr, aurEff);
+    }
+
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+            target->RemoveAura(SPELL_PALADIN_AEGIS_OF_LIGHT);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_pal_aegis_of_light::HandleApply, EFFECT_0, SPELL_AURA_AREA_TRIGGER, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_pal_aegis_of_light::HandleRemove, EFFECT_0, SPELL_AURA_AREA_TRIGGER, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+class spell_pal_aura_of_sacrifice : public SpellScriptLoader
+{
+public:
+    spell_pal_aura_of_sacrifice() : SpellScriptLoader("spell_pal_aura_of_sacrifice") { }
+
+    class spell_pal_aura_of_sacrifice_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_pal_aura_of_sacrifice_AuraScript);
+
+    public:
+        spell_pal_aura_of_sacrifice_AuraScript() { }
+
+        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            amount = 0;
+        }
+
+        void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
+        {
+            Unit* target = GetTarget();
+            Unit* caster = GetCaster();
+            if (!target || !caster)
+                return;
+
+            if (!caster->HealthAbovePct(75)) // hp above 75%
+                return;
+
+            absorbAmount = CalculatePct(dmgInfo.GetDamage(), 10); // 10% of damage
+            caster->ModifyHealth(-absorbAmount);
+        }
+
+        void Register() override
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pal_aura_of_sacrifice_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+            OnEffectAbsorb += AuraEffectAbsorbFn(spell_pal_aura_of_sacrifice_AuraScript::Absorb, EFFECT_0);
+        }
+
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_pal_aura_of_sacrifice_AuraScript();
+    }
+};
+
+class spell_pal_retribution_aura : public SpellScriptLoader
+{
+public:
+    spell_pal_retribution_aura() : SpellScriptLoader("spell_pal_retribution_aura") {}
+
+    class spell_pal_retribution_aura_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_pal_retribution_aura_AuraScript);
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            Unit* target = eventInfo.GetProcTarget();
+            if (!target)
+                return;
+
+            GetCaster()->CastSpell(target, SPELL_PALADIN_RETRIBUTION_AURA_DAMAGE, true, nullptr, aurEff);
+        }
+
+        void Register() override
+        {
+            OnEffectProc += AuraEffectProcFn(spell_pal_retribution_aura_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_pal_retribution_aura_AuraScript();
     }
 };
 
@@ -2334,9 +2536,16 @@ void AddSC_paladin_spell_scripts()
     RegisterCastSpellOnProcAuraScript("spell_pal_fervent_martyr", EFFECT_0, SPELL_AURA_DUMMY, SPELL_PALADIN_FERVENT_MARTYR_BUFF); // 196923
     RegisterAuraScript(spell_pal_crusade);
     RegisterAuraScript(spell_pal_consecration);
+    RegisterAuraScript(spell_pal_aegis_of_light);
+
+    new spell_pal_consecration_heal();
+    new spell_pal_aura_of_sacrifice();
+    new spell_pal_retribution_aura();
 
     // NPC Scripts
     RegisterCreatureAI(npc_pal_lights_hammer);
+
+    RegisterAuraScript(spell_pal_light_of_the_titans);
 
     // Area Trigger scripts
 }

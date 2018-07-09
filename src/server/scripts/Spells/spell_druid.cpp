@@ -57,6 +57,8 @@ enum DruidSpells
     SPELL_DRUID_MOONFIRE_CAT                        = 155625,
     SPELL_DRUID_SWIPE_CAT                           = 106785,
     SPELL_DRUID_SABERTOOTH                          = 202031,
+    SPELL_DRUID_GERMINATION                         = 155675,
+    SPELL_DRUID_GERMINATION_REJUVENATION            = 155777
 };
 
 enum ShapeshiftFormSpells
@@ -2339,6 +2341,44 @@ public:
     }
 };
 
+class spell_dru_rejuvenation : public SpellScriptLoader
+{
+public:
+    spell_dru_rejuvenation() : SpellScriptLoader("spell_dru_rejuvenation") {}
+
+    class spell_dru_rejuvenation_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dru_rejuvenation_AuraScript);
+
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_DRUID_GERMINATION, SPELL_DRUID_GERMINATION_REJUVENATION });
+        }
+
+        void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* caster = GetCaster();
+            Unit* target = GetTarget();
+            if (!caster || !target)
+                return;
+
+            if (caster->HasAura(SPELL_DRUID_GERMINATION))
+                caster->CastSpell(target, SPELL_DRUID_GERMINATION_REJUVENATION, true, nullptr, aurEff);
+        }
+
+        void Register() override
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_dru_rejuvenation_AuraScript::OnApply, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_dru_rejuvenation_AuraScript();
+    }
+};
+
 void AddSC_druid_spell_scripts()
 {
     // Spells Scripts
@@ -2381,6 +2421,7 @@ void AddSC_druid_spell_scripts()
     new spell_dru_bloodtalons();
     new spell_dru_travel_form_dummy();
     new spell_dru_travel_form();
+    new spell_dru_rejuvenation();
 
     RegisterSpellScript(spell_dru_thrash);
     RegisterAuraScript(spell_dru_thrash_periodic_damage);

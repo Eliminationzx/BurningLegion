@@ -25,6 +25,7 @@
 #include "SpellMgr.h"
 #include "SpellPackets.h"
 #include "SpellScript.h"
+#include "PhasingHandler.h"
 
 enum MonkSpells
 {
@@ -106,8 +107,7 @@ enum MonkSpells
     SPELL_MONK_RENEWING_MIST_HOT                        = 119611,
     SPELL_MONK_RENEWING_MIST_JUMP_AURA                  = 119607,
     SPELL_MONK_RENEWING_MIST_PERIODIC                   = 119611,
-    SPELL_MONK_RING_OF_PEACE_DISARM                     = 137461,
-    SPELL_MONK_RING_OF_PEACE_SILENCE                    = 137460,
+    SPELL_MONK_RING_OF_PEACE_KNOCKBACK                  = 237371,
     SPELL_MONK_RISING_SUN_KICK                          = 107428,
     SPELL_MONK_RISING_THUNDER                           = 210804,
     SPELL_MONK_ROLL                                     = 109132,
@@ -152,6 +152,9 @@ enum MonkSpells
     SPELL_MONK_ZEN_PILGRIMAGE_RETURN                    = 126895,
     SPELL_MONK_ZEN_PULSE_DAMAGE                         = 124081,
     SPELL_MONK_ZEN_PULSE_HEAL                           = 198487,
+    SPELL_MONK_SONG_OF_CHI_JI_STUN                      = 198909,
+    SPELL_MONK_LIFE_COCOON                              = 116849,
+    SPELL_MONK_EFFUSE                                   = 116694
 };
 
 enum StormEarthAndFireSpells
@@ -1640,42 +1643,40 @@ public:
         return new spell_monk_power_strikes_SpellScript();
     }
 };
-// 140023 - Ring of Peace Aura
-class spell_monk_ring_of_peace_aura : public SpellScriptLoader
+
+// 116844 - Ring of Peace
+// AreaTriggerID - 718
+class at_monk_ring_of_peace : public AreaTriggerEntityScript
 {
 public:
-    spell_monk_ring_of_peace_aura() : SpellScriptLoader("spell_monk_ring_of_peace_aura") {}
 
-    class spell_monk_ring_of_peace_aura_AuraScript : public AuraScript
+    at_monk_ring_of_peace() : AreaTriggerEntityScript("at_monk_ring_of_peace") { }
+
+    struct at_monk_ring_of_peaceAI : AreaTriggerAI
     {
-        PrepareAuraScript(spell_monk_ring_of_peace_aura_AuraScript);
+        at_monk_ring_of_peaceAI(AreaTrigger* areatrigger) : AreaTriggerAI(areatrigger) { }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return sSpellMgr->GetSpellInfo(SPELL_MONK_RING_OF_PEACE_SILENCE)
-                && sSpellMgr->GetSpellInfo(SPELL_MONK_RING_OF_PEACE_DISARM);
-        }
+        uint32 knockBackInterval = 200;
 
-        void HandleDummyProc(AuraEffect const* /*auraEffect*/, ProcEventInfo& /*eventInfo*/)
+        void OnUpdate(uint32 diff) override
         {
-            Unit* caster = GetCaster();
-            Unit* target = GetTarget();
-            if (!caster)
+            Unit* caster = at->GetCaster();
+            if (!caster || !caster->IsPlayer())
                 return;
 
-            caster->CastSpell(target, SPELL_MONK_RING_OF_PEACE_SILENCE, true);
-            caster->CastSpell(target, SPELL_MONK_RING_OF_PEACE_DISARM, true);
-        }
-
-        void Register() override
-        {
-            OnEffectProc += AuraEffectProcFn(spell_monk_ring_of_peace_aura_AuraScript::HandleDummyProc, EFFECT_0, SPELL_AURA_DUMMY);
+            if (knockBackInterval <= diff)
+            {
+                caster->CastSpell(at->GetPosition(), SPELL_MONK_RING_OF_PEACE_KNOCKBACK, true);
+                knockBackInterval = 200;
+            }
+            else
+                knockBackInterval -= 200;
         }
     };
 
-    AuraScript* GetAuraScript() const override
+    AreaTriggerAI* GetAI(AreaTrigger* areatrigger) const override
     {
-        return new spell_monk_ring_of_peace_aura_AuraScript();
+        return new at_monk_ring_of_peaceAI(areatrigger);
     }
 };
 
@@ -2041,6 +2042,8 @@ public:
         DespawnSpirit(GetCaster());
         GetCaster()->CastSpell(creature, SPELL_MONK_TRANSCENDENCE_CLONE_TARGET, true);
         creature->CastSpell(creature, SPELL_MONK_MEDITATE_VISUAL, true);
+        creature->CastSpell(creature, SPELL_MONK_TRANSCENDENCE_VISUAL, true);
+        creature->GetMotionMaster()->Clear(); // clear movement
         GetCaster()->Variables.Set(MONK_TRANSCENDENCE_GUID, creature->GetGUID());
     }
 
@@ -2909,6 +2912,15 @@ public:
     {
         PrepareAuraScript(spell_monk_soothing_mist_aura_AuraScript);
 
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            return eventInfo.GetProcSpell() &&
+                (eventInfo.GetProcSpell()->GetSpellInfo()->Id == SPELL_MONK_ENVELOPING_MIST ||
+                    eventInfo.GetProcSpell()->GetSpellInfo()->Id == SPELL_MONK_LIFE_COCOON ||
+                    eventInfo.GetProcSpell()->GetSpellInfo()->Id == SPELL_MONK_EFFUSE ||
+                    eventInfo.GetProcSpell()->GetSpellInfo()->Id == SPELL_MONK_VIVIFY);
+        }
+
         void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
         {
             if (Unit* caster = GetCaster())
@@ -2919,6 +2931,7 @@ public:
         void Register() override
         {
             OnEffectProc += AuraEffectProcFn(spell_monk_soothing_mist_aura_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+            DoCheckProc += AuraCheckProcFn(spell_monk_soothing_mist_aura_AuraScript::CheckProc);
         }
     };
 
@@ -3556,32 +3569,31 @@ class spell_monk_healing_elixirs_aura : public SpellScriptLoader
 {
 public:
     spell_monk_healing_elixirs_aura() : SpellScriptLoader("spell_monk_healing_elixirs_aura") { }
+   
     class spell_monk_healing_elixirs_aura_AuraScript : public AuraScript
     {
         PrepareAuraScript(spell_monk_healing_elixirs_aura_AuraScript);
-        void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            return eventInfo.GetActor()->HealthBelowPctDamaged(GetEffectInfo(EFFECT_0)->BasePoints, eventInfo.GetDamageInfo()->GetDamage());
+        }
+
+        void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
         {
             PreventDefaultAction();
-            if (!GetCaster())
-                return;
-            if (!eventInfo.GetDamageInfo())
-                return;
-            if (!eventInfo.GetDamageInfo()->GetDamage())
-                return;
-            if (Unit* caster = GetCaster())
-            {
-                if (caster->HealthBelowPctDamaged(35, eventInfo.GetDamageInfo()->GetDamage()))
-                {
-                    caster->CastSpell(caster, SPELL_MONK_HEALING_ELIXIRS_RESTORE_HEALTH, true);
-                    caster->GetSpellHistory()->ConsumeCharge(SPELL_MONK_HEALING_ELIXIRS_RESTORE_HEALTH);
-                }
-            }
+
+            GetCaster()->CastSpell(GetCaster(), SPELL_MONK_HEALING_ELIXIRS_RESTORE_HEALTH, true);
+            GetCaster()->GetSpellHistory()->ConsumeCharge(SPELL_MONK_HEALING_ELIXIRS_RESTORE_HEALTH);
         }
+
         void Register() override
         {
-            OnEffectProc += AuraEffectProcFn(spell_monk_healing_elixirs_aura_AuraScript::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+            OnEffectProc += AuraEffectProcFn(spell_monk_healing_elixirs_aura_AuraScript::OnProc, EFFECT_0, SPELL_AURA_DUMMY);
+            DoCheckProc += AuraCheckProcFn(spell_monk_healing_elixirs_aura_AuraScript::CheckProc);
         }
     };
+
     AuraScript* GetAuraScript() const override
     {
         return new spell_monk_healing_elixirs_aura_AuraScript();
@@ -3675,6 +3687,57 @@ class spell_monk_whirling_dragon_punch : public AuraScript
     }
 };
 
+// 198898 - Song of Chi-Ji
+// AreaTriggerID - 5484
+class at_monk_song_of_chi_ji : public AreaTriggerEntityScript
+{
+public:
+
+    at_monk_song_of_chi_ji() : AreaTriggerEntityScript("at_monk_song_of_chi_ji") { }
+
+    struct at_monk_song_of_chi_jiAI : AreaTriggerAI
+    {
+        at_monk_song_of_chi_jiAI(AreaTrigger* areatrigger) : AreaTriggerAI(areatrigger) { }
+
+        uint32 stunInterval = 500;
+
+        void OnInitialize() override
+        {
+            Unit* caster = at->GetCaster();
+            if (!caster)
+                return;
+
+            Position pos = caster->GetPosition();
+            at->MovePositionToFirstCollision(pos, 40.0f, 0.0f);
+            at->SetDestination(pos, 4000);
+        }
+
+        void OnUpdate(uint32 diff) override
+        {
+            Unit* caster = at->GetCaster();
+            if (!caster || !caster->IsPlayer())
+                return;
+
+            if (stunInterval <= diff)
+            {
+                for (ObjectGuid guid : at->GetInsideUnits())
+                    if (Unit* unit = ObjectAccessor::GetUnit(*caster, guid))
+                        if (caster->IsValidAttackTarget(unit))
+                            caster->CastSpell(unit, SPELL_MONK_SONG_OF_CHI_JI_STUN, true);
+
+                stunInterval = 500;
+            }
+            else
+                stunInterval -= 500;
+        }
+    };
+
+    AreaTriggerAI* GetAI(AreaTrigger* areatrigger) const override
+    {
+        return new at_monk_song_of_chi_jiAI(areatrigger);
+    }
+};
+
 void AddSC_monk_spell_scripts()
 {
     RegisterAreaTriggerAI(at_monk_gift_of_the_ox_sphere);
@@ -3728,7 +3791,7 @@ void AddSC_monk_spell_scripts()
     new spell_monk_purifying_brew();
     new spell_monk_renewing_mist();
     new spell_monk_renewing_mist_periodic();
-    new spell_monk_ring_of_peace_aura();
+    new at_monk_ring_of_peace();
     new spell_monk_rising_sun_kick();
     new spell_monk_rising_thunder();
     new spell_monk_roll();
@@ -3739,6 +3802,7 @@ void AddSC_monk_spell_scripts()
     new spell_monk_stagger_damage();
     new spell_monk_stagger_visual();
     new spell_monk_stance_of_the_sturdy_ox();
+    new at_monk_song_of_chi_ji();
     RegisterAuraScript(spell_monk_storm_earth_and_fire);
     new spell_monk_surging_mist();
     new spell_monk_surging_mist_glyphed();

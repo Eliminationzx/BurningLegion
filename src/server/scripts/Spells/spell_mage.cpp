@@ -162,7 +162,9 @@ enum MageSpells
     SPELL_MAGE_FLAME_PATCH_AOE_DMG               = 205472,
     SPELL_MAGE_CINDERSTORM                       = 198929,
     SPELL_MAGE_CINDERSTORM_DMG                   = 198928,
-    SPELL_MAGE_IGNITE_DOT                        = 12654
+    SPELL_MAGE_IGNITE_DOT                        = 12654,
+    SPELL_MAGE_DISPLACEMENT                      = 212801,
+    SPELL_MAGE_DISPLACEMENT_BEACON               = 212799
 };
 
 enum TemporalDisplacementSpells
@@ -174,6 +176,8 @@ enum TemporalDisplacementSpells
     SPELL_SHAMAN_SATED                           = 57724,
     SPELL_PET_NETHERWINDS_FATIGUED               = 160455
 };
+
+#define MAGE_DISPLACEMENT_GUID  "MAGE_DISPLACEMENT_GUID"
 
 // Runic Empowerment - 81229
 class playerscript_mage_arcane : public PlayerScript
@@ -2916,6 +2920,92 @@ class spell_mage_cinderstorm : public SpellScript
     }
 };
 
+class spell_mage_displacement : public SpellScriptLoader
+{
+public:
+    spell_mage_displacement() : SpellScriptLoader("spell_mage_displacement") { }
+
+    class spell_mage_displacement_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_mage_displacement_SpellScript);
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            if (Creature* displacement = GetDisplacement(GetCaster()))
+                GetCaster()->NearTeleportTo(*displacement);
+        }
+
+        static Creature* GetDisplacement(Unit* caster)
+        {
+            ObjectGuid displacementGuid = caster->Variables.GetValue<ObjectGuid>(MAGE_DISPLACEMENT_GUID, ObjectGuid());
+
+            if (displacementGuid.IsEmpty())
+                return nullptr;
+
+            return ObjectAccessor::GetCreature(*caster, displacementGuid);
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_mage_displacement_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_mage_displacement_SpellScript();
+    }
+};
+
+class spell_mage_blink : public SpellScript
+{
+    PrepareSpellScript(spell_mage_blink);
+
+    void HandleOnCast()
+    {
+        Unit* caster = GetCaster();
+
+        if (caster->HasSpell(SPELL_MAGE_DISPLACEMENT))
+        {
+            caster->CastSpell(caster, SPELL_MAGE_DISPLACEMENT_BEACON, true);
+
+            DespawnDisplacement(caster);
+
+            if (TempSummon* tempSumm = caster->SummonCreature(WORLD_TRIGGER, caster->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 10 * IN_MILLISECONDS))
+            {
+                tempSumm->setFaction(caster->getFaction());
+                tempSumm->SetGuidValue(UNIT_FIELD_SUMMONEDBY, caster->GetGUID());
+                PhasingHandler::InheritPhaseShift(tempSumm, caster);
+                caster->Variables.Set(MAGE_DISPLACEMENT_GUID, tempSumm->GetGUID());
+            }
+        }
+    }
+
+    static void DespawnDisplacement(Unit* caster)
+    {
+        // Remove previous one if any
+        if (Creature* displacement = GetDisplacement(caster))
+            displacement->DespawnOrUnsummon();
+
+        caster->Variables.Remove(MAGE_DISPLACEMENT_GUID);
+    }
+
+    static Creature* GetDisplacement(Unit* caster)
+    {
+        ObjectGuid displacementGuid = caster->Variables.GetValue<ObjectGuid>(MAGE_DISPLACEMENT_GUID, ObjectGuid());
+
+        if (displacementGuid.IsEmpty())
+            return nullptr;
+
+        return ObjectAccessor::GetCreature(*caster, displacementGuid);
+    }
+
+    void Register() override
+    {
+        OnCast += SpellCastFn(spell_mage_blink::HandleOnCast);
+    }
+};
+
 void AddSC_mage_spell_scripts()
 {
     new playerscript_mage_arcane();
@@ -2996,6 +3086,9 @@ void AddSC_mage_spell_scripts()
     new at_mage_arcane_orb();
     RegisterAreaTriggerAI(at_mage_flame_patch);
     RegisterAreaTriggerAI(at_mage_cinderstorm);
+
+    RegisterSpellScript(spell_mage_blink);
+    new spell_mage_displacement();
 
     // NPC Scripts
     new npc_mirror_image(); 
