@@ -2401,6 +2401,51 @@ class spell_pal_aegis_of_light : public AuraScript
     }
 };
 
+class spell_pal_aura_of_sacrifice : public SpellScriptLoader
+{
+public:
+    spell_pal_aura_of_sacrifice() : SpellScriptLoader("spell_pal_aura_of_sacrifice") { }
+
+    class spell_pal_aura_of_sacrifice_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_pal_aura_of_sacrifice_AuraScript);
+
+    public:
+        spell_pal_aura_of_sacrifice_AuraScript() { }
+
+        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            amount = 0;
+        }
+
+        void Absorb(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& absorbAmount)
+        {
+            Unit* target = GetTarget();
+            Unit* caster = GetCaster();
+            if (!target || !caster)
+                return;
+
+            if (!caster->HealthAbovePct(75)) // hp above 75%
+                return;
+
+            absorbAmount = CalculatePct(dmgInfo.GetDamage(), 10); // 10% of damage
+            caster->ModifyHealth(-absorbAmount);
+        }
+
+        void Register() override
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pal_aura_of_sacrifice_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+            OnEffectAbsorb += AuraEffectAbsorbFn(spell_pal_aura_of_sacrifice_AuraScript::Absorb, EFFECT_0);
+        }
+
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_pal_aura_of_sacrifice_AuraScript();
+    }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     new spell_pal_bastion_of_light();
@@ -2462,6 +2507,7 @@ void AddSC_paladin_spell_scripts()
     RegisterAuraScript(spell_pal_aegis_of_light);
 
     new spell_pal_consecration_heal();
+    new spell_pal_aura_of_sacrifice();
 
     // NPC Scripts
     RegisterCreatureAI(npc_pal_lights_hammer);
