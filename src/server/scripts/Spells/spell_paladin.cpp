@@ -128,7 +128,8 @@ enum PaladinSpells
     SPELL_PALADIN_WORD_OF_GLORY_HEAL            = 214894,
     SPELL_PALDIN_BLESSED_HAMMER                 = 204019,
     SPELL_PALADIN_GREATER_JUDGEMENT             = 218178,
-    SPELL_PALADIN_AEGIS_OF_LIGHT                = 204335
+    SPELL_PALADIN_AEGIS_OF_LIGHT                = 204335,
+    SPELL_PALADIN_RETRIBUTION_AURA_DAMAGE       = 204011
 };
 
 enum PaladinNPCs
@@ -2378,14 +2379,14 @@ class spell_pal_aegis_of_light : public AuraScript
 {
     PrepareAuraScript(spell_pal_aegis_of_light);
 
-    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
         Unit* target = GetTarget();
         Unit* caster = GetCaster();
         if (!target || !caster)
             return;
 
-        caster->CastSpell(target, SPELL_PALADIN_AEGIS_OF_LIGHT, true);
+        caster->CastSpell(target, SPELL_PALADIN_AEGIS_OF_LIGHT, true, nullptr, aurEff);
     }
 
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -2418,7 +2419,7 @@ public:
             amount = 0;
         }
 
-        void Absorb(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& absorbAmount)
+        void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
         {
             Unit* target = GetTarget();
             Unit* caster = GetCaster();
@@ -2443,6 +2444,38 @@ public:
     AuraScript* GetAuraScript() const override
     {
         return new spell_pal_aura_of_sacrifice_AuraScript();
+    }
+};
+
+class spell_pal_retribution_aura : public SpellScriptLoader
+{
+public:
+    spell_pal_retribution_aura() : SpellScriptLoader("spell_pal_retribution_aura") {}
+
+    class spell_pal_retribution_aura_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_pal_retribution_aura_AuraScript);
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            Unit* target = eventInfo.GetProcTarget();
+            if (!target)
+                return;
+
+            GetCaster()->CastSpell(target, SPELL_PALADIN_RETRIBUTION_AURA_DAMAGE, true, nullptr, aurEff);
+        }
+
+        void Register() override
+        {
+            OnEffectProc += AuraEffectProcFn(spell_pal_retribution_aura_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_pal_retribution_aura_AuraScript();
     }
 };
 
@@ -2508,6 +2541,7 @@ void AddSC_paladin_spell_scripts()
 
     new spell_pal_consecration_heal();
     new spell_pal_aura_of_sacrifice();
+    new spell_pal_retribution_aura();
 
     // NPC Scripts
     RegisterCreatureAI(npc_pal_lights_hammer);

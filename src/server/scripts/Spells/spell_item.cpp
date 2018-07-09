@@ -4739,7 +4739,7 @@ public:
     {
         PrepareAuraScript(spell_item_titanstrike_AuraScript);
 
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
             Unit* caster = GetCaster();
             if (!caster)
@@ -4748,7 +4748,7 @@ public:
             if (caster->HasAura(SPELL_BROKEN_BOND))
                 return;
 
-            caster->CastSpell(caster, SPELL_STORMBOUND, true);
+            caster->CastSpell(caster, SPELL_STORMBOUND, true, nullptr, aurEff);
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
