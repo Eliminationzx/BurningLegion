@@ -2672,7 +2672,7 @@ public:
                 eventInfo.GetSpellInfo()->Id == SPELL_ROGUE_RUPTURE)
                 return true;
             
-            float mainRollChance = 2.5f * eventInfo.GetActor()->GetPower(POWER_COMBO_POINTS);
+            float mainRollChance = 25 * eventInfo.GetActor()->GetPower(POWER_COMBO_POINTS) / 100.0f;
             return roll_chance_f(mainRollChance);
         }
 
