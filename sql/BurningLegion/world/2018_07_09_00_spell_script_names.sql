@@ -10,3 +10,6 @@ INSERT INTO spell_script_names (spell_id, ScriptName) VALUES (210372, 'spell_pal
 
 DELETE FROM spell_script_names WHERE spell_id = 203797;
 INSERT INTO spell_script_names (spell_id, ScriptName) VALUES (203797, 'spell_pal_retribution_aura');
+
+DELETE FROM spell_script_names WHERE spell_id = 774;
+INSERT INTO spell_script_names (spell_id, ScriptName) VALUES (774, 'spell_dru_rejuvenation');
