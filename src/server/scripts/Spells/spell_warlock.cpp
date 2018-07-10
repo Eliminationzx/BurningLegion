@@ -2308,7 +2308,7 @@ class spell_warl_corruption_effect : public AuraScript
 };
 
 // Rain of Fire - 5740
-// AreaTriggerID - 5420
+// AreaTriggerID - 10133
 struct at_warl_rain_of_fire : AreaTriggerAI
 {
     int32 timeInterval;
