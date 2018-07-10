@@ -152,7 +152,6 @@ enum MonkSpells
     SPELL_MONK_ZEN_PILGRIMAGE_RETURN                    = 126895,
     SPELL_MONK_ZEN_PULSE_DAMAGE                         = 124081,
     SPELL_MONK_ZEN_PULSE_HEAL                           = 198487,
-    SPELL_MONK_SONG_OF_CHI_JI_STUN                      = 198909,
     SPELL_MONK_LIFE_COCOON                              = 116849,
     SPELL_MONK_EFFUSE                                   = 116694
 };
@@ -1645,7 +1644,7 @@ public:
 };
 
 // 116844 - Ring of Peace
-// AreaTriggerID - 718
+// AreaTriggerID - 3983
 class at_monk_ring_of_peace : public AreaTriggerEntityScript
 {
 public:
@@ -1656,7 +1655,7 @@ public:
     {
         at_monk_ring_of_peaceAI(AreaTrigger* areatrigger) : AreaTriggerAI(areatrigger) { }
 
-        uint32 knockBackInterval = 200;
+        uint32 knockBackInterval = 1000;
 
         void OnUpdate(uint32 diff) override
         {
@@ -1667,10 +1666,10 @@ public:
             if (knockBackInterval <= diff)
             {
                 caster->CastSpell(at->GetPosition(), SPELL_MONK_RING_OF_PEACE_KNOCKBACK, true);
-                knockBackInterval = 200;
+                knockBackInterval = 1000;
             }
             else
-                knockBackInterval -= 200;
+                knockBackInterval -= 1000;
         }
     };
 
@@ -3427,22 +3426,10 @@ public:
     }
 };
 
-//5484
+//10191
 struct at_monk_song_of_chiji : AreaTriggerAI
 {
     at_monk_song_of_chiji(AreaTrigger* areatrigger) : AreaTriggerAI(areatrigger) { }
-
-    /*void OnSetCreatePosition(Unit* caster, Position& startPos, Position& endPos, std::list<Position>& path) override
-    {
-        if (!caster)
-            return;
-
-        if (!caster->ToPlayer())
-            return;
-
-        startPos = caster->GetPosition();
-        at->SetLinearMove(caster, startPos, endPos, path, 40.0f);
-    }*/
 
     void OnUnitEnter(Unit* unit) override
     {
@@ -3454,8 +3441,8 @@ struct at_monk_song_of_chiji : AreaTriggerAI
         if (!caster->ToPlayer())
             return;
 
-        if(unit != caster && caster->IsValidAttackTarget(unit))
-            caster->CastSpell(unit, SPELL_MONK_SONG_OF_CHIJI, true);
+        if(caster->IsValidAttackTarget(unit))
+           caster->CastSpell(unit, SPELL_MONK_SONG_OF_CHIJI, true);
     }
 };
 
@@ -3687,57 +3674,6 @@ class spell_monk_whirling_dragon_punch : public AuraScript
     }
 };
 
-// 198898 - Song of Chi-Ji
-// AreaTriggerID - 5484
-class at_monk_song_of_chi_ji : public AreaTriggerEntityScript
-{
-public:
-
-    at_monk_song_of_chi_ji() : AreaTriggerEntityScript("at_monk_song_of_chi_ji") { }
-
-    struct at_monk_song_of_chi_jiAI : AreaTriggerAI
-    {
-        at_monk_song_of_chi_jiAI(AreaTrigger* areatrigger) : AreaTriggerAI(areatrigger) { }
-
-        uint32 stunInterval = 500;
-
-        void OnInitialize() override
-        {
-            Unit* caster = at->GetCaster();
-            if (!caster)
-                return;
-
-            Position pos = caster->GetPosition();
-            at->MovePositionToFirstCollision(pos, 40.0f, 0.0f);
-            at->SetDestination(pos, 4000);
-        }
-
-        void OnUpdate(uint32 diff) override
-        {
-            Unit* caster = at->GetCaster();
-            if (!caster || !caster->IsPlayer())
-                return;
-
-            if (stunInterval <= diff)
-            {
-                for (ObjectGuid guid : at->GetInsideUnits())
-                    if (Unit* unit = ObjectAccessor::GetUnit(*caster, guid))
-                        if (caster->IsValidAttackTarget(unit))
-                            caster->CastSpell(unit, SPELL_MONK_SONG_OF_CHI_JI_STUN, true);
-
-                stunInterval = 500;
-            }
-            else
-                stunInterval -= 500;
-        }
-    };
-
-    AreaTriggerAI* GetAI(AreaTrigger* areatrigger) const override
-    {
-        return new at_monk_song_of_chi_jiAI(areatrigger);
-    }
-};
-
 void AddSC_monk_spell_scripts()
 {
     RegisterAreaTriggerAI(at_monk_gift_of_the_ox_sphere);
@@ -3802,7 +3738,6 @@ void AddSC_monk_spell_scripts()
     new spell_monk_stagger_damage();
     new spell_monk_stagger_visual();
     new spell_monk_stance_of_the_sturdy_ox();
-    new at_monk_song_of_chi_ji();
     RegisterAuraScript(spell_monk_storm_earth_and_fire);
     new spell_monk_surging_mist();
     new spell_monk_surging_mist_glyphed();
