@@ -12449,38 +12449,34 @@ void Unit::UpdateObjectVisibility(bool forced)
     }
 }
 
-void Unit::SendMoveKnockBack(Player* player, float speedXY, float speedZ, float vcos, float vsin)
+void Unit::SendMoveKnockBack(Unit* unit, float vcos, float vsin, float speedXY, float speedZ)
 {
+    Player* mover = unit->GetPlayerMovingMe();
+    if (!mover)
+    {
+        TC_LOG_ERROR("entities.unit", "Unit::SendKnockBackToMover: Incorrect use of the function. It was called on a unit controlled by the server!");
+        return;
+    }
+
     WorldPackets::Movement::MoveKnockBack moveKnockBack;
-    moveKnockBack.MoverGUID = GetGUID();
+    moveKnockBack.MoverGUID = mover->GetGUID();
     moveKnockBack.SequenceIndex = m_movementCounter++;
     moveKnockBack.Speeds.HorzSpeed = speedXY;
     moveKnockBack.Speeds.VertSpeed = speedZ;
     moveKnockBack.Direction = Position(vcos, vsin);
-    player->GetSession()->SendPacket(moveKnockBack.Write());
+    mover->SendDirectMessage(moveKnockBack.Write());
 }
 
 void Unit::KnockbackFrom(float x, float y, float speedXY, float speedZ, Movement::SpellEffectExtraData const* spellEffectExtraData /*= nullptr*/)
 {
-    Player* player = ToPlayer();
-    if (!player)
-    {
-        if (Unit* charmer = GetCharmer())
-        {
-            player = charmer->ToPlayer();
-            if (player && player->m_unitMovedByMe != this)
-                player = NULL;
-        }
-    }
-
-    if (!player)
-        GetMotionMaster()->MoveKnockbackFrom(x, y, speedXY, speedZ, spellEffectExtraData);
-    else
+    if (IsMovedByPlayer())
     {
         float vcos, vsin;
         GetSinCos(x, y, vsin, vcos);
-        SendMoveKnockBack(player, std::abs(speedXY), -speedZ, vcos, vsin);
+        SendMoveKnockBack(this, vcos, vsin, speedXY, -speedZ);
     }
+    else
+        GetMotionMaster()->MoveKnockbackFrom(x, y, speedXY, speedZ, spellEffectExtraData);
 }
 
 float Unit::GetCombatRatingReduction(CombatRating cr) const
@@ -12944,14 +12940,14 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form) const
 void Unit::JumpTo(float speedXY, float speedZ, bool forward)
 {
     float angle = forward ? 0 : float(M_PI);
-    if (GetTypeId() == TYPEID_UNIT)
-        GetMotionMaster()->MoveJumpTo(angle, speedXY, speedZ);
-    else
+    if (IsMovedByPlayer())
     {
         float vcos = std::cos(angle+GetOrientation());
         float vsin = std::sin(angle+GetOrientation());
-        SendMoveKnockBack(ToPlayer(), speedXY, -speedZ, vcos, vsin);
+        SendMoveKnockBack(this, vcos, vsin, speedXY, -speedZ);
     }
+    else
+        GetMotionMaster()->MoveJumpTo(angle, speedXY, speedZ);
 }
 
 void Unit::JumpTo(WorldObject* obj, float speedZ, bool withOrientation)

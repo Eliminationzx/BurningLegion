@@ -1310,7 +1310,7 @@ class TC_GAME_API Unit : public WorldObject
         void UpdateOrientation(float orientation);
         void UpdateHeight(float newZ);
 
-        void SendMoveKnockBack(Player* player, float speedXY, float speedZ, float vcos, float vsin);
+        void SendMoveKnockBack(Unit* unit, float vcos, float vsin, float speedXY, float speedZ);
         void KnockbackFrom(float x, float y, float speedXY, float speedZ, Movement::SpellEffectExtraData const* spellEffectExtraData = nullptr);
         void JumpTo(float speedXY, float speedZ, bool forward = true);
         void JumpTo(WorldObject* obj, float speedZ, bool withOrientation = false);
@@ -1424,6 +1424,7 @@ class TC_GAME_API Unit : public WorldObject
         Player* GetPlayerMovingMe() const { return m_playerMovingMe; }
         // only set for direct client control (possess effects, vehicles and similar)
         Player* m_playerMovingMe;
+        bool IsMovedByPlayer() const { return m_playerMovingMe != nullptr; }
         SharedVisionList const& GetSharedVisionList() { return m_sharedVision; }
         void AddPlayerToVision(Player* player);
         void RemovePlayerFromVision(Player* player);
