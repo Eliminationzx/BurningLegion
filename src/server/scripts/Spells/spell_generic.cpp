@@ -4805,6 +4805,113 @@ public:
     }
 };
 
+enum ConcordanceOfTheLegionfall
+{
+    SPELL_CONCORDANCE_OF_LEGIONFALL_STRENGTH    = 242583,
+    SPELL_CONCORDANCE_OF_LEGIONFALL_AGILITY     = 242584,
+    SPELL_CONCORDANCE_OF_LEGIONFALL_INTELLECT   = 242586,
+    SPELL_CONCORDANCE_OF_LEGIONFALL_VERSATILITY = 243096
+};
+
+enum PrimaryStat
+{
+    PRIMARY_STAT_INTELLECT   = 0,
+    PRIMARY_STAT_STRENGTH    = 1,
+    PRIMARY_STAT_AGILITY     = 2,
+    PRIMARY_STAT_VERSATILITY = 3
+};
+
+// 239042 - Concordance of the Legionfall
+class spell_gen_concordance_of_legionfall : public SpellScriptLoader
+{
+public:
+    spell_gen_concordance_of_legionfall() : SpellScriptLoader("spell_gen_concordance_of_legionfall") { }
+
+    class spell_gen_concordance_of_legionfall_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_gen_concordance_of_legionfall_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ 
+                SPELL_CONCORDANCE_OF_LEGIONFALL_STRENGTH, 
+                SPELL_CONCORDANCE_OF_LEGIONFALL_AGILITY,
+                SPELL_CONCORDANCE_OF_LEGIONFALL_INTELLECT,
+                SPELL_CONCORDANCE_OF_LEGIONFALL_VERSATILITY
+            });
+        }
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            Unit* caster = eventInfo.GetActionTarget();
+            Player* player = caster->ToPlayer();
+            if (!player)
+                return;
+           
+            PrimaryStat primstat = PRIMARY_STAT_INTELLECT;
+            int32 stat = 0;
+            int32 intellect = player->GetStat(STAT_INTELLECT);
+            int32 agility = player->GetStat(STAT_AGILITY);
+            int32 strength = player->GetStat(STAT_STRENGTH);
+            int32 versatilityHealingDone = player->GetRatingBonusValue(CR_VERSATILITY_HEALING_DONE);
+            int32 versatilityDamageDone = player->GetRatingBonusValue(CR_VERSATILITY_DAMAGE_DONE);
+            int32 versatilityDamageTaken = player->GetRatingBonusValue(CR_VERSATILITY_DAMAGE_TAKEN);
+
+            // set as default
+            stat = intellect;
+
+            if (stat < agility)
+            {
+                stat = agility;
+                primstat = PRIMARY_STAT_AGILITY;
+            }
+
+            if (stat < strength)
+            {
+                stat = strength;
+                primstat = PRIMARY_STAT_STRENGTH;
+            }
+
+            if (stat < versatilityHealingDone || 
+                stat < versatilityDamageDone ||
+                stat < versatilityDamageTaken)
+            {
+                primstat = PRIMARY_STAT_VERSATILITY;
+            }
+
+            switch (primstat)
+            {
+                case PRIMARY_STAT_INTELLECT:
+                    player->CastSpell(player, SPELL_CONCORDANCE_OF_LEGIONFALL_INTELLECT, true, nullptr, aurEff);
+                    break;
+                case PRIMARY_STAT_STRENGTH:
+                    player->CastSpell(player, SPELL_CONCORDANCE_OF_LEGIONFALL_STRENGTH, true, nullptr, aurEff);
+                    break;
+                case PRIMARY_STAT_AGILITY:
+                    player->CastSpell(player, SPELL_CONCORDANCE_OF_LEGIONFALL_AGILITY, true, nullptr, aurEff);
+                    break;
+                case PRIMARY_STAT_VERSATILITY:
+                    player->CastSpell(player, SPELL_CONCORDANCE_OF_LEGIONFALL_VERSATILITY, true, nullptr, aurEff);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectProc += AuraEffectProcFn(spell_gen_concordance_of_legionfall_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_gen_concordance_of_legionfall_AuraScript();
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     new spell_gen_absorb0_hitlimit1();
@@ -4918,4 +5025,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_spatial_rift_despawn);
     RegisterSpellScript(spell_light_judgement);
     new playerscript_light_reckoning();
+    new spell_gen_concordance_of_legionfall();
 }
