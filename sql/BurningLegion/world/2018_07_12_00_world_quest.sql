@@ -35,3 +35,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 ---fix quest 38331
 UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=285319);
 UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=285317);
+
+---fix quest 38059
+UPDATE `creature_template` SET `npcflag`=1,  `AIName`='SmartAI' WHERE (`entry`=90948);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param_string`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES ('90948', '0', '0', '0', '64', '0', '100', '0', '0', '0', '0', '0', '', '33', '90948', '0', '0', '0', '0', '0', '7', '0', '0', '0', '0', '0', '0', '0', 'quest');
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param_string`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES ('90948', '0', '1', '0', '64', '0', '100', '0', '0', '0', '0', '0', '', '41', '1', '25', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', 'despawn stop spam');
