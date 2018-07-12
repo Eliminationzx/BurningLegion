@@ -2191,7 +2191,7 @@ public:
             if (player->HasAura(SPELL_DH_DEMON_REBORN)) // Remove cd of chaos nova, blur and eye beam
             {
                 player->GetSpellHistory()->ResetCooldown(SPELL_DH_CHAOS_NOVA, true);
-                player->GetSpellHistory()->ResetCharges(sSpellMgr->GetSpellInfo(SPELL_DH_BLUR)->ChargeCategoryId);
+                player->GetSpellHistory()->ResetCooldown(SPELL_DH_BLUR, true);
                 player->GetSpellHistory()->ResetCooldown(SPELL_DH_EYE_BEAM, true);
             }
         }
