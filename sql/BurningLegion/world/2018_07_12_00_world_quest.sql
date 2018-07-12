@@ -11,3 +11,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 ---fix quest 39405
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseUseFlags`, `PhaseId`, `PhaseGroup`, `terrainSwapMap`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `unit_flags2`, `unit_flags3`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES ('210119131', '94228', '1220', '0', '0', '1', '0', '0', '0', '-1', '0', '0', '2737.49', '1583.95', '13.2277', '3.75884', '300', '0', '0', '870', '0', '0', '0', '0', '0', '0', '0', '', '0');
+
+---fix quest 40002
+UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=280170);
+
+---fix quest 37449
+INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES (90255, 37449);
+UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=286100);
+UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=277505);
+
