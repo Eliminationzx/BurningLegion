@@ -12473,7 +12473,7 @@ void Unit::KnockbackFrom(float x, float y, float speedXY, float speedZ, Movement
     {
         float vcos, vsin;
         GetSinCos(x, y, vsin, vcos);
-        SendMoveKnockBack(this, vcos, vsin, speedXY, -speedZ);
+        SendMoveKnockBack(this, vcos, vsin, std::abs(speedXY), -speedZ);
     }
     else
         GetMotionMaster()->MoveKnockbackFrom(x, y, speedXY, speedZ, spellEffectExtraData);
