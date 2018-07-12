@@ -48,3 +48,7 @@ UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=278188);
 ---fix quest 38058
 UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=277457);
 UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=277453);
+
+---fix quest 39756
+UPDATE `quest_objectives` SET `Flags`=4 (`ID`=279906);
+
