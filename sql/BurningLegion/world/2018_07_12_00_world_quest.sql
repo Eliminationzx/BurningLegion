@@ -44,3 +44,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 ---fix quest 38060
 UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=277473);
 UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=278188);
+
+---fix quest 38058
+UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=277457);
+UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=277453);
