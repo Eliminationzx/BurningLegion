@@ -5810,31 +5810,17 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
             }
             case SPELL_EFFECT_SUMMON_PET:
             {
-                bool allowSummon = m_caster->GetPetGUID().IsEmpty(); //let warlock do a replacement summon
-
-                if (!allowSummon)                  
+                if (!m_caster->GetPetGUID().IsEmpty())                  //let warlock do a replacement summon
                 {
-                    Player* player = m_caster->ToPlayer();
-                    
-                    if (player)
+                    if (m_caster->GetTypeId() == TYPEID_PLAYER)
                     {
-                        if (Pet* pet = player->GetPet())                       //starting cast, trigger pet stun (cast by pet so it doesn't attack player)
-                        {
-                            if (strict)
+                        if (strict)                         //starting cast, trigger pet stun (cast by pet so it doesn't attack player)
+                            if (Pet* pet = m_caster->ToPlayer()->GetPet())
                                 pet->CastSpell(pet, 32752, true, NULL, NULL, pet->GetGUID());
-
-                            // Allow if pet is hati
-                            if (pet->GetEntry() == ENTRY_HATI)
-                                allowSummon = true;
-                        }
-                    } 
-
-                    if (m_spellInfo->HasAttribute(SPELL_ATTR1_DISMISS_PET))
-                        allowSummon = true;
+                    }
+                    else if (!m_spellInfo->HasAttribute(SPELL_ATTR1_DISMISS_PET))
+                        return SPELL_FAILED_ALREADY_HAVE_SUMMON;
                 }
-
-                if (!allowSummon)
-                    return SPELL_FAILED_ALREADY_HAVE_SUMMON;
 
                 if (!m_caster->GetCharmGUID().IsEmpty())
                     return SPELL_FAILED_ALREADY_HAVE_CHARM;
