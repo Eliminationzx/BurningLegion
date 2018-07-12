@@ -2191,7 +2191,7 @@ public:
             if (player->HasAura(SPELL_DH_DEMON_REBORN)) // Remove cd of chaos nova, blur and eye beam
             {
                 player->GetSpellHistory()->ResetCooldown(SPELL_DH_CHAOS_NOVA, true);
-                player->GetSpellHistory()->ResetCharges(sSpellMgr->GetSpellInfo(SPELL_DH_BLUR)->ChargeCategoryId);
+                player->GetSpellHistory()->ResetCooldown(SPELL_DH_BLUR, true);
                 player->GetSpellHistory()->ResetCooldown(SPELL_DH_EYE_BEAM, true);
             }
         }
@@ -2937,6 +2937,44 @@ struct at_dh_sigil_of_silence : AreaTriggerAI
     }
 };
 
+class spell_dh_desperate_instincts: public SpellScriptLoader
+{
+public:
+    spell_dh_desperate_instincts() : SpellScriptLoader("spell_dh_desperate_instincts") {}
+
+    class spell_dh_desperate_instincts_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dh_desperate_instincts_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_DH_BLUR))
+                return false;
+            return true;
+        }
+
+        void HandlePeriodic(AuraEffect const* /*aurEff*/)
+        {
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
+
+            if (!caster->GetSpellHistory()->HasCooldown(SPELL_DH_BLUR))
+                caster->CastSpell(caster, SPELL_DH_BLUR, true);
+        }
+
+        void Register() override
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_dh_desperate_instincts_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_dh_desperate_instincts_AuraScript();
+    }
+};
+
 void AddSC_demon_hunter_spell_scripts()
 {
     new spell_dh_annihilation();
@@ -2996,6 +3034,7 @@ void AddSC_demon_hunter_spell_scripts()
     new spell_dh_vengeful_retreat_trigger();
     RegisterSpellScript(spell_dh_felblade);
     RegisterAuraScript(aura_dh_chaos_cleave);
+    new spell_dh_desperate_instincts();
 
     /// AreaTrigger Scripts
     RegisterAreaTriggerAI(at_dh_darkness);

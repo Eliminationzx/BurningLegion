@@ -534,7 +534,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleModStatBonusArmor,                         //465 SPELL_AURA_MOD_BONUS_ARMOR
     &AuraEffect::HandleModStatBonusArmorPercent,                  //466 SPELL_AURA_MOD_BONUS_ARMOR_PCT
     &AuraEffect::HandleModStatBonusPercent,                       //467 SPELL_AURA_MOD_STAT_BONUS_PCT
-    &AuraEffect::HandleNULL,                                      //468 SPELL_AURA_TRIGGER_SPELL_ON_HEALTH_PCT
+    &AuraEffect::HandleTriggerSpellOnHealthPct,                   //468 SPELL_AURA_TRIGGER_SPELL_ON_HEALTH_PCT
     &AuraEffect::HandleShowConfirmationPrompt,                    //469 SPELL_AURA_SHOW_CONFIRMATION_PROMPT_WITH_DIFFICULTY
     &AuraEffect::HandleNULL,                                      //470
     &AuraEffect::HandleModVersatilityByPct,                       //471 SPELL_AURA_MOD_VERSATILITY
@@ -6255,6 +6255,28 @@ void AuraEffect::HandleModSpellCategoryCooldown(AuraApplication const* aurApp, u
 
     if (Player* player = aurApp->GetTarget()->ToPlayer())
         player->SendSpellCategoryCooldowns();
+}
+
+void AuraEffect::HandleTriggerSpellOnHealthPct(AuraApplication const* aurApp, uint8 mode, bool apply) const
+{
+    if (!(mode & AURA_EFFECT_HANDLE_REAL))
+        return;
+
+    if (!apply)
+        return;
+
+    Unit* target = aurApp->GetTarget();
+    
+    if (GetMiscValue())
+    {
+        if (target->HealthBelowPct(GetAmount()))
+            target->CastSpell(target, GetSpellEffectInfo()->TriggerSpell, true);
+    }
+    else
+    {
+        if (target->HealthAbovePct(GetAmount()))
+            target->CastSpell(target, GetSpellEffectInfo()->TriggerSpell, true);
+    }
 }
 
 void AuraEffect::HandleShowConfirmationPrompt(AuraApplication const* aurApp, uint8 mode, bool apply) const
