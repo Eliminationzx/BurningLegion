@@ -4884,17 +4884,29 @@ public:
             switch (primstat)
             {
                 case PRIMARY_STAT_INTELLECT:
-                    player->CastSpell(player, SPELL_CONCORDANCE_OF_LEGIONFALL_INTELLECT, true, nullptr, aurEff);
+                {
+                    int32 bp0 = sSpellMgr->GetSpellInfo(SPELL_CONCORDANCE_OF_LEGIONFALL_INTELLECT)->GetEffect(EFFECT_0)->BasePoints * 2;
+                    player->CastCustomSpell(SPELL_CONCORDANCE_OF_LEGIONFALL_INTELLECT, SPELLVALUE_BASE_POINT0, bp0, player, TRIGGERED_FULL_MASK, nullptr, aurEff);
                     break;
+                }
                 case PRIMARY_STAT_STRENGTH:
-                    player->CastSpell(player, SPELL_CONCORDANCE_OF_LEGIONFALL_STRENGTH, true, nullptr, aurEff);
+                {
+                    int32 bp0 = sSpellMgr->GetSpellInfo(SPELL_CONCORDANCE_OF_LEGIONFALL_STRENGTH)->GetEffect(EFFECT_0)->BasePoints * 2;
+                    player->CastCustomSpell(SPELL_CONCORDANCE_OF_LEGIONFALL_STRENGTH, SPELLVALUE_BASE_POINT0, bp0, player, TRIGGERED_FULL_MASK, nullptr, aurEff);
                     break;
+                }
                 case PRIMARY_STAT_AGILITY:
-                    player->CastSpell(player, SPELL_CONCORDANCE_OF_LEGIONFALL_AGILITY, true, nullptr, aurEff);
+                {
+                    int32 bp0 = sSpellMgr->GetSpellInfo(SPELL_CONCORDANCE_OF_LEGIONFALL_AGILITY)->GetEffect(EFFECT_0)->BasePoints * 2;
+                    player->CastCustomSpell(SPELL_CONCORDANCE_OF_LEGIONFALL_AGILITY, SPELLVALUE_BASE_POINT0, bp0, player, TRIGGERED_FULL_MASK, nullptr, aurEff);
                     break;
+                }
                 case PRIMARY_STAT_VERSATILITY:
-                    player->CastSpell(player, SPELL_CONCORDANCE_OF_LEGIONFALL_VERSATILITY, true, nullptr, aurEff);
+                {
+                    int32 bp0 = sSpellMgr->GetSpellInfo(SPELL_CONCORDANCE_OF_LEGIONFALL_VERSATILITY)->GetEffect(EFFECT_0)->BasePoints * 2;
+                    player->CastCustomSpell(SPELL_CONCORDANCE_OF_LEGIONFALL_VERSATILITY, SPELLVALUE_BASE_POINT0, bp0, player, TRIGGERED_FULL_MASK, nullptr, aurEff);
                     break;
+                }
                 default:
                     break;
             }
