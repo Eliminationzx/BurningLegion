@@ -146,6 +146,9 @@ enum DeathKnightSpells
     SPELL_DK_NORTHREND_WINDS                    = 204088,
     SPELL_DK_KILLING_MACHINE                    = 51128,
     SPELL_DK_REMORSELESS_WINTER_SLOW_DOWN       = 211793,
+    SPELL_DK_VAMPIRIC_BLOOD                     = 55233,
+    SPELL_DK_UMBILICUS_ETERNUS                  = 193213,
+    SPELL_DK_UMBILICUS_ETERNUS_SHIELD           = 193320
 };
 
 // 70656 - Advantage (T10 4P Melee Bonus)
@@ -2495,6 +2498,77 @@ class spell_dk_obliterate : public SpellScript
     }
 };
 
+class spell_dk_umbilicus_eternus : public SpellScriptLoader
+{
+public:
+    spell_dk_umbilicus_eternus() : SpellScriptLoader("spell_dk_umbilicus_eternus") { }
+
+    class spell_dk_umbilicus_eternus_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dk_umbilicus_eternus_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_DK_VAMPIRIC_BLOOD))
+                return false;
+            return true;
+        }
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            return eventInfo.GetSpellInfo()->Id == SPELL_DK_VAMPIRIC_BLOOD;
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(spell_dk_umbilicus_eternus_AuraScript::CheckProc);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_dk_umbilicus_eternus_AuraScript();
+    }
+};
+
+class spell_dk_umbilicus_eternus_dummy : public SpellScriptLoader
+{
+public:
+    spell_dk_umbilicus_eternus_dummy() : SpellScriptLoader("spell_dk_umbilicus_eternus_dummy") { }
+
+    class spell_dk_umbilicus_eternus_dummy_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dk_umbilicus_eternus_dummy_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_DK_UMBILICUS_ETERNUS))
+                return false;
+            return true;
+        }
+
+        void OnRemove(AuraEffect const*  aurEff, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* target = GetTarget();
+            if (!target)
+                return;
+
+            int32 bp = target->GetTotalAttackPowerValue(BASE_ATTACK) * 0.473f * GetMaxDuration() * sSpellMgr->GetSpellInfo(SPELL_DK_UMBILICUS_ETERNUS)->GetEffect(EFFECT_0)->BasePoints;
+            target->CastCustomSpell(SPELL_DK_UMBILICUS_ETERNUS_SHIELD, SPELLVALUE_BASE_POINT0, bp, target, true, nullptr, aurEff);
+        }
+
+        void Register() override
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_dk_umbilicus_eternus_dummy_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_dk_umbilicus_eternus_dummy_AuraScript();
+    }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     new spell_dk_advantage_t10_4p();
@@ -2551,4 +2625,6 @@ void AddSC_deathknight_spell_scripts()
     new spell_dk_will_of_the_necropolis();
     RegisterSpellScript(spell_dk_glacial_advance);
     RegisterSpellScript(spell_dk_obliterate);
+    new spell_dk_umbilicus_eternus();
+    new spell_dk_umbilicus_eternus_dummy();
 }
