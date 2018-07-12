@@ -14,3 +14,9 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 
 ---fix quest 40002
 UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=280170);
+
+---fix quest 37449
+INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES (90255, 37449);
+UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=286100);
+UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=277505);
+
