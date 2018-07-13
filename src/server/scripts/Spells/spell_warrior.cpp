@@ -1375,9 +1375,7 @@ public:
             if (Player* _player = GetCaster()->ToPlayer())
             {
                 if (Unit* target = GetHitUnit())
-                {
                     _player->CastSpell(target, SPELL_WARRIOR_MORTAL_WOUNDS, true);
-                }
             }
         }
 
@@ -2954,6 +2952,51 @@ struct npc_warr_ravager : public ScriptedAI
     }
 };
 
+class spell_war_shattered_defenses : public AuraScript
+{
+    PrepareAuraScript(spell_war_shattered_defenses);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_WARRIOR_COLOSSUS_SMASH;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_war_shattered_defenses::CheckProc);
+    }
+};
+
+class spell_war_t21_arms4p_bonus : public AuraScript
+{
+    PrepareAuraScript(spell_war_t21_arms4p_bonus);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_WARRIOR_MORTAL_STRIKE;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_war_t21_arms4p_bonus::CheckProc);
+    }
+};
+
+class spell_war_executioners_precision : public AuraScript
+{
+    PrepareAuraScript(spell_war_executioners_precision);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_WARRIOR_EXECUTE;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_war_executioners_precision::CheckProc);
+    }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     new spell_warr_berzerker_rage();
@@ -3025,6 +3068,9 @@ void AddSC_warrior_spell_scripts()
     RegisterSpellScript(spell_warr_ravager_damage);
     RegisterSpellScript(spell_warr_execute);
     RegisterAuraScript(aura_warr_war_machine);
+    RegisterAuraScript(spell_war_shattered_defenses);
+    RegisterAuraScript(spell_war_t21_arms4p_bonus);
+    RegisterAuraScript(spell_war_executioners_precision);
 
     RegisterCreatureAI(npc_warr_ravager);
 }
