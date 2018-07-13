@@ -1101,7 +1101,6 @@ class spell_dk_will_of_the_necropolis : public SpellScriptLoader
 
             void Absorb(AuraEffect* /*p_AuraEffect*/, DamageInfo& p_DmgInfo, uint32& p_AbsorbAmount)
             {
-                uint32 damage = p_DmgInfo.GetDamage();
                 int32 bp1 = GetEffectInfo(EFFECT_1)->BasePoints;
                 int32 bp2 = GetEffectInfo(EFFECT_2)->BasePoints;
 
