@@ -7178,6 +7178,41 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
         }
     }
 
+    // Mastery: Lightbringer
+    if (Aura* lightringer = GetAura(183997))
+    {
+        float dist = GetDistance(victim);
+        
+        // Beacon of the Lightbringer
+        if (HasAura(197446))
+        {
+            std::list<Unit*> beaconUnits;
+            GetFriendlyUnitListInRange(beaconUnits, 100.f);
+
+            for (auto beaconUnit : beaconUnits)
+            {
+                // Beacon of light
+                if (beaconUnit->HasAura(53563, GetGUID()))
+                {
+                    if (beaconUnit->GetDistance(this) < dist)
+                    {
+                        dist = beaconUnit->GetDistance(this);
+                        break;
+                    }
+                }
+            }
+        }
+
+        int32 lightbringerPct = lightringer->GetEffect(EFFECT_0)->GetAmount();
+        float maxRange = HasAura(214202) ? 20.0f : 10.0f; // Include Rule of Law
+
+        if (dist > maxRange)
+            lightbringerPct -= dist / 10;
+
+        if (lightbringerPct > 0)
+            AddPct(DoneTotal, lightbringerPct);
+    }
+
     // Done fixed damage bonus auras
     int32 DoneAdvertisedBenefit = SpellBaseHealingBonusDone(spellProto->GetSchoolMask());
 
