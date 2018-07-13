@@ -828,19 +828,27 @@ public:
             return true;
         }
 
-        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {         
+            if (Unit* target = eventInfo.GetActionTarget())
+                target->CastSpell(target, SPELL_WARRIOR_SECOND_WIND_DAMAGED, true, nullptr, aurEff);
+        }
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            if(!GetCaster())
+            Unit* target = GetTarget();
+            if (!target)
                 return;
 
-            GetCaster()->CastSpell(GetCaster(), SPELL_WARRIOR_SECOND_WIND_DAMAGED, true);
+            if (target->HasAura(SPELL_WARRIOR_SECOND_WIND_HEAL))
+                target->RemoveAura(SPELL_WARRIOR_SECOND_WIND_HEAL);
         }
 
         void Register() override
         {
             OnEffectProc += AuraEffectProcFn(spell_warr_second_wind_proc_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+            OnEffectRemove += AuraEffectRemoveFn(spell_warr_second_wind_proc_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
-
     };
 
     AuraScript* GetAuraScript() const override
@@ -860,20 +868,21 @@ public:
 
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            Unit* caster = GetCaster();
-            if (!caster)
+            Unit* target = GetTarget();
+            if (!target)
                 return;
 
-            caster->RemoveAura(SPELL_WARRIOR_SECOND_WIND_HEAL);
+            if (target->HasAura(SPELL_WARRIOR_SECOND_WIND_HEAL))
+                target->RemoveAura(SPELL_WARRIOR_SECOND_WIND_HEAL);
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            Unit* caster = GetCaster();
-            if (!caster)
+            Unit* target = GetTarget();
+            if (!target)
                 return;
 
-            caster->CastSpell(caster, SPELL_WARRIOR_SECOND_WIND_HEAL, true);
+            target->CastSpell(target, SPELL_WARRIOR_SECOND_WIND_HEAL, true);
         }
 
         void Register() override

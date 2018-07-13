@@ -20,3 +20,9 @@ INSERT INTO spell_script_names (spell_id, ScriptName) VALUES (238147, 'spell_war
 
 DELETE FROM spell_linked_spell WHERE spell_effect = -242188;
 INSERT INTO spell_linked_spell (spell_trigger, spell_effect, type, comment) VALUES (12294, -242188, 0, 'Remove executioners precision buff by mortal strike');
+
+DELETE FROM spell_script_names WHERE ScriptName = 'spell_warr_second_wind_proc';
+DELETE FROM spell_script_names WHERE ScriptName = 'spell_warr_second_wind_damaged';
+INSERT INTO spell_script_names (spell_id, ScriptName) VALUES 
+(29838, 'spell_warr_second_wind_proc'),
+(202149, 'spell_warr_second_wind_damaged');
