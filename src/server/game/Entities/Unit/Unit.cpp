@@ -7203,13 +7203,16 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
             }
         }
 
-        int32 lightbringerPct = lightringer->GetEffect(EFFECT_0)->GetAmount();
+        float lightbringerPct = 1.0f;
+        if (Player* modOwner = GetSpellModOwner())
+            AddPct(lightbringerPct, modOwner->GetRatingBonusValue(CR_VERSATILITY_HEALING_DONE) + modOwner->GetTotalAuraModifier(SPELL_AURA_MOD_VERSATILITY));
+
         float maxRange = HasAura(214202) ? 20.0f : 10.0f; // Include Rule of Law
 
         if (dist > maxRange)
             lightbringerPct -= dist / 10;
 
-        if (lightbringerPct > 0)
+        if (lightbringerPct)
             AddPct(DoneTotal, lightbringerPct);
     }
 
