@@ -4,7 +4,7 @@ INSERT INTO spell_script_names (spell_id, ScriptName) VALUES (206967, 'spell_dk_
 DELETE FROM spell_script_names WHERE spell_id = 248580;
 INSERT INTO spell_script_names (spell_id, ScriptName) VALUES (248580, 'spell_war_shattered_defenses');
 
-DELETE FROM spell_linked_spell WHERE spell_effect = -248580;
+DELETE FROM spell_linked_spell WHERE spell_effect = -248625;
 INSERT INTO spell_linked_spell (spell_trigger, spell_effect, type, comment) VALUES (12294, -248625, 1, 'Remove shattered defenses buff by mortal strike');
 INSERT INTO spell_linked_spell (spell_trigger, spell_effect, type, comment) VALUES (163201, -248625, 1, 'Remove shattered defenses buff by execute');
 
