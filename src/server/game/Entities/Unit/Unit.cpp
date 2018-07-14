@@ -7251,16 +7251,19 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
             lightbringerPct = 12.0f + (player->GetFloatValue(PLAYER_MASTERY) / 2);
 
         float effectiveMaxRange = 10.0f;
-        float noeffectiveMaxRange = GetSpellMaxRangeForTarget(victim, spellProto);
+        float noeffectiveMaxRange = 40.0f;
 
         // Rule of Law range bonus
         if (AuraEffect const* ruleOfLaw = GetAuraEffect(214202, EFFECT_2))
+        {
             AddPct(effectiveMaxRange, ruleOfLaw->GetAmount());
+            AddPct(noeffectiveMaxRange, ruleOfLaw->GetAmount());
+        }
 
         if (dist > effectiveMaxRange && dist < noeffectiveMaxRange)
-            lightbringerPct /= dist / effectiveMaxRange;
+            lightbringerPct = lightbringerPct / dist * 10.0f;
         else if (dist >= noeffectiveMaxRange)
-            lightbringerPct -= lightbringerPct;
+            lightbringerPct = 0.0f;
 
         if (lightbringerPct)
             AddPct(heal, lightbringerPct);
