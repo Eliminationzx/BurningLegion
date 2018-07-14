@@ -7248,7 +7248,7 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
 
         float lightbringerPct = 0.0f;
         if (Player const* player = ToPlayer())
-            lightbringerPct = 12.0f + (player->GetFloatValue(PLAYER_MASTERY) / 2);
+            lightbringerPct = 12.0f + player->GetFloatValue(PLAYER_MASTERY);
 
         float effectiveMaxRange = 10.0f;
         float noeffectiveMaxRange = 40.0f;
