@@ -7226,6 +7226,46 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
     // Done Percentage for DOT is already calculated, no need to do it again. The percentage mod is applied in Aura::HandleAuraSpecificMods.
     float heal = float(int32(healamount) + DoneTotal) * (damagetype == DOT ? 1.0f : SpellHealingPctDone(victim, spellProto));
 
+    // Mastery: Lightbringer
+    if (HasAura(183997))
+    {
+        float dist = GetDistance(victim);
+
+        // Beacon of the Lightbringer
+        if (HasAura(197446))
+        {
+            std::list<Unit*> beaconUnits;
+            GetFriendlyUnitListInRange(beaconUnits, 100.f);
+
+            for (auto beaconUnit : beaconUnits)
+            {
+                // Beacon of light
+                if (beaconUnit->HasAura(53563, GetGUID()))
+                    if (beaconUnit->GetDistance(this) < dist)
+                        dist = beaconUnit->GetDistance(this);
+            }
+        }
+
+        float lightbringerPct = 0.0f;
+        if (Player const* player = ToPlayer())
+            lightbringerPct = 12.0f + (player->GetFloatValue(PLAYER_MASTERY) / 2);
+
+        float effectiveMaxRange = 10.0f;
+        float noeffectiveMaxRange = GetSpellMaxRangeForTarget(victim, spellProto);
+
+        // Rule of Law range bonus
+        if (AuraEffect const* ruleOfLaw = GetAuraEffect(214202, EFFECT_2))
+            AddPct(effectiveMaxRange, ruleOfLaw->GetAmount());
+
+        if (dist > effectiveMaxRange && dist < noeffectiveMaxRange)
+            lightbringerPct /= dist / effectiveMaxRange;
+        else if (dist >= noeffectiveMaxRange)
+            lightbringerPct -= lightbringerPct;
+
+        if (lightbringerPct)
+            AddPct(heal, lightbringerPct);
+    }
+
     // apply spellmod to Done amount
     if (Player* modOwner = GetSpellModOwner())
     {
