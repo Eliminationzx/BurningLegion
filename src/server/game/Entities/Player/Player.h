@@ -2306,12 +2306,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void ActivatePvpItemLevels(bool activate) { _usePvpItemLevels = activate; }
         bool IsUsingPvpItemLevels() const { return _usePvpItemLevels; }
 
-        template<class Do>
-        void BroadcastWorker(Do& _do);
-        void SendNotification(uint32 entry, ChatMsg msgType);
-
-        void InitPlayerClassPhase(uint8 classId);
-
         /*********************************************************/
         /***                 INSTANCE SYSTEM                   ***/
         /*********************************************************/

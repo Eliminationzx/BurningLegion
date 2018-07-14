@@ -80,7 +80,6 @@ enum DeathKnightSpells
     SPELL_DK_SOUL_REAPER_HASTE                  = 114868,
     SPELL_DK_T15_DPS_4P_BONUS                   = 138347,
     SPELL_DK_UNHOLY_PRESENCE                    = 48265,
-    SPELL_DK_WILL_OF_THE_NECROPOLIS             = 206967,
     SPELL_DK_BLOOD_BOIL_TRIGGERED               = 65658,
     SPELL_DK_BLOOD_GORGED_HEAL                  = 50454,
     SPELL_DK_DEATH_STRIKE_ENABLER               = 89832,
@@ -144,7 +143,7 @@ enum DeathKnightSpells
     SPELL_DK_HOWLING_BLAST_AOE                  = 237680,
     SPELL_DK_RIME_BUFF                          = 59052,
     SPELL_DK_NORTHREND_WINDS                    = 204088,
-    SPELL_DK_KILLING_MACHINE                    = 51128,
+    SPELL_DK_KILLING_MACHINE                    = 51124,
     SPELL_DK_REMORSELESS_WINTER_SLOW_DOWN       = 211793,
     SPELL_DK_VAMPIRIC_BLOOD                     = 55233,
     SPELL_DK_UMBILICUS_ETERNUS                  = 193213,
@@ -1085,8 +1084,7 @@ class spell_dk_unholy_blight : public SpellScriptLoader
         }
 };
 
-// 81164 - Will of the Necropolis
-/// 6.x
+// 206967 - Will of the Necropolis
 class spell_dk_will_of_the_necropolis : public SpellScriptLoader
 {
     public:
@@ -1096,23 +1094,22 @@ class spell_dk_will_of_the_necropolis : public SpellScriptLoader
         {
             PrepareAuraScript(spell_dk_will_of_the_necropolis_AuraScript);
 
-            bool Validate(SpellInfo const* spellInfo) override
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_DK_WILL_OF_THE_NECROPOLIS))
-                    return false;
-                if (!spellInfo->GetEffect(EFFECT_0))
-                    return false;
-                return true;
-            }
-
             void CalculateAmount(AuraEffect const* /*p_AuraEffect*/, int32& p_Amount, bool& /*p_CanBeRecalculated*/)
             {
                 p_Amount = -1;
             }
 
-            void Absorb(AuraEffect* /*p_AuraEffect*/, DamageInfo& /*p_DmgInfo*/, uint32& p_AbsorbAmount)
+            void Absorb(AuraEffect* /*p_AuraEffect*/, DamageInfo& p_DmgInfo, uint32& p_AbsorbAmount)
             {
-                p_AbsorbAmount = 0; //This is set at 0 because we don't want to absorb
+                int32 bp1 = GetEffectInfo(EFFECT_1)->BasePoints;
+                int32 bp2 = GetEffectInfo(EFFECT_2)->BasePoints;
+
+                Unit* target = GetTarget();
+
+                if (target->HealthBelowPct(bp2))
+                    p_AbsorbAmount = CalculatePct(p_DmgInfo.GetDamage(), bp1);
+                else
+                    p_AbsorbAmount = 0;
             }
 
             void Register() override
@@ -1329,7 +1326,7 @@ class spell_dk_remorseless_winter_damage : public SpellScript
 
     void Register() override
     {
-        OnEffectHit += SpellEffectFn(spell_dk_remorseless_winter_damage::HandleOnHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        OnEffectHitTarget += SpellEffectFn(spell_dk_remorseless_winter_damage::HandleOnHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
 

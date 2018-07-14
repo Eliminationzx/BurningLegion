@@ -480,9 +480,6 @@ bool Player::Create(ObjectGuid::LowType guidlow, WorldPackets::Character::Charac
     SetUInt32Value(UNIT_FIELD_DISPLAY_POWER, powertype);
     InitDisplayIds();
 
-    // Init class phase
-    InitPlayerClassPhase(createInfo->Class);
-
     if (sWorld->getIntConfig(CONFIG_GAME_TYPE) == REALM_TYPE_PVP || sWorld->getIntConfig(CONFIG_GAME_TYPE) == REALM_TYPE_RPPVP)
     {
         SetByteFlag(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_PVP_FLAG, UNIT_BYTE2_FLAG_PVP);
@@ -1489,6 +1486,33 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     if (!InBattleground() && mEntry->IsBattlegroundOrArena())
         return false;
 
+    uint32 mapRequiredLevel;
+    switch (GetMapId())
+    {
+        case MAP_OUTLAND:
+            mapRequiredLevel = getRace() == RACE_BLOODELF ? 0 : 58;
+            break;
+        case MAP_NORTHREND:
+            mapRequiredLevel = 68;
+            break;
+        case MAP_BROKEN_ISLANDS:
+            mapRequiredLevel = 98;
+            break;
+        case MAP_PANDARIA:
+            mapRequiredLevel = (
+                getRace() == RACE_PANDAREN_ALLIANCE || 
+                getRace() == RACE_PANDAREN_HORDE    || 
+                getRace() == RACE_PANDAREN_NEUTRAL
+                ) ? 0 : 80;
+            break;
+        case MAP_DRAENOR:
+            mapRequiredLevel = 90;
+            break;
+        default:
+            mapRequiredLevel = 0;
+            break;
+    }
+
     // client without expansion support
     if (GetSession()->GetExpansion() < mEntry->Expansion())
     {
@@ -1504,6 +1528,11 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         SendTransferAborted(mapid, TRANSFER_ABORT_INSUF_EXPAN_LVL, mEntry->Expansion());
 
         return false;                                       // normal client can't teleport to this map...
+    }
+    else if (getLevel() < mapRequiredLevel)
+    {
+        GetSession()->SendNotification(GetSession()->GetTrinityString(LANG_LEVEL_MINREQUIRED), mapRequiredLevel);
+        return false;
     }
     else
         TC_LOG_DEBUG("maps", "Player %s (%s) is being teleported to map (MapID: %u)", GetName().c_str(), GetGUID().ToString().c_str(), mapid);
@@ -7308,6 +7337,9 @@ void Player::UpdateArea(uint32 newArea)
     if (oldArea != newArea)
     {
         sScriptMgr->OnPlayerUpdateArea(this, newArea, oldArea);
+
+        if (ZoneScript* zoneScript = GetZoneScript())
+            zoneScript->OnPlayerAreaUpdate(this, newArea, oldArea);
 
         if (IsInGarrison())
         {
@@ -15937,7 +15969,13 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     if (quest->GetRewSpell() > 0)
     {
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(quest->GetRewSpell());
-        if (questGiver && questGiver->isType(TYPEMASK_UNIT) && spellInfo->HasTargetType(TARGET_UNIT_TARGET_ANY))
+      if (questGiver && questGiver->isType(TYPEMASK_UNIT) &&
+            !spellInfo->HasEffect(DIFFICULTY_NONE, SPELL_EFFECT_LEARN_SPELL) &&
+            !spellInfo->HasEffect(DIFFICULTY_NONE, SPELL_EFFECT_CREATE_ITEM) &&
+            !spellInfo->HasEffect(DIFFICULTY_NONE, SPELL_EFFECT_APPLY_AURA) &&
+            !spellInfo->HasEffect(DIFFICULTY_NONE, SPELL_EFFECT_SUMMON) &&
+            !spellInfo->HasEffect(DIFFICULTY_NONE, SPELL_EFFECT_UPDATE_ZONE_AURAS_AND_PHASES) &&
+            !spellInfo->HasEffect(DIFFICULTY_NONE, SPELL_EFFECT_DUMMY))
         {
             if (Unit* unit = questGiver->ToUnit())
                 unit->CastSpell(this, quest->GetRewSpell(), true);
@@ -18506,9 +18544,6 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
     }
 
     SetMap(map);
-
-    // Init class phase
-    InitPlayerClassPhase(fields[4].GetUInt8());
 
     // now that map position is determined, check instance validity
     if (!CheckInstanceValidity(true) && !IsInstanceLoginGameMasterException())
@@ -29656,65 +29691,4 @@ uint8 Player::GetItemLimitCategoryQuantity(ItemLimitCategoryEntry const* limitEn
     }
 
     return limit;
-}
-
-template<class Do>
-void Player::BroadcastWorker(Do& _do)
-{
-    _do(this);
-}
-
-void Player::SendNotification(uint32 entry, ChatMsg msgType)
-{
-    if (!entry)
-        return;
-
-    Trinity::TrinityStringChatBuilder builder(nullptr, msgType, entry, this);
-    Trinity::LocalizedPacketDo<Trinity::TrinityStringChatBuilder> localizer(builder);
-    BroadcastWorker(localizer);
-}
-
-void Player::InitPlayerClassPhase(uint8 classId)
-{
-    switch (classId)
-    {
-        case CLASS_WARRIOR:
-            PhasingHandler::AddPhase(this, PHASE_WARRIOR);
-            break;
-        case CLASS_PALADIN:
-            PhasingHandler::AddPhase(this, PHASE_PALADIN);
-            break;
-        case CLASS_HUNTER:
-            PhasingHandler::AddPhase(this, PHASE_HUNTER);
-            break;
-        case CLASS_ROGUE:
-            PhasingHandler::AddPhase(this, PHASE_ROGUE);
-            break;
-        case CLASS_PRIEST:
-            PhasingHandler::AddPhase(this, PHASE_PRIEST);
-            break;
-        case CLASS_DEATH_KNIGHT:
-            PhasingHandler::AddPhase(this, PHASE_DEATH_KNIGHT);
-            break;
-        case CLASS_SHAMAN:
-            PhasingHandler::AddPhase(this, PHASE_SHAMAN);
-            break;
-        case CLASS_MAGE:
-            PhasingHandler::AddPhase(this, PHASE_MAGE);
-            break;
-        case CLASS_WARLOCK:
-            PhasingHandler::AddPhase(this, PHASE_WARLOCK);
-            break;
-        case CLASS_MONK:
-            PhasingHandler::AddPhase(this, PHASE_MONK);
-            break;
-        case CLASS_DRUID:
-            PhasingHandler::AddPhase(this, PHASE_DRUID);
-            break;
-        case CLASS_DEMON_HUNTER:
-            PhasingHandler::AddPhase(this, PHASE_DEMON_HUNTER);
-            break;
-        default:
-            break;
-    }
 }
