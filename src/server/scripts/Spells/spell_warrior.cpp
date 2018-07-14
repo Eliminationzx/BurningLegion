@@ -830,8 +830,8 @@ public:
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {         
-            if (Unit* target = eventInfo.GetActionTarget())
-                target->CastSpell(target, SPELL_WARRIOR_SECOND_WIND_DAMAGED, true, nullptr, aurEff);
+            if (Unit* caster = eventInfo.GetActor())
+                caster->CastSpell(caster, SPELL_WARRIOR_SECOND_WIND_DAMAGED, true, nullptr, aurEff);
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

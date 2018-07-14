@@ -2470,8 +2470,8 @@ class spell_pal_fervent_martyr : public AuraScript
     {
         PreventDefaultAction();
 
-        if (Unit* target = eventInfo.GetActionTarget())
-            target->CastSpell(target, SPELL_PALADIN_FERVENT_MARTYR_BUFF, true, nullptr, aurEff);
+        if (Unit* caster = eventInfo.GetActor())
+            caster->CastSpell(caster, SPELL_PALADIN_FERVENT_MARTYR_BUFF, true, nullptr, aurEff);
     }
 
     void Register() override
