@@ -128,7 +128,8 @@ enum PaladinSpells
     SPELL_PALADIN_WORD_OF_GLORY_HEAL            = 214894,
     SPELL_PALDIN_BLESSED_HAMMER                 = 204019,
     SPELL_PALADIN_GREATER_JUDGEMENT             = 218178,
-    SPELL_PALADIN_AEGIS_OF_LIGHT                = 204335
+    SPELL_PALADIN_AEGIS_OF_LIGHT                = 204335,
+    SPELL_PALADIN_AURA_OF_SACRIFICE_DAMAGE      = 210380
 };
 
 enum PaladinNPCs
@@ -1681,7 +1682,7 @@ public:
         {
             Unit* caster = GetCaster();
 
-            int32 dmg = (GetHitHeal() * 50.0f) / 100.0f;
+            int32 dmg = CalculatePct(GetHitHeal(), 50);
             caster->CastCustomSpell(caster, SPELL_PALADIN_LIGHT_OF_THE_MARTYR_DAMAGE, &dmg, NULL, NULL, true);
 
             if (caster->HasAura(SPELL_PALADIN_FERVENT_MARTYR_BUFF))
@@ -2383,19 +2384,24 @@ public:
 
         void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
         {
-            Unit* target = GetTarget();
             Unit* caster = GetCaster();
-            if (!target || !caster)
+            if (!caster)
                 return;
+
+            absorbAmount = 0;
             
-            if (target == caster)
-                return;
-
-            if (!caster->HealthAbovePct(75)) // hp above 75%
-                return;
-
-            absorbAmount = CalculatePct(dmgInfo.GetDamage(), 10); // 10% of damage
-            caster->ModifyHealth(-absorbAmount);
+            if (Unit* victim = dmgInfo.GetVictim())
+            {
+                if (victim != caster)
+                {
+                    if (caster->HealthAbovePct(75))
+                    {
+                        int32 damage = CalculatePct(dmgInfo.GetDamage(), 10);
+                        absorbAmount = damage;
+                        caster->CastCustomSpell(caster, SPELL_PALADIN_AURA_OF_SACRIFICE_DAMAGE, &damage, NULL, NULL, true);
+                    }
+                }
+            }
         }
 
         void Register() override
