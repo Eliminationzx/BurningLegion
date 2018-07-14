@@ -1243,6 +1243,42 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
 
         int32 addhealth = damage;
 
+        // Mastery: Lightbringer
+        if (m_caster->HasAura(183997))
+        {
+            float dist = m_caster->GetDistance(unitTarget);
+
+            // Beacon of the Lightbringer
+            if (m_caster->HasAura(197446))
+            {
+                std::list<Unit*> beaconUnits;
+                m_caster->GetFriendlyUnitListInRange(beaconUnits, 100.f);
+
+                for (auto beaconUnit : beaconUnits)
+                {
+                    // Beacon of light
+                    if (beaconUnit->HasAura(53563, m_caster->GetGUID()))
+                        if (beaconUnit->GetDistance(m_caster) < dist)
+                            dist = beaconUnit->GetDistance(m_caster);
+                }
+            }
+
+            float lightbringerPct = 1.0f;
+            if (Player* modOwner = m_caster->GetSpellModOwner())
+                lightbringerPct *= modOwner->GetRatingBonusValue(CR_VERSATILITY_HEALING_DONE) + modOwner->GetTotalAuraModifier(SPELL_AURA_MOD_VERSATILITY);
+
+            float maxRange = 10.0f;
+           
+            if (AuraEffect const* ruleOfLaw = m_caster->GetAuraEffect(214202, EFFECT_2))
+                AddPct(maxRange, ruleOfLaw->GetAmount());
+
+            if (dist > maxRange)
+                lightbringerPct -= dist / 10;
+
+            if (lightbringerPct)
+                AddPct(addhealth, lightbringerPct);
+        }
+
         // Vessel of the Naaru (Vial of the Sunwell trinket)
         if (m_spellInfo->Id == 45064)
         {
