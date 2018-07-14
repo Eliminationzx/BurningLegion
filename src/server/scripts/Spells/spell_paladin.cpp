@@ -92,6 +92,7 @@ enum PaladinSpells
     SPELL_PALADIN_HAND_OF_SACRIFICE             = 6940,
     SPELL_PALADIN_HAND_OF_THE_PROTECTOR         = 213652,
     SPELL_PALADIN_HOLY_LIGHT                    = 82326,
+    SPELL_PALADIN_FLASH_OF_LIGHT                = 19750,
     SPELL_PALADIN_HOLY_PRISM_ALLIES             = 114871,
     SPELL_PALADIN_HOLY_PRISM_DAMAGE_VISUAL      = 114862,
     SPELL_PALADIN_HOLY_PRISM_DAMAGE_VISUAL_2    = 114870,
@@ -2450,6 +2451,30 @@ public:
     }
 };
 
+class spell_pal_fervent_martyr : public AuraScript
+{
+    PrepareAuraScript(spell_pal_fervent_martyr);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_HOLY_LIGHT || eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_FLASH_OF_LIGHT;
+    }
+
+    void HandleEffectProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        if (Unit* target = eventInfo.GetActionTarget())
+            target->CastSpell(target, SPELL_PALADIN_FERVENT_MARTYR_BUFF, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_pal_fervent_martyr::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_pal_fervent_martyr::HandleEffectProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     new spell_pal_bastion_of_light();
@@ -2505,9 +2530,9 @@ void AddSC_paladin_spell_scripts()
     RegisterAuraScript(spell_pal_blade_of_wrath_proc);
     RegisterAuraScript(spell_pal_the_fire_of_justice);
     RegisterAuraScript(spell_pal_ardent_defender);
-    RegisterCastSpellOnProcAuraScript("spell_pal_fervent_martyr", EFFECT_0, SPELL_AURA_DUMMY, SPELL_PALADIN_FERVENT_MARTYR_BUFF); // 196923
     RegisterAuraScript(spell_pal_crusade);
     RegisterAuraScript(spell_pal_consecration);
+    RegisterAuraScript(spell_pal_fervent_martyr);
 
     new spell_pal_consecration_heal();
     new spell_pal_aura_of_sacrifice();
