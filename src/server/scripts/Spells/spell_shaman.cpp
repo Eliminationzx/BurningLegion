@@ -2715,7 +2715,7 @@ struct npc_voodoo_totem : public ScriptedAI
             me->GetAttackableUnitListInRange(targets, 8.0f);
 
             for (Unit* target : targets)
-                if (me->IsValidAttackTarget(target))
+                if (me->IsValidAttackTarget(target) && !target->HasAura(SPELL_TOTEM_VOODOO_EFFECT))
                     me->CastSpell(target, SPELL_TOTEM_VOODOO_EFFECT, true);
 
             context.Repeat();
