@@ -130,7 +130,10 @@ enum PaladinSpells
     SPELL_PALDIN_BLESSED_HAMMER                 = 204019,
     SPELL_PALADIN_GREATER_JUDGEMENT             = 218178,
     SPELL_PALADIN_AEGIS_OF_LIGHT                = 204335,
-    SPELL_PALADIN_AURA_OF_SACRIFICE_DAMAGE      = 210380
+    SPELL_PALADIN_AURA_OF_SACRIFICE             = 183416,
+    SPELL_PALADIN_AURA_OF_SACRIFICE_ALLY        = 210372,
+    SPELL_PALADIN_AURA_OF_SACRIFICE_DAMAGE      = 210380,
+    SPELL_PALADIN_AURA_OF_SACRIFICE_HEAL        = 210383
 };
 
 enum PaladinNPCs
@@ -2372,58 +2375,68 @@ public:
     };
 };
 
-class spell_pal_aura_of_sacrifice : public SpellScriptLoader
+// 210372
+class spell_pal_aura_of_sacrifice_ally : public AuraScript
 {
-public:
-    spell_pal_aura_of_sacrifice() : SpellScriptLoader("spell_pal_aura_of_sacrifice") { }
+    PrepareAuraScript(spell_pal_aura_of_sacrifice_ally);
 
-    class spell_pal_aura_of_sacrifice_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_pal_aura_of_sacrifice_AuraScript);
+        return ValidateSpellInfo({ SPELL_PALADIN_AURA_OF_SACRIFICE });
+    }
 
-    public:
-        spell_pal_aura_of_sacrifice_AuraScript() { }
+    void CalcAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        amount = -1;
+    }
 
-        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    void OnAbsorb(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& absorbAmount)
+    {
+        Unit* caster = GetCaster();
+        SpellInfo const* auraOfSacrificeInfo = sSpellMgr->GetSpellInfo(SPELL_PALADIN_AURA_OF_SACRIFICE);
+
+        if (!caster || !caster->IsValidAssistTarget(GetTarget()) || caster->HealthBelowPct(auraOfSacrificeInfo->GetEffect(EFFECT_2)->BasePoints))
         {
-            amount = 0;
-        }
-
-        void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
-        {
-            Unit* caster = GetCaster();
-            if (!caster)
-                return;
-
             absorbAmount = 0;
-            
-            if (Unit* victim = dmgInfo.GetVictim())
-            {
-                if (victim != caster)
-                {
-                    if (caster->HealthAbovePct(75))
-                    {
-                        int32 damage = CalculatePct(dmgInfo.GetDamage(), 10);
-                        absorbAmount = damage;
-                        caster->CastCustomSpell(caster, SPELL_PALADIN_AURA_OF_SACRIFICE_DAMAGE, &damage, NULL, NULL, true);
-                    }
-                }
-            }
+            return;
         }
 
-        void Register() override
-        {
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pal_aura_of_sacrifice_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
-            OnEffectAbsorb += AuraEffectAbsorbFn(spell_pal_aura_of_sacrifice_AuraScript::Absorb, EFFECT_0);
-        }
+        absorbAmount = CalculatePct(dmgInfo.GetDamage(), auraOfSacrificeInfo->GetEffect(EFFECT_0)->BasePoints);
 
-    };
+        // Deal damages to the paladin
+        GetTarget()->CastCustomSpell(SPELL_PALADIN_AURA_OF_SACRIFICE_DAMAGE, SPELLVALUE_BASE_POINT0, absorbAmount, caster, TRIGGERED_FULL_MASK);
+    }
 
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_pal_aura_of_sacrifice_AuraScript();
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pal_aura_of_sacrifice_ally::CalcAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+        OnEffectAbsorb += AuraEffectAbsorbFn(spell_pal_aura_of_sacrifice_ally::OnAbsorb, EFFECT_0);
     }
 };
+
+// Aura of Sacrifice - 183416
+// AreaTriggerID - 100102 (custom)
+struct at_pal_aura_of_sacrifice : AreaTriggerAI
+{
+    at_pal_aura_of_sacrifice(AreaTrigger* areatrigger) : AreaTriggerAI(areatrigger)
+    {
+        at->SetPeriodicProcTimer(1000);
+    }
+
+    void OnUnitEnter(Unit* unit) override
+    {
+        if (Unit* caster = at->GetCaster())
+            if (unit->IsPlayer() && caster->IsPlayer() && caster != unit)
+                if (caster->ToPlayer()->IsInSameRaidWith(unit->ToPlayer()))
+                    caster->CastSpell(unit, SPELL_PALADIN_AURA_OF_SACRIFICE_ALLY, true);
+    }
+
+    void OnUnitExit(Unit* unit) override
+    {
+        unit->RemoveAurasDueToSpell(SPELL_PALADIN_AURA_OF_SACRIFICE_ALLY);
+    }
+};
+
 
 class spell_pal_retribution_aura : public SpellScriptLoader
 {

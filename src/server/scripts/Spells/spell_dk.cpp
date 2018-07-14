@@ -1106,10 +1106,10 @@ class spell_dk_will_of_the_necropolis : public SpellScriptLoader
 
                 Unit* target = GetTarget();
 
+                p_AbsorbAmount = 0;
+
                 if (target->HealthBelowPct(bp2))
                     p_AbsorbAmount = CalculatePct(p_DmgInfo.GetDamage(), bp1);
-                else
-                    p_AbsorbAmount = 0;
             }
 
             void Register() override
