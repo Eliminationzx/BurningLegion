@@ -19,6 +19,7 @@
 #include "ScriptMgr.h"
 #include "Player.h"
 #include "Language.h"
+#include "WorldSession.h"
 
 enum TrueshotLodgeAreaGuard
 {
@@ -36,11 +37,11 @@ public:
         if (newAreaId == TRUESHOT_LODGE_AREA_ID)
         {
             // Skip action only for hunters
-            if (player->getClass() == CLASS_HUNTER)
+            if (player->getClass() == CLASS_HUNTER && player->getLevel() > 100)
                 return;
 
-            player->SendNotification(LANG_BREACHING_TRUESHOT_LODGE, CHAT_MSG_RAID_BOSS_EMOTE);
-            player->CastSpell((Unit*)nullptr, SPELL_EAGLE_SENTINEL);
+            player->GetSession()->SendNotification(LANG_BREACHING_TRUESHOT_LODGE);
+            player->CastSpell(player, SPELL_EAGLE_SENTINEL);
         }
     }
 };
