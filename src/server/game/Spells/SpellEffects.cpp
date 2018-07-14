@@ -1243,43 +1243,6 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
 
         int32 addhealth = damage;
 
-        // Mastery: Lightbringer
-        if (m_caster->HasAura(183997))
-        {
-            float dist = m_caster->GetDistance(unitTarget);
-
-            // Beacon of the Lightbringer
-            if (m_caster->HasAura(197446))
-            {
-                std::list<Unit*> beaconUnits;
-                m_caster->GetFriendlyUnitListInRange(beaconUnits, 100.f);
-
-                for (auto beaconUnit : beaconUnits)
-                {
-                    // Beacon of light
-                    if (beaconUnit->HasAura(53563, m_caster->GetGUID()))
-                        if (beaconUnit->GetDistance(m_caster) < dist)
-                            dist = beaconUnit->GetDistance(m_caster);
-                }
-            }
-
-            float lightbringerPct = 0.0f;
-            if (Player* player = m_caster->ToPlayer())
-                lightbringerPct = 12.0f + (player->GetFloatValue(PLAYER_MASTERY) / 2);
-
-            float maxRange = 10.0f;
-           
-            // Rule of Law range bonus
-            if (AuraEffect const* ruleOfLaw = m_caster->GetAuraEffect(214202, EFFECT_2))
-                AddPct(maxRange, ruleOfLaw->GetAmount());
-
-            if (dist > maxRange)
-                lightbringerPct -= dist * 0.5f;
-
-            if (lightbringerPct)
-                AddPct(addhealth, lightbringerPct);
-        }
-
         // Vessel of the Naaru (Vial of the Sunwell trinket)
         if (m_spellInfo->Id == 45064)
         {
