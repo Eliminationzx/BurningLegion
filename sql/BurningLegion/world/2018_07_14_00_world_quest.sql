@@ -16,3 +16,6 @@ INSERT INTO `quest_poi_points` (`QuestID`, `Idx1`, `Idx2`, `X`, `Y`, `VerifiedBu
 INSERT INTO `quest_objectives` (`ID`, `QuestID`, `Type`, `Order`, `StorageIndex`, `ObjectID`, `Amount`, `Flags`, `Flags2`, `ProgressBarWeight`, `Description`, `VerifiedBuild`) VALUES ('279312', '3938300', '0', '0', '0', '95319', '1', '1', '0', '0', '', '25996');
 INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES ('95395', '3938300');
 INSERT INTO `creature_questender` (`id`, `quest`) VALUES ('95396', '3938300');
+
+---fix quest 42034
+UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=283489);
