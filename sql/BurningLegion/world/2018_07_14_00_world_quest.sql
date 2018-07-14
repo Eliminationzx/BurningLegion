@@ -24,3 +24,6 @@ UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=283489);
 UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=285981);
 UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=285989);
 
+---fix quest 40195
+INSERT INTO `creature_questender` (`id`, `quest`) VALUES ('99635', '40195');
+UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=280684);
