@@ -1263,17 +1263,18 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
                 }
             }
 
-            float lightbringerPct = 1.0f;
-            if (Player* modOwner = m_caster->GetSpellModOwner())
-                lightbringerPct *= modOwner->GetRatingBonusValue(CR_VERSATILITY_HEALING_DONE) + modOwner->GetTotalAuraModifier(SPELL_AURA_MOD_VERSATILITY);
+            float lightbringerPct = 0.0f;
+            if (Player* player = m_caster->ToPlayer())
+                lightbringerPct = 12.0f + (player->GetFloatValue(PLAYER_MASTERY) / 2);
 
             float maxRange = 10.0f;
            
+            // Rule of Law range bonus
             if (AuraEffect const* ruleOfLaw = m_caster->GetAuraEffect(214202, EFFECT_2))
                 AddPct(maxRange, ruleOfLaw->GetAmount());
 
             if (dist > maxRange)
-                lightbringerPct -= dist / 10;
+                lightbringerPct -= dist * 0.5f;
 
             if (lightbringerPct)
                 AddPct(addhealth, lightbringerPct);

@@ -60,7 +60,7 @@ class npc_sanctum_of_light_guard : public CreatureScript
                 if (!who || !who->IsInWorld() || who->GetAreaId() != SANCTUM_OF_LIGHT_AREA_ID)
                     return;
 
-                if (who->getClass() == CLASS_PALADIN && who->getLevel() > 100 || who->GetTypeId() != TYPEID_PLAYER)
+                if ((who->getClass() == CLASS_PALADIN && who->getLevel() > 100) || who->GetTypeId() != TYPEID_PLAYER)
                     return;
 
                 if (!me->IsWithinDist(who, 65.0f, false))

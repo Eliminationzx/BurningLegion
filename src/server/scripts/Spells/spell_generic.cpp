@@ -4845,19 +4845,18 @@ public:
         {
             PreventDefaultAction();
 
-            Unit* caster = eventInfo.GetActionTarget();
+            Unit* caster = eventInfo.GetActor();
             Player* player = caster->ToPlayer();
             if (!player)
                 return;
            
             PrimaryStat primstat = PRIMARY_STAT_INTELLECT;
-            int32 stat = 0;
-            int32 intellect = player->GetStat(STAT_INTELLECT);
-            int32 agility = player->GetStat(STAT_AGILITY);
-            int32 strength = player->GetStat(STAT_STRENGTH);
-            int32 versatilityHealingDone = player->GetRatingBonusValue(CR_VERSATILITY_HEALING_DONE);
-            int32 versatilityDamageDone = player->GetRatingBonusValue(CR_VERSATILITY_DAMAGE_DONE);
-            int32 versatilityDamageTaken = player->GetRatingBonusValue(CR_VERSATILITY_DAMAGE_TAKEN);
+            float stat = 0.0f;
+            float intellect = player->GetStat(STAT_INTELLECT);
+            float agility = player->GetStat(STAT_AGILITY);
+            float strength = player->GetStat(STAT_STRENGTH);
+            float versatility = player->GetFloatValue(PLAYER_VERSATILITY) + player->GetFloatValue(PLAYER_VERSATILITY_BONUS);
+            int32 bp0 = GetEffectInfo(EFFECT_0)->BasePoints;
 
             // set as default
             stat = intellect;
@@ -4874,39 +4873,23 @@ public:
                 primstat = PRIMARY_STAT_STRENGTH;
             }
 
-            if (stat < versatilityHealingDone || 
-                stat < versatilityDamageDone ||
-                stat < versatilityDamageTaken)
-            {
+            if (stat < versatility)
                 primstat = PRIMARY_STAT_VERSATILITY;
-            }
 
             switch (primstat)
             {
                 case PRIMARY_STAT_INTELLECT:
-                {
-                    int32 bp0 = sSpellMgr->GetSpellInfo(SPELL_CONCORDANCE_OF_LEGIONFALL_INTELLECT)->GetEffect(EFFECT_0)->BasePoints * 2;
                     player->CastCustomSpell(SPELL_CONCORDANCE_OF_LEGIONFALL_INTELLECT, SPELLVALUE_BASE_POINT0, bp0, player, TRIGGERED_FULL_MASK, nullptr, aurEff);
                     break;
-                }
                 case PRIMARY_STAT_STRENGTH:
-                {
-                    int32 bp0 = sSpellMgr->GetSpellInfo(SPELL_CONCORDANCE_OF_LEGIONFALL_STRENGTH)->GetEffect(EFFECT_0)->BasePoints * 2;
                     player->CastCustomSpell(SPELL_CONCORDANCE_OF_LEGIONFALL_STRENGTH, SPELLVALUE_BASE_POINT0, bp0, player, TRIGGERED_FULL_MASK, nullptr, aurEff);
                     break;
-                }
                 case PRIMARY_STAT_AGILITY:
-                {
-                    int32 bp0 = sSpellMgr->GetSpellInfo(SPELL_CONCORDANCE_OF_LEGIONFALL_AGILITY)->GetEffect(EFFECT_0)->BasePoints * 2;
                     player->CastCustomSpell(SPELL_CONCORDANCE_OF_LEGIONFALL_AGILITY, SPELLVALUE_BASE_POINT0, bp0, player, TRIGGERED_FULL_MASK, nullptr, aurEff);
                     break;
-                }
                 case PRIMARY_STAT_VERSATILITY:
-                {
-                    int32 bp0 = sSpellMgr->GetSpellInfo(SPELL_CONCORDANCE_OF_LEGIONFALL_VERSATILITY)->GetEffect(EFFECT_0)->BasePoints * 2;
                     player->CastCustomSpell(SPELL_CONCORDANCE_OF_LEGIONFALL_VERSATILITY, SPELLVALUE_BASE_POINT0, bp0, player, TRIGGERED_FULL_MASK, nullptr, aurEff);
                     break;
-                }
                 default:
                     break;
             }
