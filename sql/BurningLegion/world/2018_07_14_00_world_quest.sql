@@ -27,3 +27,39 @@ UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=285989);
 ---fix quest 40195
 INSERT INTO `creature_questender` (`id`, `quest`) VALUES ('99635', '40195');
 UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=280684);
+
+---fix quest 37565
+UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=276465);
+
+---fix quest 37991
+UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=277270);
+
+---fix quest 44281
+UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=286487);
+UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=286486);
+UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=286485);
+UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=286484);
+
+---fix quest 42782
+UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=284738);
+UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=284737);
+UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=284736);
+
+---fix quest 37507
+UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=276311);
+
+---fix quest 37467
+UPDATE `quest_objectives` SET `Flags`=4 WHERE (`ID`=276307);
+
+---fix quest 37492
+UPDATE `quest_objectives` SET `Flags`=4, `Flags2`=0 WHERE (`ID`=276292);
+
+---fix npc 120221
+INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES ('120221', '46688');
+INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES ('120221', '46682');
+INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES ('120221', '46694');
+INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES ('120221', '46700');
+INSERT INTO `creature_questender` (`id`, `quest`) VALUES ('120221', '46700');
+INSERT INTO `creature_questender` (`id`, `quest`) VALUES ('120221', '46682');
+INSERT INTO `creature_questender` (`id`, `quest`) VALUES ('120221', '46694');
+INSERT INTO `creature_questender` (`id`, `quest`) VALUES ('120221', '46688');
