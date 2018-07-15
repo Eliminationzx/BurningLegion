@@ -2552,9 +2552,9 @@ void AddSC_paladin_spell_scripts()
     RegisterAuraScript(spell_pal_crusade);
     RegisterAuraScript(spell_pal_consecration);
     RegisterAuraScript(spell_pal_fervent_martyr);
+    RegisterAuraScript(spell_pal_aura_of_sacrifice_ally);
 
     new spell_pal_consecration_heal();
-    new spell_pal_aura_of_sacrifice();
     new spell_pal_retribution_aura();
 
     // Areatriggers
@@ -2566,4 +2566,5 @@ void AddSC_paladin_spell_scripts()
     RegisterAuraScript(spell_pal_light_of_the_titans);
 
     // Area Trigger scripts
+    RegisterAreaTriggerAI(at_pal_aura_of_sacrifice);
 }
