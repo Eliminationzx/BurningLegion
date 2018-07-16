@@ -3154,14 +3154,14 @@ public:
     {
         at_hun_windburstAI(AreaTrigger* areatrigger) : AreaTriggerAI(areatrigger) { }
 
-        void OnCreate() override
+        /*void OnCreate() override
         {
             Unit* caster = at->GetCaster();
             if (!caster)
                 return;
 
-            at->SetUInt32Value(AREATRIGGER_SPELL_X_SPELL_VISUAL_ID, 53509);
-        }
+            at->SetUInt32Value(AREATRIGGER_SPELL_X_SPELL_VISUAL_ID, ID);
+        }*/
 
         void OnUnitEnter(Unit* unit) override
         {
