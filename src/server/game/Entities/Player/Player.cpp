@@ -1497,7 +1497,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             mapRequiredLevel = 68;
             break;
         case MAP_BROKEN_ISLANDS:
-            mapRequiredLevel = 98;
+            mapRequiredLevel = (getRace() == RACE_NIGHTBORNE || getRace() == RACE_HIGHMOUNTAIN_TAUREN) ? 0 : 98;
             break;
         case MAP_PANDARIA:
             mapRequiredLevel = (
