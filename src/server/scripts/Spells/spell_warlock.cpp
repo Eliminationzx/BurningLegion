@@ -808,7 +808,7 @@ class spell_warl_healthstone_heal : public SpellScript
 {
     PrepareSpellScript(spell_warl_healthstone_heal);
 
-    void HandleOnHit()
+    void HandleHeal(SpellEffIndex /*p_EffIndex*/)
     {
         int32 heal = int32(CalculatePct(GetCaster()->GetCreateHealth(), GetHitHeal()));
         SetHitHeal(heal);
@@ -816,7 +816,7 @@ class spell_warl_healthstone_heal : public SpellScript
 
     void Register() override
     {
-        OnHit += SpellHitFn(spell_warl_healthstone_heal::HandleOnHit);
+        OnEffectHitTarget += SpellEffectFn(spell_warl_healthstone_heal::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
     }
 };
 

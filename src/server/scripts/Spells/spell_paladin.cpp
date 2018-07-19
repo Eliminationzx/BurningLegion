@@ -92,6 +92,7 @@ enum PaladinSpells
     SPELL_PALADIN_HAND_OF_SACRIFICE             = 6940,
     SPELL_PALADIN_HAND_OF_THE_PROTECTOR         = 213652,
     SPELL_PALADIN_HOLY_LIGHT                    = 82326,
+    SPELL_PALADIN_FLASH_OF_LIGHT                = 19750,
     SPELL_PALADIN_HOLY_PRISM_ALLIES             = 114871,
     SPELL_PALADIN_HOLY_PRISM_DAMAGE_VISUAL      = 114862,
     SPELL_PALADIN_HOLY_PRISM_DAMAGE_VISUAL_2    = 114870,
@@ -128,7 +129,11 @@ enum PaladinSpells
     SPELL_PALADIN_WORD_OF_GLORY_HEAL            = 214894,
     SPELL_PALDIN_BLESSED_HAMMER                 = 204019,
     SPELL_PALADIN_GREATER_JUDGEMENT             = 218178,
-    SPELL_PALADIN_AEGIS_OF_LIGHT                = 204335
+    SPELL_PALADIN_AEGIS_OF_LIGHT                = 204335,
+    SPELL_PALADIN_AURA_OF_SACRIFICE             = 183416,
+    SPELL_PALADIN_AURA_OF_SACRIFICE_ALLY        = 210372,
+    SPELL_PALADIN_AURA_OF_SACRIFICE_DAMAGE      = 210380,
+    SPELL_PALADIN_AURA_OF_SACRIFICE_HEAL        = 210383
 };
 
 enum PaladinNPCs
@@ -836,6 +841,9 @@ class spell_pal_divine_storm : public SpellScript
             if (caster->GetSpellHistory()->HasCooldown(SPELL_PALADIN_HAMMER_OF_JUSTICE))
                 caster->GetSpellHistory()->ModifyCooldown(SPELL_PALADIN_HAMMER_OF_JUSTICE, -7.5 * IN_MILLISECONDS);
         }
+
+        if (caster->HasAura(SPELL_PALADIN_DIVINE_PURPOSE_RET_AURA))
+            caster->RemoveAurasDueToSpell(SPELL_PALADIN_DIVINE_PURPOSE_RET_AURA);
     }
 
     void HandleDummy(SpellEffIndex /* effIndex */)
@@ -874,6 +882,9 @@ class spell_pal_templar_s_verdict : public SpellScript
             if (caster->GetSpellHistory()->HasCooldown(SPELL_PALADIN_HAMMER_OF_JUSTICE))
                 caster->GetSpellHistory()->ModifyCooldown(SPELL_PALADIN_HAMMER_OF_JUSTICE, -7.5 * IN_MILLISECONDS);
         }
+
+        if (caster->HasAura(SPELL_PALADIN_DIVINE_PURPOSE_RET_AURA))
+            caster->RemoveAurasDueToSpell(SPELL_PALADIN_DIVINE_PURPOSE_RET_AURA);
     }
 
     void Register() override
@@ -1681,7 +1692,7 @@ public:
         {
             Unit* caster = GetCaster();
 
-            int32 dmg = (GetHitHeal() * 50.0f) / 100.0f;
+            int32 dmg = CalculatePct(GetHitHeal(), 50);
             caster->CastCustomSpell(caster, SPELL_PALADIN_LIGHT_OF_THE_MARTYR_DAMAGE, &dmg, NULL, NULL, true);
 
             if (caster->HasAura(SPELL_PALADIN_FERVENT_MARTYR_BUFF))
@@ -2364,53 +2375,68 @@ public:
     };
 };
 
-class spell_pal_aura_of_sacrifice : public SpellScriptLoader
+// 210372
+class spell_pal_aura_of_sacrifice_ally : public AuraScript
 {
-public:
-    spell_pal_aura_of_sacrifice() : SpellScriptLoader("spell_pal_aura_of_sacrifice") { }
+    PrepareAuraScript(spell_pal_aura_of_sacrifice_ally);
 
-    class spell_pal_aura_of_sacrifice_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_pal_aura_of_sacrifice_AuraScript);
+        return ValidateSpellInfo({ SPELL_PALADIN_AURA_OF_SACRIFICE });
+    }
 
-    public:
-        spell_pal_aura_of_sacrifice_AuraScript() { }
-
-        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
-        {
-            amount = 0;
-        }
-
-        void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
-        {
-            Unit* target = GetTarget();
-            Unit* caster = GetCaster();
-            if (!target || !caster)
-                return;
-            
-            if (target == caster)
-                return;
-
-            if (!caster->HealthAbovePct(75)) // hp above 75%
-                return;
-
-            absorbAmount = CalculatePct(dmgInfo.GetDamage(), 10); // 10% of damage
-            caster->ModifyHealth(-absorbAmount);
-        }
-
-        void Register() override
-        {
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pal_aura_of_sacrifice_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
-            OnEffectAbsorb += AuraEffectAbsorbFn(spell_pal_aura_of_sacrifice_AuraScript::Absorb, EFFECT_0);
-        }
-
-    };
-
-    AuraScript* GetAuraScript() const override
+    void CalcAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        return new spell_pal_aura_of_sacrifice_AuraScript();
+        amount = -1;
+    }
+
+    void OnAbsorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
+    {
+        Unit* caster = GetCaster();
+        SpellInfo const* auraOfSacrificeInfo = sSpellMgr->GetSpellInfo(SPELL_PALADIN_AURA_OF_SACRIFICE);
+
+        if (!caster || !caster->IsValidAssistTarget(GetTarget()) || caster->HealthBelowPct(auraOfSacrificeInfo->GetEffect(EFFECT_2)->BasePoints))
+        {
+            absorbAmount = 0;
+            return;
+        }
+
+        absorbAmount = CalculatePct(dmgInfo.GetDamage(), auraOfSacrificeInfo->GetEffect(EFFECT_0)->BasePoints);
+
+        // Deal damages to the paladin
+        GetTarget()->CastCustomSpell(SPELL_PALADIN_AURA_OF_SACRIFICE_DAMAGE, SPELLVALUE_BASE_POINT0, absorbAmount, caster, TRIGGERED_FULL_MASK);
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pal_aura_of_sacrifice_ally::CalcAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+        OnEffectAbsorb += AuraEffectAbsorbFn(spell_pal_aura_of_sacrifice_ally::OnAbsorb, EFFECT_0);
     }
 };
+
+// Aura of Sacrifice - 183416
+// AreaTriggerID - 100102 (custom)
+struct at_pal_aura_of_sacrifice : AreaTriggerAI
+{
+    at_pal_aura_of_sacrifice(AreaTrigger* areatrigger) : AreaTriggerAI(areatrigger)
+    {
+        at->SetPeriodicProcTimer(1000);
+    }
+
+    void OnUnitEnter(Unit* unit) override
+    {
+        if (Unit* caster = at->GetCaster())
+            if (unit->IsPlayer() && caster->IsPlayer() && caster != unit)
+                if (caster->ToPlayer()->IsInSameRaidWith(unit->ToPlayer()))
+                    caster->CastSpell(unit, SPELL_PALADIN_AURA_OF_SACRIFICE_ALLY, true);
+    }
+
+    void OnUnitExit(Unit* unit) override
+    {
+        unit->RemoveAurasDueToSpell(SPELL_PALADIN_AURA_OF_SACRIFICE_ALLY);
+    }
+};
+
 
 class spell_pal_retribution_aura : public SpellScriptLoader
 {
@@ -2441,6 +2467,30 @@ public:
     AuraScript* GetAuraScript() const override
     {
         return new spell_pal_retribution_aura_AuraScript();
+    }
+};
+
+class spell_pal_fervent_martyr : public AuraScript
+{
+    PrepareAuraScript(spell_pal_fervent_martyr);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_HOLY_LIGHT || eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_FLASH_OF_LIGHT;
+    }
+
+    void HandleEffectProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        if (Unit* caster = eventInfo.GetActor())
+            caster->CastSpell(caster, SPELL_PALADIN_FERVENT_MARTYR_BUFF, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_pal_fervent_martyr::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_pal_fervent_martyr::HandleEffectProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
 
@@ -2499,12 +2549,12 @@ void AddSC_paladin_spell_scripts()
     RegisterAuraScript(spell_pal_blade_of_wrath_proc);
     RegisterAuraScript(spell_pal_the_fire_of_justice);
     RegisterAuraScript(spell_pal_ardent_defender);
-    RegisterCastSpellOnProcAuraScript("spell_pal_fervent_martyr", EFFECT_0, SPELL_AURA_DUMMY, SPELL_PALADIN_FERVENT_MARTYR_BUFF); // 196923
     RegisterAuraScript(spell_pal_crusade);
     RegisterAuraScript(spell_pal_consecration);
+    RegisterAuraScript(spell_pal_fervent_martyr);
+    RegisterAuraScript(spell_pal_aura_of_sacrifice_ally);
 
     new spell_pal_consecration_heal();
-    new spell_pal_aura_of_sacrifice();
     new spell_pal_retribution_aura();
 
     // Areatriggers
@@ -2516,4 +2566,5 @@ void AddSC_paladin_spell_scripts()
     RegisterAuraScript(spell_pal_light_of_the_titans);
 
     // Area Trigger scripts
+    RegisterAreaTriggerAI(at_pal_aura_of_sacrifice);
 }

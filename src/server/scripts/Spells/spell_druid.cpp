@@ -2166,8 +2166,6 @@ enum StarfallSpells
 // AreaTriggerID - 9482
 struct at_dru_starfall : AreaTriggerAI
 {
-    int32 timeInterval;
-
     at_dru_starfall(AreaTrigger* areatrigger) : AreaTriggerAI(areatrigger)
     {
         // How often should the action be executed

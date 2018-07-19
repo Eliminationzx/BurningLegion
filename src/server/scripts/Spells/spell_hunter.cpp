@@ -124,6 +124,8 @@ enum HunterSpells
     SPELL_HUNTER_TRAILBLAZER_BUFF                   = 231390,
     SPELL_HUNTER_VULNERABLE                         = 187131,
     SPELL_HUNTER_WILD_CALL_AURA                     = 185791,
+    SPELL_HUNTER_WINDBURST_INCREASE_SPEED           = 204477,
+    SPELL_HUNTER_WINDBURST_AREATRIGGER              = 204475
 };
 
 enum AncientHysteriaSpells
@@ -3143,6 +3145,90 @@ public:
     }
 };
 
+class at_hun_windburst : public AreaTriggerEntityScript
+{
+public:
+    at_hun_windburst() : AreaTriggerEntityScript("at_hun_windburst") { }
+
+    struct at_hun_windburstAI : AreaTriggerAI
+    {
+        at_hun_windburstAI(AreaTrigger* areatrigger) : AreaTriggerAI(areatrigger) { }
+
+        /*void OnCreate() override
+        {
+            Unit* caster = at->GetCaster();
+            if (!caster)
+                return;
+
+            at->SetUInt32Value(AREATRIGGER_SPELL_X_SPELL_VISUAL_ID, ID);
+        }*/
+
+        void OnUnitEnter(Unit* unit) override
+        {
+            Unit* caster = at->GetCaster();
+
+            if (!caster || !unit)
+                return;
+
+            if (!caster->IsPlayer())
+                return;
+
+            if (caster->IsFriendlyTo(unit))
+                caster->CastSpell(unit, SPELL_HUNTER_WINDBURST_INCREASE_SPEED, true);
+        }
+
+        void OnUnitExit(Unit* unit) override
+        {
+            Unit* caster = at->GetCaster();
+
+            if (!caster || !unit)
+                return;
+
+            if (!caster->IsPlayer())
+                return;
+
+            if (unit->HasAura(SPELL_HUNTER_WINDBURST_INCREASE_SPEED, caster->GetGUID()))
+                unit->RemoveAura(SPELL_HUNTER_WINDBURST_INCREASE_SPEED, caster->GetGUID());
+        }
+    };
+
+    AreaTriggerAI* GetAI(AreaTrigger* areatrigger) const override
+    {
+        return new at_hun_windburstAI(areatrigger);
+    }
+};
+
+class spell_hun_windburst : public SpellScriptLoader
+{
+public:
+    spell_hun_windburst() : SpellScriptLoader("spell_hun_windburst") { }
+
+    class spell_hun_windburst_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_hun_windburst_SpellScript);
+
+        void HandleAfterCast()
+        {
+            Unit* caster = GetCaster();
+            Unit* target = GetHitUnit();
+            if (!caster || !target)
+                return;
+
+            caster->CastSpell(target, SPELL_HUNTER_WINDBURST_AREATRIGGER, true);
+        }
+
+        void Register() override
+        {
+            AfterCast += SpellCastFn(spell_hun_windburst_SpellScript::HandleAfterCast);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_hun_windburst_SpellScript();
+    }
+};
+
 void AddSC_hunter_spell_scripts()
 {
     new spell_hun_harpoon();
@@ -3193,6 +3279,7 @@ void AddSC_hunter_spell_scripts()
     new spell_hun_raptor_strike();
     new spell_hun_carve();
     new spell_hun_true_aim();
+    new spell_hun_windburst();
     RegisterSpellScript(spell_hun_explosive_shot_detonate);
     RegisterSpellScript(spell_hun_exhilaration);
     RegisterAuraScript(aura_hun_volley);
@@ -3214,6 +3301,7 @@ void AddSC_hunter_spell_scripts()
     new at_hun_tar_trap_not_activated();
     new at_hun_binding_shot();
     new at_hun_caltrops();
+    new at_hun_windburst();
 
     // Playerscripts
     new PlayerScript_black_arrow();

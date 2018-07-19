@@ -1656,7 +1656,7 @@ public:
     {
         at_monk_ring_of_peaceAI(AreaTrigger* areatrigger) : AreaTriggerAI(areatrigger) { }
 
-        uint32 knockBackInterval = 1000;
+        uint32 knockBackInterval = 2000;
 
         void OnUpdate(uint32 diff) override
         {
@@ -1667,10 +1667,10 @@ public:
             if (knockBackInterval <= diff)
             {
                 caster->CastSpell(at->GetPosition(), SPELL_MONK_RING_OF_PEACE_KNOCKBACK, true);
-                knockBackInterval = 1000;
+                knockBackInterval = 2000;
             }
             else
-                knockBackInterval -= 1000;
+                knockBackInterval -= 2000;
         }
     };
 
