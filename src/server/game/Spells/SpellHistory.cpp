@@ -453,6 +453,11 @@ void SpellHistory::StartCooldown(SpellInfo const* spellInfo, uint32 itemId, Spel
                 cooldown += cooldownMod * IN_MILLISECONDS;   // SPELL_AURA_MOD_COOLDOWN does not affect category cooldows, verified with shaman shocks
             }
         }
+        
+        // Serenity 100% faster cooldown reseting
+        if (AuraEffect* serenity = _owner->GetAuraEffect(152173, EFFECT_0))
+            if (serenity->IsAffectingSpell(spellInfo)
+                cooldown -= CalculatePct(cooldown, abs(serenity->GetAmount()));
 
         // Apply SPELL_AURA_MOD_SPELL_CATEGORY_COOLDOWN modifiers
         // Note: This aura applies its modifiers to all cooldowns of spells with set category, not to category cooldown only
