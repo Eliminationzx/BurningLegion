@@ -20478,11 +20478,10 @@ bool Player::CheckInstanceValidity(bool /*isLogin*/)
         return true;
 
     // raid instances require the player to be in a raid group to be valid
-    if (map->IsRaid() && !sWorld->getBoolConfig(CONFIG_INSTANCE_IGNORE_RAID))
-        if (map->GetEntry()->Expansion() >= uint8(CURRENT_EXPANSION))
-            if (!GetGroup() || !GetGroup()->isRaidGroup())
-                return false;
-
+    if (map->IsRaid() && !sWorld->getBoolConfig(CONFIG_INSTANCE_IGNORE_RAID) && (map->GetEntry()->Expansion() >= sWorld->getIntConfig(CONFIG_EXPANSION)))
+        if (!GetGroup() || !GetGroup()->isRaidGroup())
+            return false;
+        
     if (Group* group = GetGroup())
     {
         // check if player's group is bound to this instance
@@ -22839,13 +22838,12 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
     if (npc)
     {
         // not let cheating with start flight mounted
-        if (IsMounted())
-        {
-            GetSession()->SendActivateTaxiReply(ERR_TAXIPLAYERALREADYMOUNTED);
-            return false;
-        }
+        RemoveAurasByType(SPELL_AURA_MOUNTED);
 
-        if (IsInDisallowedMountForm())
+        if (GetDisplayId() != GetNativeDisplayId())
+            RestoreDisplayId(true);
+
+        if (IsDisallowedMountForm(getTransForm(), FORM_NONE, GetDisplayId()))
         {
             GetSession()->SendActivateTaxiReply(ERR_TAXIPLAYERSHAPESHIFTED);
             return false;
@@ -22863,8 +22861,8 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
     {
         RemoveAurasByType(SPELL_AURA_MOUNTED);
 
-        if (IsInDisallowedMountForm())
-            RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
+        if (GetDisplayId() != GetNativeDisplayId())
+            RestoreDisplayId(true);
 
         if (Spell* spell = GetCurrentSpell(CURRENT_GENERIC_SPELL))
             if (spell->m_spellInfo->Id != spellid)

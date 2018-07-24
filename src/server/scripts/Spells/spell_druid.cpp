@@ -48,7 +48,6 @@ enum DruidSpells
     SPELL_DRUID_REJUVENATION                        = 774,
     SPELL_DRUID_HEALING_TOUCH                       = 5185,
     SPELL_DRUID_SWIFTMEND                           = 18562,
-    SPELL_DRUID_TRAVEL_FORM                         = 783,
     SPELL_DRUID_FELINE_SWIFTNESS                    = 131768,
     SPELL_DRUID_SHRED                               = 5221,
     SPELL_DRUID_RAKE                                = 1822,
@@ -58,7 +57,12 @@ enum DruidSpells
     SPELL_DRUID_SWIPE_CAT                           = 106785,
     SPELL_DRUID_SABERTOOTH                          = 202031,
     SPELL_DRUID_GERMINATION                         = 155675,
-    SPELL_DRUID_GERMINATION_REJUVENATION            = 155777
+    SPELL_DRUID_GERMINATION_REJUVENATION            = 155777,
+    SPELL_DRUID_FORM_AQUATIC                        = 1066,
+    SPELL_DRUID_FORM_FLIGHT                         = 33943,
+    SPELL_DRUID_FORM_STAG                           = 165961,
+    SPELL_DRUID_FORM_SWIFT_FLIGHT                   = 40120,
+    SPELL_DRUID_TRAVEL_FORM                         = 783
 };
 
 enum ShapeshiftFormSpells
@@ -1826,190 +1830,6 @@ public:
     }
 };
 
-enum DruidForms
-{
-    DRUID_AQUATIC_FORM                      = 1066,
-    DRUID_FLIGHT_FORM                       = 33943,
-    DRUID_STAG_FORM                         = 165961,
-    DRUID_SWIFT_FLIGHT_FORM                 = 40120
-};
-
-// 783 - Travel Form (dummy)
-class spell_dru_travel_form_dummy : public SpellScriptLoader
-{
-public:
-    spell_dru_travel_form_dummy() : SpellScriptLoader("spell_dru_travel_form_dummy") { }
-
-    class spell_dru_travel_form_dummy_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_dru_travel_form_dummy_SpellScript);
-
-        SpellCastResult CheckCast()
-        {
-            Player* player = GetCaster()->ToPlayer();
-            if (!player)
-                return SPELL_FAILED_CUSTOM_ERROR;
-
-            if (player->GetSkillValue(SKILL_RIDING) < 75)
-                return SPELL_FAILED_APPRENTICE_RIDING_REQUIREMENT;
-
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(player->IsInWater() ? DRUID_AQUATIC_FORM : DRUID_STAG_FORM);
-            return spellInfo->CheckLocation(player->GetMapId(), player->GetZoneId(), player->GetAreaId(), player);
-        }
-
-        void Register() override
-        {
-            OnCheckCast += SpellCheckCastFn(spell_dru_travel_form_dummy_SpellScript::CheckCast);
-        }
-    };
-
-    class spell_dru_travel_form_dummy_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_dru_travel_form_dummy_AuraScript);
-
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ DRUID_STAG_FORM, DRUID_AQUATIC_FORM, DRUID_FLIGHT_FORM, DRUID_SWIFT_FLIGHT_FORM });
-        }
-
-        bool Load() override
-        {
-            return GetCaster()->IsPlayer();
-        }
-
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            uint32 triggeredSpellId;
-
-            Player* player = GetTarget()->ToPlayer();
-            if (player->IsInWater()) // Aquatic form
-                triggeredSpellId = DRUID_AQUATIC_FORM;
-            else if (player->GetSkillValue(SKILL_RIDING) >= 225 && CheckLocationForForm(DRUID_FLIGHT_FORM) == SPELL_CAST_OK) // Flight form
-                triggeredSpellId = player->getLevel() >= 71 ? DRUID_SWIFT_FLIGHT_FORM : DRUID_FLIGHT_FORM;
-            else // Stag form (riding skill already checked in CheckCast)
-                triggeredSpellId = DRUID_STAG_FORM;
-
-            player->AddAura(triggeredSpellId, player);
-        }
-
-        void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            // No need to check remove mode, it's safe for auras to remove each other in AfterRemove hook.
-            GetTarget()->RemoveAura(DRUID_STAG_FORM);
-            GetTarget()->RemoveAura(DRUID_AQUATIC_FORM);
-            GetTarget()->RemoveAura(DRUID_FLIGHT_FORM);
-            GetTarget()->RemoveAura(DRUID_SWIFT_FLIGHT_FORM);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_dru_travel_form_dummy_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_dru_travel_form_dummy_AuraScript::AfterRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-
-    private:
-        // Outdoor check already passed - Travel Form (dummy) has SPELL_ATTR0_OUTDOORS_ONLY attribute.
-        SpellCastResult CheckLocationForForm(uint32 spell)
-        {
-            Player* player = GetTarget()->ToPlayer();
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell);
-            return spellInfo->CheckLocation(player->GetMapId(), player->GetZoneId(), player->GetAreaId(), player);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_dru_travel_form_dummy_SpellScript();
-    }
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_dru_travel_form_dummy_AuraScript();
-    }
-};
-
-// 1066 - Aquatic Form
-// 33943 - Flight Form
-// 40120 - Swift Flight Form
-// 165961 - Stag Form
-class spell_dru_travel_form : public SpellScriptLoader
-{
-public:
-    spell_dru_travel_form() : SpellScriptLoader("spell_dru_travel_form") { }
-
-    class spell_dru_travel_form_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_dru_travel_form_AuraScript);
-
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ DRUID_STAG_FORM, DRUID_AQUATIC_FORM, DRUID_FLIGHT_FORM, DRUID_SWIFT_FLIGHT_FORM });
-        }
-
-        bool Load() override
-        {
-            return GetCaster()->IsPlayer();
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            // If it stays 0, it removes Travel Form dummy in AfterRemove.
-            triggeredSpellId = 0;
-
-            // We should only handle aura interrupts.
-            if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_INTERRUPT)
-                return;
-
-            // Check what form is appropriate
-            Player* player = GetTarget()->ToPlayer();
-            if (player->IsInWater()) // Aquatic form
-                triggeredSpellId = DRUID_AQUATIC_FORM;
-            else if (player->GetSkillValue(SKILL_RIDING) >= 225 && CheckLocationForForm(DRUID_FLIGHT_FORM) == SPELL_CAST_OK) // Flight form
-                triggeredSpellId = player->GetSkillValue(SKILL_RIDING) >= 300 ? DRUID_SWIFT_FLIGHT_FORM : DRUID_FLIGHT_FORM;
-            else if (CheckLocationForForm(DRUID_STAG_FORM) == SPELL_CAST_OK) // Stag form
-                triggeredSpellId = DRUID_STAG_FORM;
-
-            // If chosen form is current aura, just don't remove it.
-            if (triggeredSpellId == m_scriptSpellId)
-                PreventDefaultAction();
-        }
-
-        void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Player* player = GetTarget()->ToPlayer();
-
-            if (triggeredSpellId) // Apply new form
-                player->AddAura(triggeredSpellId, player);
-            else // If not set, simply remove Travel Form dummy
-                player->RemoveAura(SPELL_DRUID_TRAVEL_FORM);                
-        }
-        
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_dru_travel_form_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_MOD_SHAPESHIFT, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_dru_travel_form_AuraScript::AfterRemove, EFFECT_0, SPELL_AURA_MOD_SHAPESHIFT, AURA_EFFECT_HANDLE_REAL);
-        }
-
-    private:
-        SpellCastResult CheckLocationForForm(uint32 spell_id)
-        {
-            Player* player = GetTarget()->ToPlayer();
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id);
-
-            if (!player->GetMap()->IsOutdoors(player->GetPhaseShift(), player->GetPositionX(), player->GetPositionY(), player->GetPositionZ()))
-                return SPELL_FAILED_ONLY_OUTDOORS;
-
-            return spellInfo->CheckLocation(player->GetMapId(), player->GetZoneId(), player->GetAreaId(), player);
-        }
-
-        uint32 triggeredSpellId;
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_dru_travel_form_AuraScript();
-    }
-};
 
 // 24858  Moonkin Form
 // 102560 Chosen of Elune
@@ -2351,6 +2171,183 @@ public:
     }
 };
 
+// 783 - Travel Form (dummy)
+class spell_dru_travel_form_dummy : public SpellScriptLoader
+{
+public:
+    spell_dru_travel_form_dummy() : SpellScriptLoader("spell_dru_travel_form_dummy") { }
+
+    class spell_dru_travel_form_dummy_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dru_travel_form_dummy_SpellScript);
+
+        SpellCastResult CheckCast()
+        {
+            Player* player = GetCaster()->ToPlayer();
+            if (!player)
+                return SPELL_FAILED_CUSTOM_ERROR;
+
+            if (player->GetSkillValue(SKILL_RIDING) < 75)
+                return SPELL_FAILED_APPRENTICE_RIDING_REQUIREMENT;
+
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(player->IsInWater() ? SPELL_DRUID_FORM_AQUATIC : SPELL_DRUID_FORM_STAG);
+            return spellInfo->CheckLocation(player->GetMapId(), player->GetZoneId(), player->GetAreaId(), player);
+        }
+
+        void Register() override
+        {
+            OnCheckCast += SpellCheckCastFn(spell_dru_travel_form_dummy_SpellScript::CheckCast);
+        }
+    };
+
+    class spell_dru_travel_form_dummy_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dru_travel_form_dummy_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_DRUID_FORM_STAG, SPELL_DRUID_FORM_AQUATIC, SPELL_DRUID_FORM_FLIGHT, SPELL_DRUID_FORM_SWIFT_FLIGHT });
+        }
+
+        bool Load() override
+        {
+            return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        }
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            uint32 triggeredSpellId;
+
+            Player* player = GetTarget()->ToPlayer();
+            if (player->IsInWater()) // Aquatic form
+                triggeredSpellId = SPELL_DRUID_FORM_AQUATIC;
+            else if (player->GetSkillValue(SKILL_RIDING) >= 225 && CheckLocationForForm(SPELL_DRUID_FORM_FLIGHT) == SPELL_CAST_OK) // Flight form
+                triggeredSpellId = player->getLevel() >= 71 ? SPELL_DRUID_FORM_SWIFT_FLIGHT : SPELL_DRUID_FORM_FLIGHT;
+            else // Stag form (riding skill already checked in CheckCast)
+                triggeredSpellId = SPELL_DRUID_FORM_STAG;
+
+            player->AddAura(triggeredSpellId, player);
+        }
+
+        void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            // No need to check remove mode, it's safe for auras to remove each other in AfterRemove hook.
+            GetTarget()->RemoveAura(SPELL_DRUID_FORM_STAG);
+            GetTarget()->RemoveAura(SPELL_DRUID_FORM_AQUATIC);
+            GetTarget()->RemoveAura(SPELL_DRUID_FORM_FLIGHT);
+            GetTarget()->RemoveAura(SPELL_DRUID_FORM_SWIFT_FLIGHT);
+        }
+
+        void Register() override
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_dru_travel_form_dummy_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_dru_travel_form_dummy_AuraScript::AfterRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+
+    private:
+        // Outdoor check already passed - Travel Form (dummy) has SPELL_ATTR0_OUTDOORS_ONLY attribute.
+        SpellCastResult CheckLocationForForm(uint32 spell)
+        {
+            Player* player = GetTarget()->ToPlayer();
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell);
+            return spellInfo->CheckLocation(player->GetMapId(), player->GetZoneId(), player->GetAreaId(), player);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_dru_travel_form_dummy_SpellScript();
+    }
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_dru_travel_form_dummy_AuraScript();
+    }
+};
+
+// 1066 - Aquatic Form
+// 33943 - Flight Form
+// 40120 - Swift Flight Form
+// 165961 - Stag Form
+class spell_dru_travel_form : public SpellScriptLoader
+{
+public:
+    spell_dru_travel_form() : SpellScriptLoader("spell_dru_travel_form") { }
+
+    class spell_dru_travel_form_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dru_travel_form_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_DRUID_FORM_STAG, SPELL_DRUID_FORM_AQUATIC, SPELL_DRUID_FORM_FLIGHT, SPELL_DRUID_FORM_SWIFT_FLIGHT });
+        }
+
+        bool Load() override
+        {
+            return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        }
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            // If it stays 0, it removes Travel Form dummy in AfterRemove.
+            triggeredSpellId = 0;
+
+            // We should only handle aura interrupts.
+            if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_INTERRUPT)
+                return;
+
+            // Check what form is appropriate
+            Player* player = GetTarget()->ToPlayer();
+            if (player->IsInWater()) // Aquatic form
+                triggeredSpellId = SPELL_DRUID_FORM_AQUATIC;
+            else if (player->GetSkillValue(SKILL_RIDING) >= 225 && CheckLocationForForm(SPELL_DRUID_FORM_FLIGHT) == SPELL_CAST_OK) // Flight form
+                triggeredSpellId = player->GetSkillValue(SKILL_RIDING) >= 300 ? SPELL_DRUID_FORM_SWIFT_FLIGHT : SPELL_DRUID_FORM_FLIGHT;
+            else if (CheckLocationForForm(SPELL_DRUID_FORM_STAG) == SPELL_CAST_OK) // Stag form
+                triggeredSpellId = SPELL_DRUID_FORM_STAG;
+
+            // If chosen form is current aura, just don't remove it.
+            if (triggeredSpellId == m_scriptSpellId)
+                PreventDefaultAction();
+        }
+
+        void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Player* player = GetTarget()->ToPlayer();
+
+            if (triggeredSpellId) // Apply new form
+                player->AddAura(triggeredSpellId, player);
+            else // If not set, simply remove Travel Form dummy
+                player->RemoveAura(SPELL_DRUID_TRAVEL_FORM);
+        }
+
+        void Register() override
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_dru_travel_form_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_MOD_SHAPESHIFT, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_dru_travel_form_AuraScript::AfterRemove, EFFECT_0, SPELL_AURA_MOD_SHAPESHIFT, AURA_EFFECT_HANDLE_REAL);
+        }
+
+    private:
+        SpellCastResult CheckLocationForForm(uint32 spell_id)
+        {
+            Player* player = GetTarget()->ToPlayer();
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id);
+
+            if (!player->GetMap()->IsOutdoors(player->GetPhaseShift(), player->GetPositionX(), player->GetPositionY(), player->GetPositionZ()))
+                return SPELL_FAILED_ONLY_OUTDOORS;
+
+            return spellInfo->CheckLocation(player->GetMapId(), player->GetZoneId(), player->GetAreaId(), player);
+        }
+
+        uint32 triggeredSpellId;
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_dru_travel_form_AuraScript();
+    }
+};
+
 void AddSC_druid_spell_scripts()
 {
     // Spells Scripts
@@ -2391,9 +2388,9 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScript(spell_dru_maim);
     new spell_dru_rip();
     new spell_dru_bloodtalons();
+    new spell_dru_rejuvenation();
     new spell_dru_travel_form_dummy();
     new spell_dru_travel_form();
-    new spell_dru_rejuvenation();
 
     RegisterSpellScript(spell_dru_thrash);
     RegisterAuraScript(spell_dru_thrash_periodic_damage);
