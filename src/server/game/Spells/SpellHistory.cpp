@@ -457,7 +457,7 @@ void SpellHistory::StartCooldown(SpellInfo const* spellInfo, uint32 itemId, Spel
         
         // Serenity 100% faster cooldown reseting
         if (AuraEffect const* serenity = _owner->GetAuraEffect(152173, EFFECT_0))
-            if (serenity->IsAffectingSpell(spellInfo)
+            if (serenity->IsAffectingSpell(spellInfo))
                 cooldown -= CalculatePct(cooldown, abs(serenity->GetAmount()));
 
         // Apply SPELL_AURA_MOD_SPELL_CATEGORY_COOLDOWN modifiers
