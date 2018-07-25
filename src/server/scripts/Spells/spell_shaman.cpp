@@ -3332,7 +3332,10 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove(GetExplTargetUnit());
-            Trinity::Containers::RandomResize(targets, 1);
+            Trinity::Containers::RandomResize(targets, [this](WorldObject* target)
+            {
+                return target->GetTypeId() == TYPEID_UNIT && !target->ToUnit()->HasAura(SPELL_SHAMAN_FLAME_SHOCK_MAELSTROM, GetCaster()->GetGUID());
+            }, 1);
         }
 
         void HandleScript(SpellEffIndex /*effIndex*/)
