@@ -182,6 +182,9 @@ enum ShamanSpells
     SPELL_SHAMAN_WINDFURY_ATTACK_OFF_HAND                   = 33750,
     SPELL_SHAMAN_WINDFURY_WEAPON_PASSIVE                    = 33757,
     SPELL_SHAMAN_WIND_RUSH_TOTEM                            = 192077,
+    SPELL_SHAMAN_LIGHTING_ROD_TALENT                        = 210689,
+    SPELL_SHAMAN_LIGHTING_ROD_MARK                          = 197209,
+    SPELL_SHAMAN_LIGHTING_ROD_DAMAGE                        = 197568
 };
 
 enum TotemSpells
@@ -3312,6 +3315,72 @@ public:
     }
 };
 
+class spell_sha_lighthing_rod : public SpellScriptLoader
+{
+public:
+    spell_sha_lighthing_rod() : SpellScriptLoader("spell_sha_lighthing_rod") { }
+
+    class spell_sha_lighthing_rod_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_sha_lighthing_rod_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_SHAMAN_LIGHTING_ROD_TALENT))
+                return false;
+            if (!sSpellMgr->GetSpellInfo(SPELL_SHAMAN_LIGHTING_ROD_MARK))
+                return false;
+            if (!sSpellMgr->GetSpellInfo(SPELL_SHAMAN_LIGHTING_ROD_DAMAGE))
+                return false;
+            return true;
+        }
+
+        void HandleScript(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            Unit* target = GetExplTargetUnit();
+            if (!caster || !target)
+                return;
+
+            if (!caster->HasAura(SPELL_SHAMAN_LIGHTING_ROD_TALENT))
+                return;
+
+            caster->CastSpell(target, SPELL_SHAMAN_LIGHTING_ROD_MARK, true);
+
+            int32 lightingRodDamage = CalculatePct(GetHitDamage(), 40);
+
+            std::list<Unit*> targets;
+            Trinity::AnyUnitInObjectRangeCheck u_check(caster, 100.0f);
+            Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck> searcher(caster, targets, u_check);
+            Cell::VisitAllObjects(caster, searcher, 100.0f);
+
+            targets.remove(target);
+
+            for (std::list<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
+            {
+                if (!caster->IsValidAttackTarget(*tIter) || !(*tIter)->HasAura(SPELL_SHAMAN_LIGHTING_ROD_MARK))
+                    targets.erase(tIter++);
+                else
+                    ++tIter;
+            }
+
+            if (!targets.empty())
+                for (auto lightingRodTarget : targets)
+                     caster->CastCustomSpell(SPELL_SHAMAN_LIGHTING_ROD_DAMAGE, SPELLVALUE_BASE_POINT0, lightingRodDamage, lightingRodTarget, true, NULL);
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_sha_lighthing_rod_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_sha_lighthing_rod_SpellScript();
+    }
+};
+
 // 210621 - Path of Flames Spread
 class spell_sha_path_of_flames_spread : public SpellScriptLoader
 {
@@ -3799,6 +3868,7 @@ void AddSC_shaman_spell_scripts()
     new spell_sha_wellspring();
     RegisterAuraScript(spell_sha_windfury);
     new spell_shaman_windfury_weapon();
+    new spell_sha_lighthing_rod();
     RegisterSpellScript(spell_sha_undulation);
     RegisterSpellScript(spell_sha_chain_lightning);
     RegisterSpellAndAuraScriptPair(spell_sha_rainfall, aura_sha_rainfall);
