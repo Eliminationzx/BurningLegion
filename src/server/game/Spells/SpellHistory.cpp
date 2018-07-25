@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SpellAuraEffects.h"
 #include "SpellHistory.h"
 #include "DatabaseEnv.h"
 #include "DB2Stores.h"
@@ -455,7 +456,7 @@ void SpellHistory::StartCooldown(SpellInfo const* spellInfo, uint32 itemId, Spel
         }
         
         // Serenity 100% faster cooldown reseting
-        if (AuraEffect* serenity = _owner->GetAuraEffect(152173, EFFECT_0))
+        if (AuraEffect const* serenity = _owner->GetAuraEffect(152173, EFFECT_0))
             if (serenity->IsAffectingSpell(spellInfo)
                 cooldown -= CalculatePct(cooldown, abs(serenity->GetAmount()));
 
