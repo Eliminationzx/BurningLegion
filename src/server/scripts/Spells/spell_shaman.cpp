@@ -3345,7 +3345,9 @@ public:
             if (!caster->HasAura(SPELL_SHAMAN_LIGHTING_ROD_TALENT))
                 return;
 
-            caster->CastSpell(target, SPELL_SHAMAN_LIGHTING_ROD_MARK, true);
+            // 30% chance of marking
+            if (roll_chance_i(30))
+                caster->CastSpell(target, SPELL_SHAMAN_LIGHTING_ROD_MARK, true);
 
             int32 lightingRodDamage = CalculatePct(GetHitDamage(), 40);
 

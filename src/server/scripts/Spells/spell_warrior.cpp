@@ -3006,6 +3006,38 @@ class spell_war_executioners_precision : public AuraScript
     }
 };
 
+class spell_warr_shield_slam_cooldown : public SpellScriptLoader
+{
+public:
+    spell_warr_shield_slam_cooldown() : SpellScriptLoader("spell_warr_shield_slam_cooldown") { }
+
+    class spell_warr_shield_slam_cooldown_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_warr_shield_slam_cooldown_SpellScript);
+
+        void HandleAction()
+        {
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
+
+            // 30% chance of reseting cooldown
+            if (roll_chance_i(30))
+                caster->GetSpellHistory()->ResetCooldown(SPELL_WARRIOR_SHIELD_SLAM, true);
+        }
+
+        void Register() override
+        {
+            OnCast += SpellCastFn(spell_warr_shield_slam_cooldown_SpellScript::HandleAction);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_warr_shield_slam_cooldown_SpellScript();
+    }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     new spell_warr_berzerker_rage();
@@ -3072,6 +3104,7 @@ void AddSC_warrior_spell_scripts()
     new spell_warr_wrecking_ball_effect();
     new spell_warr_rallying_cry();
     new spell_warr_jump_to_skyhold();
+    new spell_warr_shield_slam_cooldown();
     RegisterSpellScript(spell_warr_commanding_shout);
     RegisterSpellAndAuraScriptPair(spell_warr_ravager, aura_warr_ravager);
     RegisterSpellScript(spell_warr_ravager_damage);
