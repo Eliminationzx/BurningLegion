@@ -6,3 +6,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_warr_shield_slam_reset');
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (231834, 'spell_warr_shield_slam_reset');
+
+DELETE FROM areatrigger_template WHERE Id = 6031;
+INSERT INTO `areatrigger_template` (`Id`, `Type`, `Flags`, `Data0`, `Data1`, `Data2`, `Data3`, `Data4`, `Data5`, `ScriptName`, `VerifiedBuild`) VALUES 
+('6031','0','0','8','8','0','0','0','0','at_dh_sigil_of_chains','26124');
