@@ -1413,6 +1413,8 @@ public:
 
         void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
         {
+            PreventDefaultAction();
+
             Unit* caster = GetCaster();
             caster->GetSpellHistory()->ResetCooldown(SPELL_DH_FELBLADE, true);
         }

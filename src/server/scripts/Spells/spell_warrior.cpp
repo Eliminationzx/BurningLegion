@@ -140,6 +140,7 @@ enum WarriorSpells
     SPELL_WARRIOR_THUNDERSTRUCK                     = 199045,
     SPELL_WARRIOR_THUNDERSTRUCK_STUN                = 199042,
     SPELL_WARRIOR_THUNDER_CLAP                      = 6343,
+    SPELL_WARRIOR_REVENGE                           = 6572,
     SPELL_WARRIOR_TRAUMA_DOT                        = 215537,
     SPELL_WARRIOR_UNCHACKLED_FURY                   = 76856,
     SPELL_WARRIOR_UNRELENTING_ASSAULT_RANK_1        = 46859,
@@ -3006,35 +3007,42 @@ class spell_war_executioners_precision : public AuraScript
     }
 };
 
-class spell_warr_shield_slam_cooldown : public SpellScriptLoader
+class spell_warr_shield_slam_reset : public SpellScriptLoader
 {
 public:
-    spell_warr_shield_slam_cooldown() : SpellScriptLoader("spell_warr_shield_slam_cooldown") { }
+    spell_warr_shield_slam_reset() : SpellScriptLoader("spell_warr_shield_slam_reset") {}
 
-    class spell_warr_shield_slam_cooldown_SpellScript : public SpellScript
+    class spell_warr_shield_slam_reset_AuraScript : public AuraScript
     {
-        PrepareSpellScript(spell_warr_shield_slam_cooldown_SpellScript);
+        PrepareAuraScript(spell_warr_shield_slam_reset_AuraScript);
 
-        void HandleAction()
+        bool CheckProc(ProcEventInfo& eventInfo)
         {
-            Unit* caster = GetCaster();
-            if (!caster)
-                return;
+            if (eventInfo.GetSpellInfo()->Id == SPELL_WARRIOR_DEVASTATE ||
+                eventInfo.GetSpellInfo()->Id == SPELL_WARRIOR_THUNDER_CLAP ||
+                eventInfo.GetSpellInfo()->Id == SPELL_WARRIOR_REVENGE)
+                return true;
+            return false;
+        }
 
-            // 30% chance of reseting cooldown
-            if (roll_chance_i(30))
-                caster->GetSpellHistory()->ResetCooldown(SPELL_WARRIOR_SHIELD_SLAM, true);
+        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+        {
+            PreventDefaultAction();
+
+            Unit* caster = GetCaster();
+            caster->GetSpellHistory()->ResetCooldown(SPELL_WARRIOR_SHIELD_SLAM, true);
         }
 
         void Register() override
         {
-            OnCast += SpellCastFn(spell_warr_shield_slam_cooldown_SpellScript::HandleAction);
+            DoCheckProc += AuraCheckProcFn(spell_warr_shield_slam_reset_AuraScript::CheckProc);
+            OnEffectProc += AuraEffectProcFn(spell_warr_shield_slam_reset_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
         }
     };
 
-    SpellScript* GetSpellScript() const override
+    AuraScript* GetAuraScript() const override
     {
-        return new spell_warr_shield_slam_cooldown_SpellScript();
+        return new spell_warr_shield_slam_reset_AuraScript();
     }
 };
 
@@ -3104,7 +3112,7 @@ void AddSC_warrior_spell_scripts()
     new spell_warr_wrecking_ball_effect();
     new spell_warr_rallying_cry();
     new spell_warr_jump_to_skyhold();
-    new spell_warr_shield_slam_cooldown();
+    new spell_warr_shield_slam_reset();
     RegisterSpellScript(spell_warr_commanding_shout);
     RegisterSpellAndAuraScriptPair(spell_warr_ravager, aura_warr_ravager);
     RegisterSpellScript(spell_warr_ravager_damage);
