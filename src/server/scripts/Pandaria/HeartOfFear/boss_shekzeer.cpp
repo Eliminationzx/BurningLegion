@@ -800,7 +800,6 @@ class boss_shekzeer : public CreatureScript
                                 // Picking a random target
                                 std::list<Player*>::iterator itr, next;
                                 itr = playerList.begin();
-                                Player* target = 0;
 
                                 // Removing tanks, DPS & hunters
                                 for (itr = playerList.begin(); itr != playerList.end(); itr = next)

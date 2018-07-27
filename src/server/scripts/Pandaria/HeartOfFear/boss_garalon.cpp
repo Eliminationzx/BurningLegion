@@ -740,7 +740,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 /*p_Diff*/) { }
+        void UpdateAI(const uint32 /*p_Diff*/) override { }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
