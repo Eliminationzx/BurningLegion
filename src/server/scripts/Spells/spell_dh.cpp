@@ -1413,6 +1413,8 @@ public:
 
         void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
         {
+            PreventDefaultAction();
+
             Unit* caster = GetCaster();
             caster->GetSpellHistory()->ResetCooldown(SPELL_DH_FELBLADE, true);
         }
@@ -2819,7 +2821,7 @@ struct at_dh_sigil_of_flame : AreaTriggerAI
 };
 
 // Sigil of Chains - 202138
-// AreaTriggerID - 10718
+// AreaTriggerID - 6031
 struct at_dh_sigil_of_chains : AreaTriggerAI
 {
     at_dh_sigil_of_chains(AreaTrigger* areatrigger) : AreaTriggerAI(areatrigger) { }

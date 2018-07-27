@@ -1,0 +1,2 @@
+DELETE FROM spell_linked_spell WHERE spell_effect = -240842;
+INSERT INTO spell_linked_spell (spell_trigger, spell_effect, type, comment) VALUES (60103, -240842, 0, 'Remove buff Lashing flames by Lava lash');
