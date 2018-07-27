@@ -51,7 +51,6 @@ UPDATE creature_template SET InhabitType=5 WHERE entry IN(21801);
 UPDATE creature_template SET unit_flags=262144+33554432, flags_extra=130 WHERE entry=27869;
 UPDATE creature_template SET faction=120 WHERE entry=8320;
 UPDATE creature_template SET dynamicflags=0 WHERE entry=26873;
-UPDATE creature_template SET modelid2=0 WHERE modelid2=17116;
 UPDATE creature_template SET unit_flags=0 WHERE entry=19055;
 UPDATE creature_template SET dynamicflags=8+32 WHERE entry=26514;
 UPDATE creature_template SET unit_flags=32768 WHERE entry=30204;
