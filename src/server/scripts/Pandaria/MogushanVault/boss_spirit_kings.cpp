@@ -1494,13 +1494,13 @@ class spell_volley : public SpellScriptLoader
                 switch (GetSpellInfo()->Id)
                 {
                     case SPELL_VOLLEY_1:
-                        coneAngle = M_PI / (1.5f);
+                        coneAngle = float(M_PI) / 1.5f;
                         break;
                     case SPELL_VOLLEY_2:
-                        coneAngle = M_PI / 4;
+                        coneAngle = float(M_PI) / 4.f;
                         break;
                     case SPELL_VOLLEY_3:
-                        coneAngle = M_PI / 6;
+                        coneAngle = float(M_PI) / 6.f;
                         break;
                 }
 
