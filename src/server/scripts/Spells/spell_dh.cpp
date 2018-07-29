@@ -2737,7 +2737,7 @@ public:
         bool Load() override
         {
             if (Aura* fear = GetAura())
-                fear->Variables.Set("damage", 0);
+                fear->Variables.Set("SigilOfMiseryFearDamage", (uint64)0);
             return true;
         }
 
@@ -2749,12 +2749,12 @@ public:
 
             if (Aura* fear = GetAura())
             {
-                uint32 dmg = fear->Variables.GetValue<uint32>("damage", 0);
+                uint32 dmg = fear->Variables.GetValue<uint64>("SigilOfMiseryFearDamage");
                 uint32 newdamage = eventInfo.GetDamageInfo()->GetDamage() + dmg;
                 if (newdamage > target->CountPctFromMaxHealth(10))
                     fear->SetDuration(0);
                 else
-                    fear->Variables.Set("damage", newdamage);
+                    fear->Variables.Set("SigilOfMiseryFearDamage", newdamage);
             }
             return true;
         }
