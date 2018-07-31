@@ -352,7 +352,6 @@ class boss_garajal : public CreatureScript
                                 me->AddAura(SPELL_SOUL_CUT_SUICIDE, target);
                                 me->AddAura(SPELL_SOUL_CUT_DAMAGE,  target);
 
-                                ObjectGuid viewerGuid = target->GetGUID();
                                 uint8  mobCount   = IsHeroic() ? 3: 1;
 
                                 for (uint8 i = 0; i < mobCount; ++i)

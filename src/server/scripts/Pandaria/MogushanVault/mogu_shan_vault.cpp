@@ -918,10 +918,10 @@ class npc_lorewalker_cho : public CreatureScript
                     // If the trash before Garajal are done, we don't go on the left side
                     case 18:
                     {
-                        Creature* skullcharger = GetClosestCreatureWithEntry(me, NPC_ZANDALARI_SKULLCHARGER, 100.0f, true);
+                        /*Creature* skullcharger = GetClosestCreatureWithEntry(me, NPC_ZANDALARI_SKULLCHARGER, 100.0f, true);
                         Creature* infiltrator  = GetClosestCreatureWithEntry(me, NPC_ZANDALARI_INFILTRATOR,  100.0f, true);
                         Creature* firedancer   = GetClosestCreatureWithEntry(me, NPC_ZANDALARI_FIREDANCER,   100.0f, true);
-                        /*if (!skullcharger && !infiltrator && !firedancer)
+                        if (!skullcharger && !infiltrator && !firedancer)
                             SetNextWaypoint(20);*/
                         break;
                     }
