@@ -4845,8 +4845,8 @@ public:
         {
             PreventDefaultAction();
 
-            Unit* caster = eventInfo.GetActor();
-            Player* player = caster->ToPlayer();
+            Unit* target = eventInfo.GetActionTarget();
+            Player* player = target->ToPlayer();
             if (!player)
                 return;
            
