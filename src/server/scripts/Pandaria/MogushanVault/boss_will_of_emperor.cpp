@@ -694,8 +694,10 @@ class boss_jin_qin_xi : public CreatureScript
                             float angle = me->GetOrientation() + frand(-0.75f, 0.75f);
                             // angle corrections
                             angle = angle < 0.0f ? 0.0f : (angle > 6.28f ? 6.28f : angle);
+                            comboArc = urand(0, 1);
+                            
                             // Stomp or arc
-                            if (comboArc = urand(0, 1))
+                            if (comboArc == 1)
                             {
                                 // Emote for arc attack
                                 //me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK2HLOOSE);

@@ -1183,11 +1183,11 @@ class npc_lorewalker_cho : public CreatureScript
                     }
                     case ACTION_ELEGON_GOB_ACTIVATION:
                     {
-                        Map::PlayerList const& players = me->GetMap()->GetPlayers();
                         // Previous boss not done
                         if (!pInstance->CheckRequiredBosses(DATA_ELEGON))
 #ifdef CROSS
                         {
+                            Map::PlayerList const& players = me->GetMap()->GetPlayers();
                             sLog->outAshran("===== ACTION_ELEGON_GOB_ACTIVATION FAIL =====");
                             sLog->outAshran("CheckRequiredBosses fail, player in raid : ");
                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
