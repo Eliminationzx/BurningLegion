@@ -62,7 +62,8 @@ enum DruidSpells
     SPELL_DRUID_FORM_FLIGHT                         = 33943,
     SPELL_DRUID_FORM_STAG                           = 165961,
     SPELL_DRUID_FORM_SWIFT_FLIGHT                   = 40120,
-    SPELL_DRUID_TRAVEL_FORM                         = 783
+    SPELL_DRUID_TRAVEL_FORM                         = 783,
+    SPELL_DRUID_CELESTIAL_ALIGNMENT                 = 194223
 };
 
 enum ShapeshiftFormSpells
@@ -2348,6 +2349,36 @@ public:
     }
 };
 
+class spell_dru_power_of_goldrinn : public AuraScript
+{
+    PrepareAuraScript(spell_dru_power_of_goldrinn);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_DRUID_STARSURGE;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dru_power_of_goldrinn::CheckProc);
+    }
+};
+
+class spell_dru_moon_and_stars : public AuraScript
+{
+    PrepareAuraScript(spell_dru_moon_and_stars);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetActionTarget()->HasAura(SPELL_DRUID_CELESTIAL_ALIGNMENT);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dru_moon_and_stars::CheckProc);
+    }
+};
+
 void AddSC_druid_spell_scripts()
 {
     // Spells Scripts
@@ -2396,6 +2427,8 @@ void AddSC_druid_spell_scripts()
     RegisterAuraScript(spell_dru_thrash_periodic_damage);
     RegisterSpellScript(spell_dru_blessing_of_the_ancients);
     RegisterAuraScript(spell_dru_gore);
+    RegisterAuraScript(spell_dru_power_of_goldrinn);
+    RegisterAuraScript(spell_dru_moon_and_stars);
     RegisterAuraScript(aura_dru_solar_empowerment);
     RegisterAuraScript(aura_dru_lunar_empowerment);
     RegisterAuraScript(aura_dru_astral_form);
