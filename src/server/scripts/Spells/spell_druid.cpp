@@ -63,7 +63,9 @@ enum DruidSpells
     SPELL_DRUID_FORM_STAG                           = 165961,
     SPELL_DRUID_FORM_SWIFT_FLIGHT                   = 40120,
     SPELL_DRUID_TRAVEL_FORM                         = 783,
-    SPELL_DRUID_CELESTIAL_ALIGNMENT                 = 194223
+    SPELL_DRUID_CELESTIAL_ALIGNMENT                 = 194223,
+    SPELL_DRUID_WILD_GROWTH                         = 48438,
+    SPELL_DRUID_REGROWTH                            = 8936
 };
 
 enum ShapeshiftFormSpells
@@ -219,11 +221,17 @@ class aura_dru_lunar_empowerment : public AuraScript
     {
         GetTarget()->RemoveAurasDueToSpell(SPELL_DRUID_STARLORD_LUNAR);
     }
+    
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_DRUID_LUNAR_STRIKE;
+    }
 
     void Register() override
     {
         OnEffectApply += AuraEffectApplyFn(aura_dru_lunar_empowerment::OnApply, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
         OnEffectRemove += AuraEffectRemoveFn(aura_dru_lunar_empowerment::OnRemove, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+        DoCheckProc += AuraCheckProcFn(aura_dru_lunar_empowerment::CheckProc);
     }
 };
 //7.3.2.25549 END
@@ -2379,6 +2387,51 @@ class spell_dru_moon_and_stars : public AuraScript
     }
 };
 
+class spell_dru_power_of_the_archdruid : public AuraScript
+{
+    PrepareAuraScript(spell_dru_power_of_the_archdruid);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_DRUID_WILD_GROWTH;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dru_power_of_the_archdruid::CheckProc);
+    }
+};
+
+class spell_dru_power_of_the_archdruid_trigger : public AuraScript
+{
+    PrepareAuraScript(spell_dru_power_of_the_archdruid_trigger);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_DRUID_REJUVENATION || eventInfo.GetSpellInfo()->Id == SPELL_DRUID_REGROWTH;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dru_power_of_the_archdruid_trigger::CheckProc);
+    }
+};
+
+class spell_dru_clearcasting : public AuraScript
+{
+    PrepareAuraScript(spell_dru_clearcasting);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_DRUID_REGROWTH;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dru_clearcasting::CheckProc);
+    }
+};
+
 void AddSC_druid_spell_scripts()
 {
     // Spells Scripts
@@ -2435,6 +2488,9 @@ void AddSC_druid_spell_scripts()
     RegisterAuraScript(aura_dru_restoration_affinity);
     RegisterAuraScript(aura_dru_feral_affinity);
     RegisterAuraScript(aura_dru_frenzied_regeneration);
+    RegisterAuraScript(spell_dru_power_of_the_archdruid);
+    RegisterAuraScript(spell_dru_power_of_the_archdruid_trigger);
+    RegisterAuraScript(spell_dru_clearcasting);
 
     // AreaTrigger Scripts
     new at_dru_solar_beam();
