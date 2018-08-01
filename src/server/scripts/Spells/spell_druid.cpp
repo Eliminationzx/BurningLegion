@@ -66,7 +66,8 @@ enum DruidSpells
     SPELL_DRUID_CELESTIAL_ALIGNMENT                 = 194223,
     SPELL_DRUID_WILD_GROWTH                         = 48438,
     SPELL_DRUID_REGROWTH                            = 8936,
-    SPELL_DRUID_MANGLE_TALENT                       = 231064
+    SPELL_DRUID_MANGLE_TALENT                       = 231064,
+    SPELL_DRUID_MANGLE                              = 33917
 };
 
 enum ShapeshiftFormSpells
@@ -105,13 +106,26 @@ enum GoreSpells
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        bool _spellCanProc = (eventInfo.GetSpellInfo()->Id == SPELL_DRUID_THRASH || eventInfo.GetSpellInfo()->Id == SPELL_DRUID_MAUL || eventInfo.GetSpellInfo()->Id == SPELL_DRUID_MOONFIRE || eventInfo.GetSpellInfo()->Id == SPELL_DRUID_SWIPE);
-        return (eventInfo.GetHitMask() & PROC_HIT_NORMAL) && _spellCanProc;
+        return eventInfo.GetSpellInfo()->Id == SPELL_DRUID_THRASH ||
+        eventInfo.GetSpellInfo()->Id == SPELL_DRUID_MAUL          || 
+        eventInfo.GetSpellInfo()->Id == SPELL_DRUID_MOONFIRE      || 
+        eventInfo.GetSpellInfo()->Id == SPELL_DRUID_SWIPE;
+    }
+    
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+
+        Unit* caster = GetCaster();
+        
+        caster->GetSpellHistory()->ResetCooldown(SPELL_DRUID_MANGLE, true);
+        caster->ModifyPower(POWER_RAGE, 4);
     }
 
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_dru_gore::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_dru_gore::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
  };
 
