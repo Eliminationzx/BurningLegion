@@ -693,6 +693,24 @@ void Battleground::RewardChestToTeam(uint32 TeamID)
             player->AddItem(player->IsInAlliance() ? ITEM_BG_ALLIANCE_CHEST : ITEM_BG_HORDE_CHEST, 1);
 }
 
+void Battleground::KillCreditQuest(uint32 TeamID)
+{
+    for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+    {
+        Player* player = _GetPlayerForTeam(TeamID, itr, "KillCreditQuest");
+        if (!player)
+            continue;
+
+        if (isBattleground())
+        {
+            if (player->GetQuestStatus(44173) == QUEST_STATUS_INCOMPLETE)
+            {
+                player->KilledMonsterCredit(player->IsInAlliance() ? 888843 : 888843);
+            }
+        }
+    }
+}
+
 void Battleground::UpdateWorldState(uint32 variable, uint32 value, bool hidden /*= false*/)
 {
     WorldPackets::WorldState::UpdateWorldState worldstate;
@@ -704,6 +722,7 @@ void Battleground::UpdateWorldState(uint32 variable, uint32 value, bool hidden /
 
 void Battleground::EndBattleground(uint32 winner)
 {
+    
     RemoveFromBGFreeSlotQueue();
 
     bool guildAwarded = false;
@@ -762,6 +781,7 @@ void Battleground::EndBattleground(uint32 winner)
     BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(GetTypeID(), GetArenaType());
 
     RewardChestToTeam(winner);
+    KillCreditQuest(winner);
 
     for (BattlegroundPlayerMap::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
@@ -820,8 +840,10 @@ void Battleground::EndBattleground(uint32 winner)
         // Reward winner team
         if (team == winner)
         {
+
             if (IsRandom() || BattlegroundMgr::IsBGWeekend(GetTypeID()))
             {
+            
                 UpdatePlayerScore(player, SCORE_BONUS_HONOR, GetBonusHonorFromKill(winnerKills));
                 if (!player->GetRandomWinner())
                 {
@@ -863,7 +885,9 @@ void Battleground::EndBattleground(uint32 winner)
         player->SendDirectMessage(battlefieldStatus.Write());
 
         player->UpdateCriteria(CRITERIA_TYPE_COMPLETE_BATTLEGROUND, 1);
-    }
+
+    }                    
+        
 }
 
 uint32 Battleground::GetBonusHonorFromKill(uint32 kills) const
