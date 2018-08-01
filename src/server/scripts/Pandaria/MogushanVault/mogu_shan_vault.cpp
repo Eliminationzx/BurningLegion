@@ -1467,7 +1467,7 @@ class mob_sorcerer_mogu : public CreatureScript
                 StartNextFight(NPC_SORCERER_MOGU, NPC_MOUNTED_MOGU, MOB_ZIAN, MOB_QIANG, ACTION_END_FIRST_COMBAT, ACTION_START_SECOND_COMBAT, me);
             }
 
-            void DoAction(const int32 action)
+            void DoAction(const int32 action) override
             {
                 switch (action)
                 {
