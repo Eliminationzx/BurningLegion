@@ -65,7 +65,8 @@ enum DruidSpells
     SPELL_DRUID_TRAVEL_FORM                         = 783,
     SPELL_DRUID_CELESTIAL_ALIGNMENT                 = 194223,
     SPELL_DRUID_WILD_GROWTH                         = 48438,
-    SPELL_DRUID_REGROWTH                            = 8936
+    SPELL_DRUID_REGROWTH                            = 8936,
+    SPELL_DRUID_MANGLE_TALENT                       = 231064
 };
 
 enum ShapeshiftFormSpells
@@ -2432,6 +2433,45 @@ class spell_dru_clearcasting : public AuraScript
     }
 };
 
+class spell_dru_mangle : public SpellScriptLoader
+{
+public:
+    spell_dru_mangle() : SpellScriptLoader("spell_dru_mangle") { }
+
+    class spell_dru_mangle_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dru_mangle_SpellScript);
+
+        void CalcDmg(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            int32 dmg = GetHitDamage();
+            
+            if (caster->HasAura(SPELL_DRUID_MANGLE_TALENT))
+            {
+                if (Unit* target = GetHitUnit())
+                {
+                    if (target->HasAura(SPELL_DRUID_THRASH_PERIODIC_DAMAGE))
+                    {
+                        AddPct(dmg, 20); // Additional damage 20%
+                        SetHitDamage(dmg);
+                    }
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_dru_mangle_SpellScript::CalcDmg, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_dru_mangle_SpellScript();
+    }
+};
+
 void AddSC_druid_spell_scripts()
 {
     // Spells Scripts
@@ -2475,6 +2515,7 @@ void AddSC_druid_spell_scripts()
     new spell_dru_rejuvenation();
     new spell_dru_travel_form_dummy();
     new spell_dru_travel_form();
+    new spell_dru_mangle();
 
     RegisterSpellScript(spell_dru_thrash);
     RegisterAuraScript(spell_dru_thrash_periodic_damage);

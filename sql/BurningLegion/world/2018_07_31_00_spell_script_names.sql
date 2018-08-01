@@ -2,12 +2,14 @@ DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_dru_power_of_gold
 'spell_dru_moon_and_stars', 
 'spell_dru_power_of_the_archdruid',
 'spell_dru_power_of_the_archdruid_trigger',
+'spell_dru_mangle',
 'spell_dru_clearcasting');
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (202940, 'spell_dru_moon_and_stars'),
 (189870, 'spell_dru_power_of_the_archdruid'),
 (189877, 'spell_dru_power_of_the_archdruid_trigger'),
 (16870, 'spell_dru_clearcasting'),
+(33917, 'spell_dru_mangle'),
 (202996, 'spell_dru_power_of_goldrinn');
 
 DELETE FROM `spell_proc` WHERE `SpellId`=16870;
