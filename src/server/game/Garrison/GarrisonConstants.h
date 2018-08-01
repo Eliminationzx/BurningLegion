@@ -19,6 +19,13 @@
 #ifndef GarrisonConstants_h__
 #define GarrisonConstants_h__
 
+enum GarrisonTimers
+{
+    GUPDATE_MISSIONS_DISTRIBUTION,
+
+    GUPDATE_COUNT
+};
+
 enum GarrisonMisc
 {
     GARRISON_WOD_CURRENCY   = 824,
@@ -37,6 +44,7 @@ enum GarrisonType
     GARRISON_TYPE_NONE          = 0,
     GARRISON_TYPE_GARRISON      = 2,
     GARRISON_TYPE_CLASS_HALL    = 3,
+    //GARRISON_TYPE_WAR_CAMPAIGN  = 9,
 
     GARRISON_TYPE_MIN           = GARRISON_TYPE_GARRISON,
     GARRISON_TYPE_MAX           = GARRISON_TYPE_CLASS_HALL,
@@ -199,6 +207,7 @@ enum GarrisonFollowerStatus
     FOLLOWER_STATUS_NO_XP_GAIN  = 0x10
 };
 
+#define GARRISON_MISSION_DISTRIB_FOLLOWER_COEFF (1.5f)
 namespace GarrisonMission
 {
     enum State
@@ -211,41 +220,66 @@ namespace GarrisonMission
 
     enum Type
     {
-        Combat         = 3,
-        Generic        = 4,
-        Salvage        = 5,
-        Logistics      = 6,
-        Wildlife       = 7,
-        Trading        = 8,
-        Construction   = 9,
-        Provision      = 10,
-        Recruitement   = 11,
-        Training       = 12,
-        Patrol         = 13,
-        Research       = 14,
-        Defense        = 15,
-        Exploration    = 16,
-        Siege          = 17,
-        Alchemy        = 18,
-        BlackSmithing  = 19,
-        Enchanting     = 20,
-        Engineering    = 21,
-        Inscription    = 22,
-        JewelCrafting  = 23,
-        LeatherWorking = 24,
-        Tailoring      = 25,
-        Treasure       = 35,
-        PetBattle      = 36,
-        ShipCombat     = 37,
-        ShipOil        = 38,
-        ShipTraining   = 39,
-        ShipTreasure   = 40,
-        ShipSiegeA     = 41,
-        ShipSiegeH     = 42,
-        ShipBonus      = 47,
-        ShipLegendary  = 48,
-        ShipSiegeIHA   = 49,
-        ShipSiegeIHH   = 50
+        Combat                      = 3,
+        Generic                     = 4,
+        Salvage                     = 5,
+        Logistics                   = 6,
+        Wildlife                    = 7,
+        Trading                     = 8,
+        Construction                = 9,
+        Provision                   = 10,
+        Recruitement                = 11,
+        Training                    = 12,
+        Patrol                      = 13,
+        Research                    = 14,
+        Defense                     = 15,
+        Exploration                 = 16,
+        Siege                       = 17,
+        Alchemy                     = 18,
+        BlackSmithing               = 19,
+        Enchanting                  = 20,
+        Engineering                 = 21,
+        Inscription                 = 22,
+        JewelCrafting               = 23,
+        LeatherWorking              = 24,
+        Tailoring                   = 25,
+        Treasure                    = 35,
+        PetBattle                   = 36,
+        ShipCombat                  = 37,
+        ShipOil                     = 38,
+        ShipTraining                = 39,
+        ShipTreasure                = 40,
+        ShipSiegeA                  = 41,
+        ShipSiegeH                  = 42,
+        ShipBonus                   = 47,
+        ShipLegendary               = 48,
+        ShipSiegeIHA                = 49,
+        ShipSiegeIHH                = 50,
+        ZoneSupportAlliance         = 51,
+        Invastion                   = 52,
+        ArtifactMonk                = 53,
+        GenericLegion               = 54,
+        TutorialLegion              = 55,
+        ZoneSupportHorde            = 57,
+        ArtifactShaman              = 58,
+        ArtifactDruid               = 59,
+        ArtifactMage                = 60,
+        ArtifactHunter              = 61,
+        ArtifactPaladin             = 63,
+        ArtifactWarlock             = 64,
+        ArtifactDemonHunter         = 65,
+        ArtifactRogue               = 66,
+        ArtifactPriest              = 67,
+        ArtifactDeathKnight         = 68,
+        ArtifactWarrior             = 69,
+        ClassHallCampaign           = 70,
+        ClassHallGeneric            = 71,
+        ClassHallTreasure           = 72,
+        ClassHallSpecialReward      = 73,
+        ClassHallQuest              = 74,
+        ClassHallTreasureDungeon    = 75,
+        ClassHallTreasonRaid        = 76,
+        BrokenShoreGeneric          = 79,
     };
 
     enum Flags
@@ -260,6 +294,18 @@ namespace GarrisonMission
         Ok    = 0,
         Error = 1
     };
+
+    enum AddResult
+    {
+        Success = 0,
+        Fail    = 1,
+    };
+
+    enum RewardType
+    {
+        Normal  = 0,
+        Bonus   = 1,
+    };
 }
 
-#endif  ///< GarrisonConstants_h__
+#endif

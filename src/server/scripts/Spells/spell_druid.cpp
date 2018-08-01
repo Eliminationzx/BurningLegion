@@ -62,7 +62,12 @@ enum DruidSpells
     SPELL_DRUID_FORM_FLIGHT                         = 33943,
     SPELL_DRUID_FORM_STAG                           = 165961,
     SPELL_DRUID_FORM_SWIFT_FLIGHT                   = 40120,
-    SPELL_DRUID_TRAVEL_FORM                         = 783
+    SPELL_DRUID_TRAVEL_FORM                         = 783,
+    SPELL_DRUID_CELESTIAL_ALIGNMENT                 = 194223,
+    SPELL_DRUID_WILD_GROWTH                         = 48438,
+    SPELL_DRUID_REGROWTH                            = 8936,
+    SPELL_DRUID_MANGLE_TALENT                       = 231064,
+    SPELL_DRUID_MANGLE                              = 33917
 };
 
 enum ShapeshiftFormSpells
@@ -101,13 +106,26 @@ enum GoreSpells
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        bool _spellCanProc = (eventInfo.GetSpellInfo()->Id == SPELL_DRUID_THRASH || eventInfo.GetSpellInfo()->Id == SPELL_DRUID_MAUL || eventInfo.GetSpellInfo()->Id == SPELL_DRUID_MOONFIRE || eventInfo.GetSpellInfo()->Id == SPELL_DRUID_SWIPE);
-        return (eventInfo.GetHitMask() & PROC_HIT_NORMAL) && _spellCanProc;
+        return eventInfo.GetSpellInfo()->Id == SPELL_DRUID_THRASH ||
+        eventInfo.GetSpellInfo()->Id == SPELL_DRUID_MAUL          || 
+        eventInfo.GetSpellInfo()->Id == SPELL_DRUID_MOONFIRE      || 
+        eventInfo.GetSpellInfo()->Id == SPELL_DRUID_SWIPE;
+    }
+    
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+
+        Unit* caster = GetCaster();
+        
+        caster->GetSpellHistory()->ResetCooldown(SPELL_DRUID_MANGLE, true);
+        caster->ModifyPower(POWER_RAGE, 4);
     }
 
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_dru_gore::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_dru_gore::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
  };
 
@@ -218,11 +236,17 @@ class aura_dru_lunar_empowerment : public AuraScript
     {
         GetTarget()->RemoveAurasDueToSpell(SPELL_DRUID_STARLORD_LUNAR);
     }
+    
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_DRUID_LUNAR_STRIKE;
+    }
 
     void Register() override
     {
         OnEffectApply += AuraEffectApplyFn(aura_dru_lunar_empowerment::OnApply, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
         OnEffectRemove += AuraEffectRemoveFn(aura_dru_lunar_empowerment::OnRemove, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+        DoCheckProc += AuraCheckProcFn(aura_dru_lunar_empowerment::CheckProc);
     }
 };
 //7.3.2.25549 END
@@ -2348,6 +2372,120 @@ public:
     }
 };
 
+class spell_dru_power_of_goldrinn : public AuraScript
+{
+    PrepareAuraScript(spell_dru_power_of_goldrinn);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_DRUID_STARSURGE;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dru_power_of_goldrinn::CheckProc);
+    }
+};
+
+class spell_dru_moon_and_stars : public AuraScript
+{
+    PrepareAuraScript(spell_dru_moon_and_stars);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetActionTarget()->HasAura(SPELL_DRUID_CELESTIAL_ALIGNMENT);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dru_moon_and_stars::CheckProc);
+    }
+};
+
+class spell_dru_power_of_the_archdruid : public AuraScript
+{
+    PrepareAuraScript(spell_dru_power_of_the_archdruid);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_DRUID_WILD_GROWTH;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dru_power_of_the_archdruid::CheckProc);
+    }
+};
+
+class spell_dru_power_of_the_archdruid_trigger : public AuraScript
+{
+    PrepareAuraScript(spell_dru_power_of_the_archdruid_trigger);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_DRUID_REJUVENATION || eventInfo.GetSpellInfo()->Id == SPELL_DRUID_REGROWTH;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dru_power_of_the_archdruid_trigger::CheckProc);
+    }
+};
+
+class spell_dru_clearcasting : public AuraScript
+{
+    PrepareAuraScript(spell_dru_clearcasting);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_DRUID_REGROWTH;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dru_clearcasting::CheckProc);
+    }
+};
+
+class spell_dru_mangle : public SpellScriptLoader
+{
+public:
+    spell_dru_mangle() : SpellScriptLoader("spell_dru_mangle") { }
+
+    class spell_dru_mangle_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dru_mangle_SpellScript);
+
+        void CalcDmg(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            int32 dmg = GetHitDamage();
+            
+            if (caster->HasAura(SPELL_DRUID_MANGLE_TALENT))
+            {
+                if (Unit* target = GetHitUnit())
+                {
+                    if (target->HasAura(SPELL_DRUID_THRASH_PERIODIC_DAMAGE))
+                    {
+                        AddPct(dmg, 20); // Additional damage 20%
+                        SetHitDamage(dmg);
+                    }
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_dru_mangle_SpellScript::CalcDmg, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_dru_mangle_SpellScript();
+    }
+};
+
 void AddSC_druid_spell_scripts()
 {
     // Spells Scripts
@@ -2391,17 +2529,23 @@ void AddSC_druid_spell_scripts()
     new spell_dru_rejuvenation();
     new spell_dru_travel_form_dummy();
     new spell_dru_travel_form();
+    new spell_dru_mangle();
 
     RegisterSpellScript(spell_dru_thrash);
     RegisterAuraScript(spell_dru_thrash_periodic_damage);
     RegisterSpellScript(spell_dru_blessing_of_the_ancients);
     RegisterAuraScript(spell_dru_gore);
+    RegisterAuraScript(spell_dru_power_of_goldrinn);
+    RegisterAuraScript(spell_dru_moon_and_stars);
     RegisterAuraScript(aura_dru_solar_empowerment);
     RegisterAuraScript(aura_dru_lunar_empowerment);
     RegisterAuraScript(aura_dru_astral_form);
     RegisterAuraScript(aura_dru_restoration_affinity);
     RegisterAuraScript(aura_dru_feral_affinity);
     RegisterAuraScript(aura_dru_frenzied_regeneration);
+    RegisterAuraScript(spell_dru_power_of_the_archdruid);
+    RegisterAuraScript(spell_dru_power_of_the_archdruid_trigger);
+    RegisterAuraScript(spell_dru_clearcasting);
 
     // AreaTrigger Scripts
     new at_dru_solar_beam();

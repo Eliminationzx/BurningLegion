@@ -114,7 +114,7 @@ namespace WorldPackets
         struct GarrisonMissionReward
         {
             int32 ItemID = 0;
-            uint32 Quantity = 0;
+            uint32 ItemQuantity = 0;
             int32 CurrencyID = 0;
             uint32 CurrencyQuantity = 0;
             uint32 FollowerXP = 0;
@@ -147,7 +147,7 @@ namespace WorldPackets
             std::vector<GarrisonFollower const*> Followers;
             std::vector<GarrisonMission const*> Missions;
             std::vector<std::vector<GarrisonMissionReward>> MissionRewards;
-            std::vector<std::vector<GarrisonMissionReward>> MissionOvermaxRewards;
+            std::vector<std::vector<GarrisonMissionReward>> MissionBonusRewards;
             std::vector<GarrisonMissionAreaBonus const*> MissionAreaBonuses;
             std::vector<GarrisonTalent> Talents;
             std::vector<bool> CanStartMission;
@@ -463,6 +463,44 @@ namespace WorldPackets
             std::vector<uint32 /* dbID */> Missions;
             bool   unk4 = false;
             bool   preventXmlOpenMissionEvent = false;
+        };
+
+        class GarrisonAddMissionResult final : public ServerPacket
+        {
+        public:
+            GarrisonAddMissionResult() : ServerPacket(SMSG_GARRISON_ADD_MISSION_RESULT, 4) { }
+
+            uint32 GarrType;
+            uint32 Result;
+            uint8 State;
+            GarrisonMission Mission;
+
+            std::vector<WorldPackets::Garrison::GarrisonMissionReward> Rewards;
+            std::vector<WorldPackets::Garrison::GarrisonMissionReward> BonusRewards;
+
+            bool Success = true;
+
+            WorldPacket const* Write() override;
+        };
+
+        class GarrisonStartMission final : public ClientPacket
+        {
+        public:
+            GarrisonStartMission(WorldPacket&& packet) : ClientPacket(CMSG_GARRISON_START_MISSION, std::move(packet)) { }
+
+            void Read() override;
+
+            ObjectGuid NpcGUID;
+            uint32 MissionID;
+            std::vector<uint64 /* dbID */> Followers;
+        };
+
+        class GarrisonStartMissionResult final : public ServerPacket
+        {
+        public:
+            GarrisonStartMissionResult() : ServerPacket(SMSG_GARRISON_START_MISSION_RESULT, 4) { }
+
+            WorldPacket const* Write() override;
         };
     }
 }
