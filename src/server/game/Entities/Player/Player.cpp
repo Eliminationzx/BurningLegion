@@ -15743,7 +15743,7 @@ uint32 Player::GetQuestXPReward(Quest const* quest)
     if (rewarded && !quest->IsDFQuest())
         return 0;
 
-    float questXpRate = GetPersonnalXpRate() ? GetPersonnalXpRate(): sWorld->getRate(RATE_XP_QUEST);
+    float questXpRate = GetPersonalRate() ? GetPersonalRate(): sWorld->getRate(RATE_XP_QUEST);
     uint32 XP = quest->XPValue(getLevel()) * questXpRate;
 
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
