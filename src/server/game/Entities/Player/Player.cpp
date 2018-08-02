@@ -345,7 +345,7 @@ Player::Player(WorldSession* session) : Unit(true), m_sceneMgr(this), m_archaeol
 
     _lastTargetedGO = 0;
 
-    _PersonnalXpRate = 0;
+    _PersonalRate = 0;
 
     memset(_voidStorageItems, 0, VOID_STORAGE_MAX_SLOT * sizeof(VoidStorageItem*));
 
@@ -25822,12 +25822,12 @@ void Player::SetMover(Unit* target)
     SendDirectMessage(packet.Write());
 }
 
-void Player::SetPersonnalXpRate(float personnalXPRate)
+void Player::SetPersonalRate(float personalRate)
 {
-    _PersonnalXpRate = personnalXPRate;
+    _PersonalRate = personalRate;
 
-    PreparedStatement* statement = CharacterDatabase.GetPreparedStatement(CHAR_UPD_XP_RATE);
-    statement->setFloat(0, personnalXPRate);
+    PreparedStatement* statement = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PERSONAL_RATE);
+    statement->setFloat(0, personalRate);
     statement->setUInt64(1, GetGUID().GetCounter());
     CharacterDatabase.Execute(statement);
 }

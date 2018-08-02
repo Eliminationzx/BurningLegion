@@ -1,0 +1,1 @@
+ALTER TABLE characters CHANGE `xpRate` `personalRate` tinyint(3);

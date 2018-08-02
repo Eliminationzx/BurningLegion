@@ -6027,7 +6027,7 @@ void Spell::EffectGiveExperience(SpellEffIndex /*effIndex*/)
         return;
 
     Player* playerTarget = unitTarget->ToPlayer();
-    float questXpRate = playerTarget->GetPersonnalXpRate() ? playerTarget->GetPersonnalXpRate() : sWorld->getRate(RATE_XP_QUEST);
+    float questXpRate = playerTarget->GetPersonalRate() ? playerTarget->GetPersonalRate() : sWorld->getRate(RATE_XP_QUEST);
     uint32 XP = questXp->Difficulty[effectInfo->MiscValueB] * questXpRate;
 
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras

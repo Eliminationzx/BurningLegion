@@ -35,27 +35,28 @@ class npc_rate_xp_modifier : public CreatureScript
     public:
         npc_rate_xp_modifier() : CreatureScript("npc_rate_xp_modifier") { }
 
-#define MAX_RATE uint32(10)
+        uint32 personalRates[11] = { 1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
 
         bool OnGossipHello(Player* player, Creature* creature) override
         {
-            for (uint32 i = 1; i <= MAX_RATE; ++i)
-            {
-                if (i == player->GetPersonnalXpRate())
+            for (uint32 i = 0; i < 11; ++i)
+            {               
+                if (personalRates[i] == player->GetPersonalRate())
                     continue;
 
-                if (i == sWorld->getRate(RATE_XP_KILL))
+                if (personalRates[i] == sWorld->getRate(RATE_XP_KILL) &&
+                    personalRates[i] == sWorld->getRate(RATE_REPUTATION_GAIN))
                     continue;
 
                 std::ostringstream gossipText;
-                gossipText << "Rate x" << i;
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, gossipText.str(), GOSSIP_SENDER_MAIN, i);
+                gossipText << "Rate x" << personalRates[i];
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, gossipText.str(), GOSSIP_SENDER_MAIN, personalRates[i]);
             }
 
-            if (player->GetPersonnalXpRate())
+            if (player->GetPersonalRate())
             {
                 std::ostringstream gossipText;
-                gossipText << "Default Rate - x" << sWorld->getRate(RATE_XP_KILL);
+                gossipText << "Default Rate [XP/Reputation gain] - x" << sWorld->getRate(RATE_XP_KILL) << "/" << sWorld->getRate(RATE_REPUTATION_LOWLEVEL_QUEST);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, gossipText.str(), GOSSIP_SENDER_MAIN, 0);
             }
 
@@ -66,7 +67,7 @@ class npc_rate_xp_modifier : public CreatureScript
         bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*uiSender*/, uint32 uiAction) override
         {
             CloseGossipMenuFor(player);
-            player->SetPersonnalXpRate(float(std::min(MAX_RATE, uiAction)));
+            player->SetPersonalRate(float(std::min(personalRates[11], uiAction)));
             return true;
         }
 };

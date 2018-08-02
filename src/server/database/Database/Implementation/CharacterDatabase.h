@@ -654,7 +654,7 @@ enum CharacterDatabaseStatements : uint32
     CHAR_DEL_WORLD_QUEST,
     CHAR_REP_WORLD_QUEST,
 
-    CHAR_UPD_XP_RATE,
+    CHAR_UPD_PERSONAL_RATE,
 
     CHAR_LOG_GM_COMMAND,
 

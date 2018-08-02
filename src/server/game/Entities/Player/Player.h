@@ -2454,8 +2454,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 GetLastTargetedGO() { return _lastTargetedGO; }
         void SetLastTargetedGO(uint32 lastTargetedGO) { _lastTargetedGO = lastTargetedGO; }
 
-        float GetPersonnalXpRate() { return _PersonnalXpRate; }
-        void SetPersonnalXpRate(float PersonnalXpRate);
+        float GetPersonalRate() { return _PersonalRate; }
+        void SetPersonalRate(float personalRate);
 
         void OnCombatExit();
 
@@ -2872,7 +2872,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 _pendingBindTimer;
 
         uint32 _lastTargetedGO;
-        float _PersonnalXpRate;
+        float _PersonalRate;
 
         uint32 _activeCheats;
 
