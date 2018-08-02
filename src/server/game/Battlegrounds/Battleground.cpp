@@ -693,22 +693,12 @@ void Battleground::RewardChestToTeam(uint32 TeamID)
             player->AddItem(player->IsInAlliance() ? ITEM_BG_ALLIANCE_CHEST : ITEM_BG_HORDE_CHEST, 1);
 }
 
-void Battleground::KillCreditQuest(uint32 TeamID)
+void Battleground::KillCreditQuestToTeam(uint32 TeamID, uint32 questID, uint32 killCreditEntry)
 {
     for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-    {
-        Player* player = _GetPlayerForTeam(TeamID, itr, "KillCreditQuest");
-        if (!player)
-            continue;
-
-        if (isBattleground())
-        {
-            if (player->GetQuestStatus(44173) == QUEST_STATUS_INCOMPLETE)
-            {
-                player->KilledMonsterCredit(player->IsInAlliance() ? 888843 : 888843);
-            }
-        }
-    }
+        if (Player* player = _GetPlayerForTeam(TeamID, itr, "KillCreditQuest"))
+            if (player->GetQuestStatus(questID) == QUEST_STATUS_INCOMPLETE)
+                player->KilledMonsterCredit(killCreditEntry);
 }
 
 void Battleground::UpdateWorldState(uint32 variable, uint32 value, bool hidden /*= false*/)
@@ -722,7 +712,6 @@ void Battleground::UpdateWorldState(uint32 variable, uint32 value, bool hidden /
 
 void Battleground::EndBattleground(uint32 winner)
 {
-    
     RemoveFromBGFreeSlotQueue();
 
     bool guildAwarded = false;
@@ -781,7 +770,10 @@ void Battleground::EndBattleground(uint32 winner)
     BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(GetTypeID(), GetArenaType());
 
     RewardChestToTeam(winner);
-    KillCreditQuest(winner);
+
+    // Quest kill credit
+    // quest 44173
+    KillCreditQuestToTeam(winner, 44173, 888843);
 
     for (BattlegroundPlayerMap::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {

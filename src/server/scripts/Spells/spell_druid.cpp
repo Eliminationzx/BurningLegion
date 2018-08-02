@@ -112,7 +112,7 @@ enum GoreSpells
         eventInfo.GetSpellInfo()->Id == SPELL_DRUID_SWIPE;
     }
     
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
 
