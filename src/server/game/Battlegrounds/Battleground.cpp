@@ -773,7 +773,10 @@ void Battleground::EndBattleground(uint32 winner)
 
     // Quest kill credit
     // quest 44173
-    KillCreditQuestToTeam(winner, 44173, 888843);
+    if (isBattleground())
+    {
+      KillCreditQuestToTeam(winner, 44173, 888843);
+    }
 
     for (BattlegroundPlayerMap::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
