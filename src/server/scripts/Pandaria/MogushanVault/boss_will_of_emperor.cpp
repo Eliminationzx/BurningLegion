@@ -1204,7 +1204,7 @@ class mob_woe_add_generic : public CreatureScript
                                         for (auto ply : playerList)
                                             me->getThreatManager().addThreat(ply, 150.0f);
                                         
-                                        target = SelectTarget(SELECT_TARGET_TOPAGGRO)
+                                        target = SelectTarget(SELECT_TARGET_TOPAGGRO);
                                     
                                         if (target)
                                         {

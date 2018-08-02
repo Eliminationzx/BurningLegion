@@ -221,34 +221,6 @@ class aura_dru_solar_empowerment : public AuraScript
     }
 };
 
-// Lunar empowerment - 164547
-class aura_dru_lunar_empowerment : public AuraScript
-{
-    PrepareAuraScript(aura_dru_lunar_empowerment);
-
-    void OnApply(const AuraEffect* /* aurEff */, AuraEffectHandleModes /*mode*/)
-    {
-        if (GetTarget()->HasAura(SPELL_DRUID_STARLORD_DUMMY))
-            GetTarget()->CastSpell(nullptr, SPELL_DRUID_STARLORD_LUNAR, true);
-    }
-
-    void OnRemove(const AuraEffect* /* aurEff */, AuraEffectHandleModes /*mode*/)
-    {
-        GetTarget()->RemoveAurasDueToSpell(SPELL_DRUID_STARLORD_LUNAR);
-    }
-    
-    bool CheckProc(ProcEventInfo& eventInfo)
-    {
-        return eventInfo.GetSpellInfo()->Id == SPELL_DRUID_LUNAR_STRIKE;
-    }
-
-    void Register() override
-    {
-        OnEffectApply += AuraEffectApplyFn(aura_dru_lunar_empowerment::OnApply, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
-        OnEffectRemove += AuraEffectRemoveFn(aura_dru_lunar_empowerment::OnRemove, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
-        DoCheckProc += AuraCheckProcFn(aura_dru_lunar_empowerment::CheckProc);
-    }
-};
 //7.3.2.25549 END
 
 // Efflorescence - 145205
@@ -557,6 +529,35 @@ enum BalanceAffinitySpells
     SPELL_DRUID_SUNFIRE       = 93402,
     SPELL_DRUID_LUNAR_STRIKE  = 194153,
     SPELL_DRUID_SOLAR_WRATH   = 190984
+};
+
+// Lunar empowerment - 164547
+class aura_dru_lunar_empowerment : public AuraScript
+{
+    PrepareAuraScript(aura_dru_lunar_empowerment);
+
+    void OnApply(const AuraEffect* /* aurEff */, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTarget()->HasAura(SPELL_DRUID_STARLORD_DUMMY))
+            GetTarget()->CastSpell(nullptr, SPELL_DRUID_STARLORD_LUNAR, true);
+    }
+
+    void OnRemove(const AuraEffect* /* aurEff */, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(SPELL_DRUID_STARLORD_LUNAR);
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_DRUID_LUNAR_STRIKE;
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(aura_dru_lunar_empowerment::OnApply, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(aura_dru_lunar_empowerment::OnRemove, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+        DoCheckProc += AuraCheckProcFn(aura_dru_lunar_empowerment::CheckProc);
+    }
 };
 
 // Balance Affinity (Feral, Guardian) - 197488
