@@ -18260,7 +18260,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
     // set which actionbars the client has active - DO NOT REMOVE EVER AGAIN (can be changed though, if it does change fieldwise)
     SetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_ACTION_BAR_TOGGLES, fields[68].GetUInt8());
 
-    _PersonnalXpRate = fields[72].GetUInt8();
+    _PersonalRate = fields[72].GetUInt8();
     m_fishingSteps = fields[73].GetUInt8();
 
     InitDisplayIds();
@@ -20762,7 +20762,7 @@ void Player::SaveToDB(bool create /*=false*/)
         stmt->setUInt8(index++, GetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_ACTION_BAR_TOGGLES));
         stmt->setUInt32(index++, m_grantableLevels);
         stmt->setUInt32(index++, realm.Build);
-        stmt->setFloat(index++, _PersonnalXpRate);
+        stmt->setFloat(index++, _PersonalRate);
     }
     else
     {
@@ -20906,7 +20906,7 @@ void Player::SaveToDB(bool create /*=false*/)
         stmt->setString(index++, ss.str());
         stmt->setUInt8(index++, GetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_ACTION_BAR_TOGGLES));
         stmt->setUInt32(index++, m_grantableLevels);
-        stmt->setFloat(index++, _PersonnalXpRate);
+        stmt->setFloat(index++, _PersonalRate);
 
         stmt->setUInt8(index++, IsInWorld() && !GetSession()->PlayerLogout() ? 1 : 0);
         stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_HONOR));

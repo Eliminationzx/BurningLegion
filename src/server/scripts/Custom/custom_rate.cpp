@@ -1,4 +1,3 @@
-#include "GameTime.h"
 #include "ScriptMgr.h"
 #include "World.h"
 #include "WorldSession.h"
