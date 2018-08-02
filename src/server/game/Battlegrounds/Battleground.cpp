@@ -696,7 +696,7 @@ void Battleground::RewardChestToTeam(uint32 TeamID)
 void Battleground::KillCreditQuestToTeam(uint32 TeamID, uint32 questID, uint32 killCreditEntry)
 {
     for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-        if (Player* player = _GetPlayerForTeam(TeamID, itr, "KillCreditQuest"))
+        if (Player* player = _GetPlayerForTeam(TeamID, itr, "KillCreditQuestToTeam"))
             if (player->GetQuestStatus(questID) == QUEST_STATUS_INCOMPLETE)
                 player->KilledMonsterCredit(killCreditEntry);
 }

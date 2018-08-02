@@ -2460,6 +2460,11 @@ void ScriptMgr::OnChargeRecoveryTimeStart(Player* player, uint32 chargeCategoryI
     FOREACH_SCRIPT(PlayerScript)->OnChargeRecoveryTimeStart(player, chargeCategoryId, chargeRecoveryTime);
 }
 
+void ScriptMgr::OnHonorGainCalculation(Player * player, float& honor_f)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnHonorGainCalculation(player, honor_f);
+}
+
 // Account
 void ScriptMgr::OnAccountLogin(uint32 accountId)
 {

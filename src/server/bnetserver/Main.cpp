@@ -72,6 +72,7 @@ void StopDB();
 void SignalHandler(std::weak_ptr<Trinity::Asio::IoContext> ioContextRef, boost::system::error_code const& error, int signalNumber);
 void KeepDatabaseAliveHandler(std::weak_ptr<boost::asio::deadline_timer> dbPingTimerRef, int32 dbPingInterval, boost::system::error_code const& error);
 void BanExpiryHandler(std::weak_ptr<boost::asio::deadline_timer> banExpiryCheckTimerRef, int32 banExpiryCheckInterval, boost::system::error_code const& error);
+void PremiumExpiryHandler(std::weak_ptr<boost::asio::deadline_timer> premiumExpiryCheckTimerRef, int32 premiumExpiryCheckInterval, boost::system::error_code const& error);
 variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile, std::string& configService);
 
 int main(int argc, char** argv)
@@ -207,6 +208,11 @@ int main(int argc, char** argv)
     banExpiryCheckTimer->expires_from_now(boost::posix_time::seconds(banExpiryCheckInterval));
     banExpiryCheckTimer->async_wait(std::bind(&BanExpiryHandler, std::weak_ptr<boost::asio::deadline_timer>(banExpiryCheckTimer), banExpiryCheckInterval, std::placeholders::_1));
 
+    int32 premiumExpiryCheckInterval = sConfigMgr->GetIntDefault("PremiumExpiryCheckInterval", 60);
+    std::shared_ptr<boost::asio::deadline_timer> premiumExpiryCheckTimer = std::make_shared<boost::asio::deadline_timer>(*ioContext);
+    premiumExpiryCheckTimer->expires_from_now(boost::posix_time::seconds(premiumExpiryCheckInterval));
+    premiumExpiryCheckTimer->async_wait(std::bind(&PremiumExpiryHandler, std::weak_ptr<boost::asio::deadline_timer>(premiumExpiryCheckTimer), premiumExpiryCheckInterval, std::placeholders::_1));
+
 #if TRINITY_PLATFORM == TRINITY_PLATFORM_WINDOWS
     std::shared_ptr<boost::asio::deadline_timer> serviceStatusWatchTimer;
     if (m_ServiceStatus != -1)
@@ -292,6 +298,20 @@ void BanExpiryHandler(std::weak_ptr<boost::asio::deadline_timer> banExpiryCheckT
 
             banExpiryCheckTimer->expires_from_now(boost::posix_time::seconds(banExpiryCheckInterval));
             banExpiryCheckTimer->async_wait(std::bind(&BanExpiryHandler, banExpiryCheckTimerRef, banExpiryCheckInterval, std::placeholders::_1));
+        }
+    }
+}
+
+void PremiumExpiryHandler(std::weak_ptr<boost::asio::deadline_timer> premiumExpiryCheckTimerRef, int32 premiumExpiryCheckInterval, boost::system::error_code const& error)
+{
+    if (!error)
+    {
+        if (std::shared_ptr<boost::asio::deadline_timer> premiumExpiryCheckTimer = premiumExpiryCheckTimerRef.lock())
+        {
+            LoginDatabase.Execute(LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPIRED_ACCOUNT_PREMIUM));
+
+            premiumExpiryCheckTimer->expires_from_now(boost::posix_time::seconds(premiumExpiryCheckInterval));
+            premiumExpiryCheckTimer->async_wait(std::bind(&BanExpiryHandler, premiumExpiryCheckTimerRef, premiumExpiryCheckInterval, std::placeholders::_1));
         }
     }
 }

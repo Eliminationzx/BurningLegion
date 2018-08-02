@@ -178,6 +178,13 @@ WrongPass.Logging = 0
 BanExpiryCheckInterval = 60
 
 #
+#    PremiumExpiryCheckInterval
+#        Description: Time (in seconds) between checks for expired premium status
+#        Default:     60
+
+PremiumExpiryCheckInterval = 60
+
+#
 #    SourceDirectory
 #        Description: The path to your TrinityCore source directory.
 #                     If the path is left empty, the built-in CMAKE_SOURCE_DIR is used.

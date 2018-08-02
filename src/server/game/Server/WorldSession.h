@@ -939,7 +939,7 @@ class TC_GAME_API WorldSession
     public:
         Ashamane::AnyData Variables;
 
-        WorldSession(uint32 id, std::string&& name, uint32 battlenetAccountId, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time,
+        WorldSession(uint32 id, std::string&& name, uint32 battlenetAccountId, std::shared_ptr<WorldSocket> sock, AccountTypes sec, bool ispremium, PremiumTypes premiumType, uint8 expansion, time_t mute_time,
             std::string os, LocaleConstant locale, uint32 recruiter, bool isARecruiter, std::string&& battlenetAccountName);
         ~WorldSession();
 
@@ -974,6 +974,8 @@ class TC_GAME_API WorldSession
         void InvalidateRBACData(); // Used to force LoadPermissions at next HasPermission check
 
         AccountTypes GetSecurity() const { return _security; }
+        bool IsPremium() const { return _ispremium; }
+        PremiumTypes GetPremiumType() const { return _premiumType; }
         uint32 GetAccountId() const { return _accountId; }
         ObjectGuid GetAccountGUID() const { return ObjectGuid::Create<HighGuid::WowAccount>(GetAccountId()); }
         std::string const& GetAccountName() const { return _accountName; }
@@ -1887,6 +1889,8 @@ class TC_GAME_API WorldSession
      // std::string m_LAddress;                             // Last Attempted Remote Adress - we can not set attempted ip for a non-existing session!
 
         AccountTypes _security;
+        bool _ispremium;
+        PremiumTypes _premiumType;
         uint32 _accountId;
         std::string _accountName;
         uint32 _battlenetAccountId;

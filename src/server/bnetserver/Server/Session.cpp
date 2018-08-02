@@ -52,13 +52,15 @@ void Battlenet::Session::AccountInfo::LoadResult(PreparedQueryResult result)
 
 void Battlenet::Session::GameAccountInfo::LoadResult(Field* fields)
 {
-    // a.id, a.username, ab.unbandate, ab.unbandate = ab.bandate, aa.gmlevel
+    // a.id, a.username, ab.unbandate, ab.unbandate = ab.bandate, aa.gmlevel, ap.id, ap.premium_type
     Id = fields[0].GetUInt32();
     Name = fields[1].GetString();
     UnbanDate = fields[2].GetUInt32();
     IsPermanenetlyBanned = fields[3].GetUInt32() != 0;
     IsBanned = IsPermanenetlyBanned || UnbanDate > time(nullptr);
     SecurityLevel = AccountTypes(fields[4].GetUInt8());
+    IsPremium = fields[5].GetUInt32() != 0;
+    PremiumType = PremiumTypes(fields[6].GetUInt8());
 
     std::size_t hashPos = Name.find('#');
     if (hashPos != std::string::npos)

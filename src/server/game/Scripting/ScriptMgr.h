@@ -820,6 +820,9 @@ class TC_GAME_API PlayerScript : public UnitScript
 
         // Called when a charge recovery cooldown start for that player
         virtual void OnChargeRecoveryTimeStart(Player* /*player*/, uint32 /*chargeCategoryId*/, int32& /*chargeRecoveryTime*/) { }
+
+        // Called when player rewarded honor
+        virtual void OnHonorGainCalculation(Player* /*player*/, float& /*honor_f*/) { }
 };
 
 class TC_GAME_API AccountScript : public ScriptObject
@@ -1255,6 +1258,7 @@ class TC_GAME_API ScriptMgr
         void OnPlayerChoiceResponse(Player* player, uint32 choiceId, uint32 responseId);
         void OnCooldownStart(Player* player, SpellInfo const* spellInfo, uint32 itemId, int32& cooldown, uint32& categoryId, int32& categoryCooldown);
         void OnChargeRecoveryTimeStart(Player* player, uint32 chargeCategoryId, int32& chargeRecoveryTime);
+        void OnHonorGainCalculation(Player* player, float& honor_f);
 
     public: /* AccountScript */
 

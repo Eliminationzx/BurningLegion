@@ -4121,3 +4121,22 @@ Metric.OverallStatusInterval = 1
 
 #
 ###################################################################################################
+
+###################################################################################################
+#
+#    PREMIUM ACCOUNTS
+#
+# Rate.Honor.Boost.Premium
+#        Honor boost rate modifier
+#        Default: 1
+
+Rate.Honor.Boost.Premium       = 1
+
+# Rate.XP.Boost.Premium
+#        XP boost rate modifier
+#        Default: 1
+
+Rate.XP.Boost.Premium       = 1
+
+#
+###################################################################################################
