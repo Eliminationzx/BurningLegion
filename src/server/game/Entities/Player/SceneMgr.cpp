@@ -33,14 +33,15 @@ SceneMgr::SceneMgr(Player* player) : _player(player)
 
 uint32 SceneMgr::PlayScene(uint32 sceneId, Position const* position /*= nullptr*/)
 {
-    if (SceneTemplate const* sceneTemplate = sObjectMgr->GetSceneTemplate(sceneId))
-        return PlaySceneByTemplate(*sceneTemplate, position);
-
-    return 0;
+    SceneTemplate const* sceneTemplate = sObjectMgr->GetSceneTemplate(sceneId);
+    return PlaySceneByTemplate(sceneTemplate, position);
 }
 
-uint32 SceneMgr::PlaySceneByTemplate(SceneTemplate const sceneTemplate, Position const* position /*= nullptr*/)
+uint32 SceneMgr::PlaySceneByTemplate(SceneTemplate const* sceneTemplate, Position const* position /*= nullptr*/)
 {
+    if (!sceneTemplate)
+        return 0;
+    
     SceneScriptPackageEntry const* entry = sSceneScriptPackageStore.LookupEntry(sceneTemplate.ScenePackageId);
     if (!entry)
         return 0;
@@ -52,13 +53,13 @@ uint32 SceneMgr::PlaySceneByTemplate(SceneTemplate const sceneTemplate, Position
     uint32 sceneInstanceID = GetNewStandaloneSceneInstanceID();
 
     if (_isDebuggingScenes)
-        ChatHandler(GetPlayer()->GetSession()).PSendSysMessage(LANG_COMMAND_SCENE_DEBUG_PLAY, sceneInstanceID, sceneTemplate.ScenePackageId, sceneTemplate.PlaybackFlags);
+        ChatHandler(GetPlayer()->GetSession()).PSendSysMessage(LANG_COMMAND_SCENE_DEBUG_PLAY, sceneInstanceID, sceneTemplate->ScenePackageId, sceneTemplate->PlaybackFlags);
 
     WorldPackets::Scenes::PlayScene playScene;
-    playScene.SceneID              = sceneTemplate.SceneId;
-    playScene.PlaybackFlags        = sceneTemplate.PlaybackFlags;
+    playScene.SceneID              = sceneTemplate->SceneId;
+    playScene.PlaybackFlags        = sceneTemplate->PlaybackFlags;
     playScene.SceneInstanceID      = sceneInstanceID;
-    playScene.SceneScriptPackageID = sceneTemplate.ScenePackageId;
+    playScene.SceneScriptPackageID = sceneTemplate->ScenePackageId;
     playScene.Location             = *position;
     playScene.TransportGUID        = GetPlayer()->GetTransGUID();
 
@@ -69,7 +70,7 @@ uint32 SceneMgr::PlaySceneByTemplate(SceneTemplate const sceneTemplate, Position
     sScriptMgr->OnSceneStart(GetPlayer(), sceneInstanceID, &sceneTemplate);
 
     // Legacy PlayerScript
-    sScriptMgr->OnSceneStart(GetPlayer(), sceneInstanceID, sceneTemplate.ScenePackageId);
+    sScriptMgr->OnSceneStart(GetPlayer(), sceneInstanceID, sceneTemplate->ScenePackageId);
 
     return sceneInstanceID;
 }
@@ -183,7 +184,7 @@ bool SceneMgr::HasSceneWithPackageId(uint32 sceneScriptPackageId) const
     return false;
 }
 
-void SceneMgr::AddInstanceIdToSceneMap(uint32 sceneInstanceID, SceneTemplate const sceneTemplate)
+void SceneMgr::AddInstanceIdToSceneMap(uint32 sceneInstanceID, SceneTemplate const* sceneTemplate)
 {
     _scenesByInstance[sceneInstanceID] = sceneTemplate;
 }
