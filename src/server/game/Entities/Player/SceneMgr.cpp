@@ -194,7 +194,7 @@ void SceneMgr::CancelSceneBySceneId(uint32 sceneId)
     std::vector<uint32> instancesIds;
 
     for (auto const& itr : _scenesByInstance)
-        if (itr.second.SceneId == sceneId)
+        if (itr.second->SceneId == sceneId)
             instancesIds.push_back(itr.first);
 
     for (uint32 sceneInstanceID : instancesIds)
