@@ -83,7 +83,7 @@ uint32 SceneMgr::PlaySceneByPackageId(uint32 sceneScriptPackageId, uint32 playba
     sceneTemplate.PlaybackFlags     = playbackflags;
     sceneTemplate.ScriptId          = 0;
 
-    return PlaySceneByTemplate(sceneTemplate, position);
+    return PlaySceneByTemplate(&sceneTemplate, position);
 }
 
 void SceneMgr::CancelScene(uint32 sceneInstanceID, bool removeFromMap /*= true*/)
