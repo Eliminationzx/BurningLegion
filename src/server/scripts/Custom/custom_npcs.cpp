@@ -67,7 +67,7 @@ class npc_rate_xp_modifier : public CreatureScript
         bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*uiSender*/, uint32 uiAction) override
         {
             CloseGossipMenuFor(player);
-            player->SetPersonalRate(float(std::min(personalRates[11], uiAction)));
+            player->SetPersonalRate(float(std::min(personalRates[10], uiAction)));
             return true;
         }
 };
