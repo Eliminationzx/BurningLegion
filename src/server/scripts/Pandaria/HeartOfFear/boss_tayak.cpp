@@ -680,7 +680,7 @@ class boss_tayak : public CreatureScript
 
                             // Creating storm to bring each player to a side of the room
                             ObjectGuid plGuid = *playerGuids.begin();
-                            if (Player* player = ObjectAccessor::GetPlayer(*me, plGuid))
+                            if (ObjectAccessor::GetPlayer(*me, plGuid))
                                 if (Creature* storm = me->SummonCreature(NPC_US_TORNADO, PlayerTelePos))
                                     storm->AI()->SetData(TYPE_STORM_POINT, 1);
 

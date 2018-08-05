@@ -26551,7 +26551,7 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot, AELootResult* aeResult/* 
 
     if (currency)
     {
-        if (CurrencyTypesEntry const * currencyEntry = sCurrencyTypesStore.LookupEntry(item->itemid))
+        if (sCurrencyTypesStore.LookupEntry(item->itemid))
             ModifyCurrency(item->itemid, item->count);
 
         SendNotifyLootItemRemoved(loot->GetGUID(), lootSlot);

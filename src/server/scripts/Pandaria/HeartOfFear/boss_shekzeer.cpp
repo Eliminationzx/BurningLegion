@@ -1753,7 +1753,7 @@ class spell_cry_of_terror : public SpellScriptLoader
                 // Looking if one of the targets affected by cry of terror is in a dissonance field
                 while (!uniqueTarget && itr != targets.end())
                 {
-                    if (Creature* dissonanceField = GetClosestCreatureWithEntry((*itr), NPC_DISSONANCE_FIELD, 5.0f))
+                    if (GetClosestCreatureWithEntry((*itr), NPC_DISSONANCE_FIELD, 5.0f) != nullptr)
                         if ((*itr)->ToUnit()->HasAura(SPELL_CRY_OF_TERROR))
                             uniqueTarget = *itr;
 

@@ -868,21 +868,6 @@ class spell_garalon_pheromones_forcecast: public SpellScriptLoader
         }
 };
 
-// Mend Leg target check for Garalon's Legs.
-/*class TargetCheck : public std::unary_function<Unit*, bool>
-{
-    public:
-        explicit TargetCheck(Unit* _caster) : caster(_caster) { }
-
-        bool operator()(WorldObject* object)
-        {
-            return object->GetEntry() != NPC_GARALON_LEG;
-        }
-
-    private:
-        Unit* caster;
-};*/
-
 // Mend Leg: 123495.
 class spell_garalon_mend_leg: public SpellScriptLoader
 {
