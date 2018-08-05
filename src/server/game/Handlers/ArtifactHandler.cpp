@@ -73,7 +73,6 @@ void WorldSession::HandleArtifactAddPower(WorldPackets::Artifact::ArtifactAddPow
 
     if (!(artifactPowerEntry->Flags & ARTIFACT_POWER_FLAG_NO_LINK_REQUIRED))
     {
->>>>>>> 55a0a2d3f6... Core/Artifact Handle Artifact tiers + Artifact unlock (3rd relic bonus) (#21593)
         if (std::unordered_set<uint32> const* artifactPowerLinks = sDB2Manager.GetArtifactPowerLinks(artifactPower->ArtifactPowerId))
         {
             bool hasAnyLink = false;
@@ -158,7 +157,6 @@ void WorldSession::HandleArtifactAddPower(WorldPackets::Artifact::ArtifactAddPow
         artifact->InitArtifactPowers(artifact->GetTemplate()->GetArtifactID(), uint8(i));
 
     artifact->SetModifier(ITEM_MODIFIER_ARTIFACT_TIER, artifactTier);
->>>>>>> 55a0a2d3f6... Core/Artifact Handle Artifact tiers + Artifact unlock (3rd relic bonus) (#21593)
 }
 
 void WorldSession::HandleArtifactSetAppearance(WorldPackets::Artifact::ArtifactSetAppearance& artifactSetAppearance)
