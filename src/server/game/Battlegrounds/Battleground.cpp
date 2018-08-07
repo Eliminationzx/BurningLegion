@@ -186,7 +186,7 @@ void Battleground::Update(uint32 diff)
             break;
         case STATUS_IN_PROGRESS:
             _ProcessOfflineQueue();
-            //_ProcessPlayerPositionBroadcast(diff);
+            _ProcessPlayerPositionBroadcast(diff);
             // after 47 minutes without one team losing, the arena closes with no winner and no rating change
             if (isArena())
             {
@@ -409,7 +409,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
     }
 
     // Send packet every 10 seconds until the 2nd field reach 0
-    if (m_CountdownTimer >= 10000)
+    /*if (m_CountdownTimer >= 10000)
     {
         uint32 countdownMaxForBGType = isArena() ? ARENA_COUNTDOWN_MAX : BATTLEGROUND_COUNTDOWN_MAX;
 
@@ -424,7 +424,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
                 player->SendDirectMessage(startTimerPacket);
 
         m_CountdownTimer = 0;
-    }
+    }*/
 
     if (!(m_Events & BG_STARTING_EVENT_1))
     {
@@ -703,11 +703,11 @@ void Battleground::KillCreditQuestToTeam(uint32 TeamID, uint32 questID, uint32 k
 
 void Battleground::UpdateWorldState(uint32 variable, uint32 value, bool hidden /*= false*/)
 {
-    WorldPackets::WorldState::UpdateWorldState worldstate;
+   /* WorldPackets::WorldState::UpdateWorldState worldstate;
     worldstate.VariableID = variable;
     worldstate.Value = value;
     worldstate.Hidden = hidden;
-    SendPacketToAll(worldstate.Write());
+    SendPacketToAll(worldstate.Write());*/
 }
 
 void Battleground::EndBattleground(uint32 winner)
