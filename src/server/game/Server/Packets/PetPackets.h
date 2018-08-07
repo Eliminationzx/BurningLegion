@@ -259,6 +259,14 @@ namespace WorldPackets
 
             PetStableInfo NewPet;
         };
+
+        class PetTameFailure final : public ServerPacket
+        {
+        public:
+            PetTameFailure() : ServerPacket(SMSG_PET_TAME_FAILURE, 1) { }
+            WorldPacket const* Write() override;
+            uint8 Reason;
+        };
     }
 }
 

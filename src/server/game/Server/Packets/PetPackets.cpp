@@ -215,3 +215,9 @@ WorldPacket const* WorldPackets::Pet::PetAdded::Write()
 
     return &_worldPacket;
 }
+
+WorldPacket const* WorldPackets::Pet::PetTameFailure::Write()
+{
+    _worldPacket << uint8(Reason);
+    return &_worldPacket;
+}

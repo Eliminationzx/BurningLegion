@@ -2535,6 +2535,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         Optional<uint8> GetFirstUnusedPetSlot();
         void DeleteFromPlayerPetDataStore(uint32 petNumber);
         void AddToPlayerPetDataStore(PlayerPetData* playerPetData);
+        void SendPetTameFailure(PetTameFailureReason reason);
 
         ArchaeologyPlayerMgr& GetArchaeologyMgr() { return m_archaeologyPlayerMgr; }
 
