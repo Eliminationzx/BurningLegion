@@ -19778,6 +19778,13 @@ void Player::AddToPlayerPetDataStore(PlayerPetData* playerPetData)
     PlayerPetDataStore.push_back(playerPetData);
 }
 
+void Player::SendPetTameFailure(PetTameFailureReason reason)
+{
+    WorldPackets::Pet::PetTameFailure packet;
+    packet.Reason = reason;
+    GetSession()->SendPacket(packet.Write());
+}
+
 void Player::_LoadQuestStatus(PreparedQueryResult result)
 {
     uint16 slot = 0;
