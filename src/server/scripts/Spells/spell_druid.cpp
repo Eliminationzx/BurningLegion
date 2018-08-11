@@ -2487,6 +2487,33 @@ public:
     }
 };
 
+// Charm Woodland Creature - 127757
+class spell_dru_charm_woodland_creature : public AuraScript
+{
+    PrepareAuraScript(spell_dru_charm_woodland_creature);
+
+    void OnApply(const AuraEffect* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        // Make targeted creature follow the player - Using pet's default dist and angle
+        if (Unit* caster = GetCaster())
+            if (Unit* target = GetTarget())
+                target->GetMotionMaster()->MoveFollow(caster, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+    }
+
+    void OnRemove(const AuraEffect* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+            if (target->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
+                target->GetMotionMaster()->MovementExpired(true); // reset movement
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_dru_charm_woodland_creature::OnApply, EFFECT_0, SPELL_AURA_AOE_CHARM, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_dru_charm_woodland_creature::OnRemove, EFFECT_0, SPELL_AURA_AOE_CHARM, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_druid_spell_scripts()
 {
     // Spells Scripts
@@ -2547,6 +2574,7 @@ void AddSC_druid_spell_scripts()
     RegisterAuraScript(spell_dru_power_of_the_archdruid);
     RegisterAuraScript(spell_dru_power_of_the_archdruid_trigger);
     RegisterAuraScript(spell_dru_clearcasting);
+    RegisterAuraScript(spell_dru_charm_woodland_creature);
 
     // AreaTrigger Scripts
     new at_dru_solar_beam();
