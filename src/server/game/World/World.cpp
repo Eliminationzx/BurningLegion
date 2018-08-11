@@ -542,6 +542,7 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_XP_EXPLORE]  = sConfigMgr->GetFloatDefault("Rate.XP.Explore", 1.0f);
     rate_values[RATE_HONOR_BOOST_PREMIUM] = sConfigMgr->GetFloatDefault("Rate.Honor.Boost.Premium", 1.0f);
     rate_values[RATE_XP_BOOST_PREMIUM] = sConfigMgr->GetFloatDefault("Rate.XP.Boost.Premium", 1.0f);
+    rate_values[RATE_REPUTATION_GAIN_BOOST_PREMIUM] = sConfigMgr->GetFloatDefault("Rate.ReputationGain.Boost.Premium", 1.0f);
     rate_values[RATE_REPAIRCOST]  = sConfigMgr->GetFloatDefault("Rate.RepairCost", 1.0f);
     if (rate_values[RATE_REPAIRCOST] < 0.0f)
     {

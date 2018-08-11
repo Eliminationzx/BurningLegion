@@ -4132,13 +4132,19 @@ Metric.OverallStatusInterval = 1
 #        Honor boost rate modifier
 #        Default: 1
 
-Rate.Honor.Boost.Premium       = 1
+Rate.Honor.Boost.Premium                = 1
 
 # Rate.XP.Boost.Premium
 #        XP boost rate modifier
 #        Default: 1
 
-Rate.XP.Boost.Premium       = 1
+Rate.XP.Boost.Premium                   = 1
+
+# Rate.ReputationGain.Boost.Premium
+#        ReputationGain boost rate modifier
+#        Default: 1
+
+Rate.ReputationGain.Boost.Premium       = 1
 
 #
 ###################################################################################################
