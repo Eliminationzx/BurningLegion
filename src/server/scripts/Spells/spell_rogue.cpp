@@ -2695,12 +2695,13 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            if (eventInfo.GetSpellInfo()->Id == SPELL_ROGUE_ENVENOM ||
-                eventInfo.GetSpellInfo()->Id == SPELL_ROGUE_RUPTURE)
+            float mainRollChance = 2.5f * eventInfo.GetActor()->GetPower(POWER_COMBO_POINTS);
+
+            if ((eventInfo.GetSpellInfo()->Id == SPELL_ROGUE_ENVENOM ||
+                eventInfo.GetSpellInfo()->Id == SPELL_ROGUE_RUPTURE) && roll_chance_f(mainRollChance))
                 return true;
             
-            float mainRollChance = 2.5f * eventInfo.GetActor()->GetPower(POWER_COMBO_POINTS);
-            return roll_chance_f(mainRollChance);
+            return false;
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -2739,7 +2740,7 @@ public:
         at_rog_bag_of_tricks_areatriggerAI(AreaTrigger* areatrigger) : AreaTriggerAI(areatrigger) { }
 
         uint32 damageInterval = 1000;
-
+        
         void OnUpdate(uint32 diff) override
         {
             Unit* caster = at->GetCaster();

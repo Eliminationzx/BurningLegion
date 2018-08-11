@@ -2293,8 +2293,7 @@ class spell_pal_consecration : public AuraScript
 
                     for (auto obj : at->GetInsideUnits())
                         if (Unit* unit = ObjectAccessor::GetUnit(*caster, obj))
-                            if (caster->IsValidAttackTarget(unit))
-                                caster->CastSpell(unit, SPELL_PALADIN_CONSECRATION_DECREASE_SPEED, true, nullptr, aurEff);
+                            caster->CastSpell(unit, SPELL_PALADIN_CONSECRATION_DECREASE_SPEED, true, nullptr, aurEff);
                 }
             }
         }

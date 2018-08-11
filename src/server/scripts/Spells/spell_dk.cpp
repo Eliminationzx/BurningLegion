@@ -22,6 +22,8 @@
  * Scriptnames of files in this file should be prefixed with "spell_dk_".
  */
 
+#include "AreaTrigger.h"
+#include "AreaTriggerAI.h"
 #include "Player.h"
 #include "DynamicObject.h"
 #include "ScriptMgr.h"
@@ -147,7 +149,8 @@ enum DeathKnightSpells
     SPELL_DK_REMORSELESS_WINTER_SLOW_DOWN       = 211793,
     SPELL_DK_VAMPIRIC_BLOOD                     = 55233,
     SPELL_DK_UMBILICUS_ETERNUS                  = 193213,
-    SPELL_DK_UMBILICUS_ETERNUS_SHIELD           = 193320
+    SPELL_DK_UMBILICUS_ETERNUS_SHIELD           = 193320,
+    SPELL_DK_DEFILE_DAMAGE                      = 156000
 };
 
 // 70656 - Advantage (T10 4P Melee Bonus)
@@ -2565,6 +2568,30 @@ public:
     }
 };
 
+class spell_dk_defile : public AuraScript
+{
+    PrepareAuraScript(spell_dk_defile);
+
+    void OnTick(AuraEffect const* aurEff)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            std::vector<AreaTrigger*> ATList = caster->GetAreaTriggers(GetSpellInfo()->Id);
+            for (AreaTrigger* at : ATList)
+            {
+                for (auto obj : at->GetInsideUnits())
+                    if (Unit* unit = ObjectAccessor::GetUnit(*caster, obj))
+                        caster->CastSpell(unit, SPELL_DK_DEFILE_DAMAGE, true, nullptr, aurEff);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_dk_defile::OnTick, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     new spell_dk_advantage_t10_4p();
@@ -2623,4 +2650,5 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_obliterate);
     new spell_dk_umbilicus_eternus();
     new spell_dk_umbilicus_eternus_dummy();
+    new spell_dk_defile();
 }
