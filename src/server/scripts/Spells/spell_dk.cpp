@@ -686,7 +686,6 @@ class spell_dk_death_strike : public SpellScriptLoader
 };
 
 // 85948 - Festering Strike
-/// 6.x
 class spell_dk_festering_strike : public SpellScriptLoader
 {
     public:
@@ -717,7 +716,7 @@ class spell_dk_festering_strike : public SpellScriptLoader
 
             void Register() override
             {
-                OnEffectHitTarget += SpellEffectFn(spell_dk_festering_strike_SpellScript::HandleFesteringWounds, EFFECT_3, SPELL_EFFECT_DUMMY);
+                OnEffectHitTarget += SpellEffectFn(spell_dk_festering_strike_SpellScript::HandleFesteringWounds, EFFECT_2, SPELL_EFFECT_DUMMY);
             }
         };
 
