@@ -630,8 +630,8 @@ public:
             if (caster->HasAura(SPELL_DH_GLUTTONY))
                 caster->CastSpell(caster, SPELL_DH_GLUTTONY_BUFF, true);
 
-            //if (caster->HasAura(SPELL_DH_FEED_THE_DEMON))
-            //    caster->GetSpellHistory()->ReduceChargeCooldown(sSpellCategoryStore.LookupEntry(sSpellMgr->GetSpellInfo(SPELL_DH_DEMON_SPIKES)->ChargeCategoryId), 1 * IN_MILLISECONDS);
+            if (caster->HasAura(SPELL_DH_FEED_THE_DEMON))
+                caster->GetSpellHistory()->ReduceChargeCooldown(sSpellCategoryStore.LookupEntry(sSpellMgr->GetSpellInfo(SPELL_DH_DEMON_SPIKES)->ChargeCategoryId), 1 * IN_MILLISECONDS);
 
             if (Aura* soulBarrier = caster->GetAura(SPELL_DH_SOUL_BARRIER))
                 if (AuraEffect* aurEff = soulBarrier->GetEffect(EFFECT_0))
