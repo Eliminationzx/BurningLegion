@@ -2291,6 +2291,9 @@ public:
         {
             Unit* caster = GetCaster();
             caster->CastSpell(caster, SPELL_DH_EYE_BEAM_DAMAGE, true);
+            
+            if (caster->HasAura(SPELL_DH_BLIND_FURY))
+                caster->ModifyPower(POWER_FURY, 40);
         }
 
         void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
