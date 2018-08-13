@@ -2977,6 +2977,39 @@ public:
     }
 };
 
+class spell_dh_demonic_infusion : public SpellScriptLoader
+{
+public:
+    spell_dh_demonic_infusion() : SpellScriptLoader("spell_dh_demonic_infusion") { }
+
+    class spell_dh_demonic_infusion_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dh_demonic_infusion_SpellScript);
+
+        void OnHitTarget(SpellEffIndex /*eff*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                if (Player* player = caster->ToPlayer())
+                {
+                    player->GetSpellHistory()->ResetCooldown(SPELL_DH_DEMON_SPIKES, true);
+                    player->GetSpellHistory()->RestoreCharge(sSpellMgr->AssertSpellInfo(SPELL_DH_DEMON_SPIKES)->ChargeCategoryId);
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_dh_demonic_infusion_SpellScript::OnHitTarget, EFFECT_0, SPELL_EFFECT_ENERGIZE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_dh_demonic_infusion_SpellScript();
+    }
+};
+
 void AddSC_demon_hunter_spell_scripts()
 {
     new spell_dh_annihilation();
@@ -3037,6 +3070,7 @@ void AddSC_demon_hunter_spell_scripts()
     RegisterSpellScript(spell_dh_felblade);
     RegisterAuraScript(aura_dh_chaos_cleave);
     new spell_dh_desperate_instincts();
+    new spell_dh_demonic_infusion();
 
     /// AreaTrigger Scripts
     RegisterAreaTriggerAI(at_dh_darkness);
