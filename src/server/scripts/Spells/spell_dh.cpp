@@ -476,7 +476,7 @@ class spell_dh_spirit_bomb_damage : public SpellScript
     }
 };
 
-// Blade Turning - 203753
+// Blade Turning - 247254
 class spell_dh_blade_turning : public SpellScriptLoader
 {
 public:
@@ -1308,7 +1308,7 @@ public:
 
         void Register() override
         {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_dh_nemesis_AuraScript::HandleAfterRemove, EFFECT_0, 270, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_dh_nemesis_AuraScript::HandleAfterRemove, EFFECT_0, SPELL_AURA_MOD_SCHOOL_MASK_DAMAGE_FROM_CASTER, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
@@ -2776,10 +2776,12 @@ class aura_dh_chaos_cleave : public AuraScript
 {
     PrepareAuraScript(aura_dh_chaos_cleave);
 
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
+        PreventDefaultAction();
+        
         int32 bp = CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), 10);
-        GetTarget()->CastCustomSpell(nullptr, SPELL_DH_CHAOS_CLEAVE_DAMAGE, &bp, nullptr, nullptr, true);
+        GetTarget()->CastCustomSpell((Unit*)nullptr, SPELL_DH_CHAOS_CLEAVE_DAMAGE, &bp, nullptr, nullptr, true, aurEff);
     }
 
     void Register() override

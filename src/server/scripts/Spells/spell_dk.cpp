@@ -2650,5 +2650,5 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_obliterate);
     new spell_dk_umbilicus_eternus();
     new spell_dk_umbilicus_eternus_dummy();
-    new spell_dk_defile();
+    RegisterAuraScript(spell_dk_defile);
 }
