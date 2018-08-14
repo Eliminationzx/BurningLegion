@@ -2784,7 +2784,7 @@ class aura_dh_chaos_cleave : public AuraScript
         PreventDefaultAction();
         
         int32 bp = CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), 10);
-        GetTarget()->CastCustomSpell((Unit*)nullptr, SPELL_DH_CHAOS_CLEAVE_DAMAGE, &bp, nullptr, nullptr, true, aurEff);
+        GetTarget()->CastCustomSpell((Unit*)nullptr, SPELL_DH_CHAOS_CLEAVE_DAMAGE, &bp, nullptr, nullptr, true);
     }
 
     void Register() override

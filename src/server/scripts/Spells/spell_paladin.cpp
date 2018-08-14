@@ -2508,21 +2508,6 @@ class spell_pal_blessed_stalwart : public AuraScript
     }
 };
 
-class spell_pal_blessed_stalwart : public AuraScript
-{
-    PrepareAuraScript(spell_pal_blessed_stalwart);
-
-    bool CheckProc(ProcEventInfo& eventInfo)
-    {
-        return eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_JUDGMENT;
-    }
-
-    void Register() override
-    {
-        DoCheckProc += AuraCheckProcFn(spell_pal_blessed_stalwart::CheckProc);
-    }
-};
-
 class spell_pal_blessed_stalwart_trigger : public AuraScript
 {
     PrepareAuraScript(spell_pal_blessed_stalwart_trigger);
