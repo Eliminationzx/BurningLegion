@@ -1273,7 +1273,8 @@ bool SpellInfo::HasOnlyDamageEffects() const
 
 bool SpellInfo::CasterCanTurnDuringCast() const
 {
-    if (HasAttribute(SPELL_ATTR5_DONT_TURN_DURING_CAST))
+    if (HasAttribute(SPELL_ATTR5_DONT_TURN_DURING_CAST) && 
+        !HasAttribute(SPELL_ATTR1_CHANNEL_TRACK_TARGET))
         return false;
 
     if (AttributesCu & SPELL_ATTR0_CU_DONT_TURN_DURING_CAST)
