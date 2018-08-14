@@ -2180,7 +2180,7 @@ public:
             if (!caster || !target)
                 return;
 
-            if (caster->HasAura(SPELL_DRUID_GERMINATION))
+            if (caster->HasAura(SPELL_DRUID_GERMINATION) && target->HasAura(GetId()))
                 caster->CastSpell(target, SPELL_DRUID_GERMINATION_REJUVENATION, true, nullptr, aurEff);
         }
 
