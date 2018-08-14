@@ -2493,6 +2493,51 @@ class spell_pal_vindicator : public AuraScript
     }
 };
 
+class spell_pal_blessed_stalwart : public AuraScript
+{
+    PrepareAuraScript(spell_pal_blessed_stalwart);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_JUDGMENT;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_pal_blessed_stalwart::CheckProc);
+    }
+};
+
+class spell_pal_blessed_stalwart : public AuraScript
+{
+    PrepareAuraScript(spell_pal_blessed_stalwart);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_JUDGMENT;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_pal_blessed_stalwart::CheckProc);
+    }
+};
+
+class spell_pal_blessed_stalwart_trigger : public AuraScript
+{
+    PrepareAuraScript(spell_pal_blessed_stalwart_trigger);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_SHIELD_OF_THE_RIGHTEOUS;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_pal_blessed_stalwart_trigger::CheckProc);
+    }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     new spell_pal_bastion_of_light();
@@ -2553,6 +2598,8 @@ void AddSC_paladin_spell_scripts()
     RegisterAuraScript(spell_pal_fervent_martyr);
     RegisterAuraScript(spell_pal_aura_of_sacrifice_ally);
     RegisterAuraScript(spell_pal_vindicator);
+    RegisterAuraScript(spell_pal_blessed_stalwart);
+    RegisterAuraScript(spell_pal_blessed_stalwart_trigger);
 
     new spell_pal_consecration_heal();
     new spell_pal_retribution_aura();
