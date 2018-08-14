@@ -300,6 +300,7 @@ class TC_GAME_API AuraEffect
         void HandleNoReagentUseAura(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleAuraRetainComboPoints(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         //  others
+        void HandleAuraModDodgeOfCritPct(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleChannelDeathItem(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleBindSight(AuraApplication const* aurApp, uint8 mode, bool apply) const;

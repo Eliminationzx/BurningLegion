@@ -708,6 +708,9 @@ void Player::UpdateDodgePercentage()
     GetDodgeFromAgility(diminishing, nondiminishing);
     // Dodge from SPELL_AURA_MOD_DODGE_PERCENT aura
     nondiminishing += GetTotalAuraModifier(SPELL_AURA_MOD_DODGE_PERCENT);
+    int32 dodgeOfCritPctValue = GetTotalAuraModifier(SPELL_AURA_MOD_DODGE_OF_CRIT_PERCENT);
+    float critPct = GetFloatValue(PLAYER_CRIT_PERCENTAGE);
+    nondiminishing += dodgeOfCritPctValue > 0 ? CalculatePct(critPct, dodgeOfCritPctValue) : 0;
     // Dodge from rating
     diminishing += GetRatingBonusValue(CR_DODGE);
     // apply diminishing formula to diminishing dodge chance

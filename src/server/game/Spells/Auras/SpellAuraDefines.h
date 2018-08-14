@@ -274,7 +274,7 @@ enum AuraType : uint32
     SPELL_AURA_MOD_TARGET_ABILITY_ABSORB_SCHOOL             = 195,
     SPELL_AURA_MOD_COOLDOWN                                 = 196,  // only 24818 Noxious Breath
     SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE    = 197,
-    SPELL_AURA_198                                          = 198,  // old SPELL_AURA_MOD_ALL_WEAPON_SKILLS
+    SPELL_AURA_MOD_DODGE_OF_CRIT_PERCENT                    = 198,  // only 231065 Lightning Reflexes
     SPELL_AURA_199                                          = 199,  // old SPELL_AURA_MOD_INCREASES_SPELL_PCT_TO_HIT. unused 4.3.4
     SPELL_AURA_MOD_XP_PCT                                   = 200,
     SPELL_AURA_FLY                                          = 201,
