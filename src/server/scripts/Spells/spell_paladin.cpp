@@ -351,10 +351,7 @@ class spell_pal_judgment_of_light : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        if (eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_JUDGMENT)
-            return true;
-
-        return false;
+        return eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_JUDGMENT;
     }
 
     void Register() override
@@ -2481,6 +2478,21 @@ class spell_pal_fervent_martyr : public AuraScript
     }
 };
 
+class spell_pal_vindicator : public AuraScript
+{
+    PrepareAuraScript(spell_pal_vindicator);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_AVENGING_WRATH;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_pal_vindicator::CheckProc);
+    }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     new spell_pal_bastion_of_light();
@@ -2540,6 +2552,7 @@ void AddSC_paladin_spell_scripts()
     RegisterAuraScript(spell_pal_consecration);
     RegisterAuraScript(spell_pal_fervent_martyr);
     RegisterAuraScript(spell_pal_aura_of_sacrifice_ally);
+    RegisterAuraScript(spell_pal_vindicator);
 
     new spell_pal_consecration_heal();
     new spell_pal_retribution_aura();
