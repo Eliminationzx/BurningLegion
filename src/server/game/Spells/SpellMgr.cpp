@@ -2811,6 +2811,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         /// @todo: remove this when basepoints of all Ride Vehicle auras are calculated correctly
         const_cast<SpellEffectInfo*>(spellInfo->GetEffect(EFFECT_0))->BasePoints = 1;
     });
+    
+    // Bulwark of Order
+    ApplySpellFix({ 209388 }, [](SpellInfo* spellInfo)
+    {
+        const_cast<SpellEffectInfo*>(spellInfo->GetEffect(EFFECT_0))->BasePoints = 50;
+    });
 
     // Black Magic
     ApplySpellFix({ 59630 }, [](SpellInfo* spellInfo)

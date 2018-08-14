@@ -3,13 +3,11 @@ DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_dh_demonic_infusi
 , 'spell_pal_vindicator'
 , 'spell_pal_blessed_stalwart'
 , 'spell_pal_blessed_stalwart_trigger'
-, 'spell_pal_painful_truths'
-, 'spell_pal_bulwark_of_order');
+, 'spell_pal_painful_truths');
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (247254, 'spell_dh_blade_turning'),
 (236189, 'spell_dh_demonic_infusion'),
 (200373, 'spell_pal_vindicator'),
 (238133, 'spell_pal_blessed_stalwart'),
 (242869, 'spell_pal_blessed_stalwart_trigger'),
-(209341, 'spell_pal_painful_truths'),
-(209388, 'spell_pal_bulwark_of_order');
+(209341, 'spell_pal_painful_truths');

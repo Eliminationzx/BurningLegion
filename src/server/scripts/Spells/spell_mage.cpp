@@ -1290,7 +1290,6 @@ class spell_mage_flurry : public SpellScript
 
         if (caster->HasAura(SPELL_MAGE_BRAIN_FREEZE_AURA))
         {
-            caster->RemoveAura(SPELL_MAGE_BRAIN_FREEZE_AURA);
             if (caster->HasSpell(SPELL_MAGE_BRAIN_FREEZE_IMPROVED))
                 isImproved = true;
         }
@@ -2934,6 +2933,21 @@ class spell_mage_blink : public SpellScript
     }
 };
 
+class spell_mage_brain_freeze : public AuraScript
+{
+    PrepareAuraScript(spell_mage_brain_freeze);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_MAGE_FLURRY;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_mage_brain_freeze::CheckProc);
+    }
+};
+
 void AddSC_mage_spell_scripts()
 {
     new playerscript_mage_arcane();
@@ -2995,6 +3009,7 @@ void AddSC_mage_spell_scripts()
     RegisterAuraScript(spell_mage_chilled);
     RegisterAuraScript(spell_mage_ray_of_frost);
     RegisterAuraScript(spell_mage_ray_of_frost_buff);
+    RegisterAuraScript(spell_mage_brain_freeze);
     //7.3.2.25549 END
 
     RegisterAuraScript(spell_mage_blazing_soul);
