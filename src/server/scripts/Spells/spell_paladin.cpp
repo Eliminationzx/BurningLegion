@@ -2538,25 +2538,6 @@ class spell_pal_painful_truths : public AuraScript
     }
 };
 
-class spell_pal_blade_of_wrath_proc : public AuraScript
-{
-    PrepareAuraScript(spell_pal_blade_of_wrath_proc);
-
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
-    {
-        Unit* caster = GetCaster();
-        if (!caster)
-            return;
-
-        caster->GetSpellHistory()->ResetCooldown(SPELL_PALADIN_BLADE_OF_JUSTICE, true);
-    }
-
-    void Register() override
-    {
-        OnEffectProc += AuraEffectProcFn(spell_pal_blade_of_wrath_proc::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-    }
-};
-
 void AddSC_paladin_spell_scripts()
 {
     new spell_pal_bastion_of_light();
