@@ -3649,6 +3649,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->AuraInterruptFlags[AuraInterruptFlagIndex<SpellAuraInterruptFlags>::value] &= ~CHANNEL_FLAG_DELAY;
     });
+    
+    // Leeching Poison
+    ApplySpellFix({ 108211 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags.fill(0);
+    });
 
     SpellInfo* spellInfo = NULL;
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
