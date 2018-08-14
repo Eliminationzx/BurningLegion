@@ -2553,6 +2553,40 @@ class spell_pal_painful_truths : public AuraScript
     }
 };
 
+class spell_pal_blade_of_wrath_proc : public AuraScript
+{
+    PrepareAuraScript(spell_pal_blade_of_wrath_proc);
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        caster->GetSpellHistory()->ResetCooldown(SPELL_PALADIN_BLADE_OF_JUSTICE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_pal_blade_of_wrath_proc::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+class spell_pal_bulwark_of_order : public AuraScript
+{
+    PrepareAuraScript(spell_pal_bulwark_of_order);
+
+    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated)
+    {
+        amount = 50;
+    }
+   
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pal_bulwark_of_order::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+    }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     new spell_pal_bastion_of_light();
@@ -2616,6 +2650,7 @@ void AddSC_paladin_spell_scripts()
     RegisterAuraScript(spell_pal_blessed_stalwart);
     RegisterAuraScript(spell_pal_blessed_stalwart_trigger);
     RegisterAuraScript(spell_pal_painful_truths);
+    RegisterAuraScript(spell_pal_bulwark_of_order);
 
     new spell_pal_consecration_heal();
     new spell_pal_retribution_aura();
