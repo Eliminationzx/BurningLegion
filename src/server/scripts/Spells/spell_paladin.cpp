@@ -2538,6 +2538,21 @@ class spell_pal_blessed_stalwart_trigger : public AuraScript
     }
 };
 
+class spell_pal_painful_truths : public AuraScript
+{
+    PrepareAuraScript(spell_pal_painful_truths);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetTypeMask() & (PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK | PROC_FLAG_TAKEN_SPELL_MELEE_DMG_CLASS);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_pal_painful_truths::CheckProc);
+    }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     new spell_pal_bastion_of_light();
@@ -2600,6 +2615,7 @@ void AddSC_paladin_spell_scripts()
     RegisterAuraScript(spell_pal_vindicator);
     RegisterAuraScript(spell_pal_blessed_stalwart);
     RegisterAuraScript(spell_pal_blessed_stalwart_trigger);
+    RegisterAuraScript(spell_pal_painful_truths);
 
     new spell_pal_consecration_heal();
     new spell_pal_retribution_aura();
