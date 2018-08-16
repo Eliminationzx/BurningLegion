@@ -3654,6 +3654,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 108211 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AuraInterruptFlags.fill(0);
+	});
+	
+    // Void Suppression
+    ApplySpellFix({ 260888 }, [](SpellInfo* spellInfo)
+    {
+        const_cast<SpellEffectInfo*>(spellInfo->GetEffect(EFFECT_1))->Effect = 0;
     });
 
     SpellInfo* spellInfo = NULL;
