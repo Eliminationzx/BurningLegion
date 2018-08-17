@@ -2509,6 +2509,73 @@ class spell_dru_charm_woodland_creature : public AuraScript
     }
 };
 
+// Swipe - 106785
+class spell_dru_swipe : public SpellScript
+{
+    PrepareSpellScript(spell_dru_swipe);
+
+    void HandleOnHit(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetHitUnit();
+        if (!caster || !target)
+            return;
+
+        int32 damage = GetHitDamage();
+        int32 casterLevel = caster->GetLevelForTarget(caster);
+
+        // This prevent awarding multiple Combo Points when multiple targets hit with Swipe AoE
+        if(m_awardComboPoint)
+            // Awards the caster 1 Combo Point (get value from the spell data)
+            caster->ModifyPower(POWER_COMBO_POINTS, sSpellMgr->GetSpellInfo(SPELL_DRUID_SWIPE_CAT)->GetEffect(EFFECT_0)->BasePoints);
+
+        // If caster is level >= 44 and the target is bleeding, deals 20% increased damage (get value from the spell data)
+        if ((casterLevel >= 44) && target->HasAuraState(AURA_STATE_BLEEDING))
+            AddPct(damage, sSpellMgr->GetSpellInfo(SPELL_DRUID_SWIPE_CAT)->GetEffect(EFFECT_1)->BasePoints);
+
+        SetHitDamage(damage);
+
+        m_awardComboPoint = false;
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_dru_swipe::HandleOnHit, EFFECT_1, SPELL_EFFECT_DUMMY);
+    }
+
+private:
+    bool m_awardComboPoint = true;
+};
+
+// Brutal Slash - 202028
+class spell_dru_brutal_slash : public SpellScript
+{
+    PrepareSpellScript(spell_dru_brutal_slash);
+
+    void HandleOnHit(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetHitUnit();
+        if (!caster || !target)
+            return;
+
+        // This prevent awarding multiple Combo Points when multiple targets hit with Brutal Slash AoE
+        if(m_awardComboPoint)
+            // Awards the caster 1 Combo Point (get value from the spell data)
+            caster->ModifyPower(POWER_COMBO_POINTS, sSpellMgr->GetSpellInfo(SPELL_DRUID_SWIPE_CAT)->GetEffect(EFFECT_0)->BasePoints);
+
+        m_awardComboPoint = false;
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_dru_brutal_slash::HandleOnHit, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+
+private:
+    bool m_awardComboPoint = true;
+};
+
 void AddSC_druid_spell_scripts()
 {
     // Spells Scripts
@@ -2570,6 +2637,8 @@ void AddSC_druid_spell_scripts()
     RegisterAuraScript(spell_dru_power_of_the_archdruid_trigger);
     RegisterAuraScript(spell_dru_clearcasting);
     RegisterAuraScript(spell_dru_charm_woodland_creature);
+    RegisterSpellScript(spell_dru_swipe);
+    RegisterSpellScript(spell_dru_brutal_slash);
 
     // AreaTrigger Scripts
     new at_dru_solar_beam();
