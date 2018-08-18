@@ -2460,7 +2460,7 @@ public:
             {
                 if (Unit* target = GetHitUnit())
                 {
-                    if (target->HasAura(SPELL_DRUID_THRASH_PERIODIC_DAMAGE))
+                    if (target->HasAura(SPELL_DRUID_THRASH_BEAR_PERIODIC_DAMAGE))
                     {
                         AddPct(dmg, 20); // Additional damage 20%
                         SetHitDamage(dmg);
