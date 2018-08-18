@@ -30,7 +30,7 @@
 
 enum DruidSpells
 {
-    SPELL_DRUID_THRASH_PERIODIC_DAMAGE              = 192090,
+    SPELL_DRUID_THRASH_BEAR_PERIODIC_DAMAGE         = 192090,
     SPELL_DRUID_BLESSING_OF_THE_ANCIENTS            = 202360,
     SPELL_DRUID_BLESSING_OF_ELUNE                   = 202737,
     SPELL_DRUID_BLESSING_OF_ANSHE                   = 202739,
@@ -129,11 +129,10 @@ enum GoreSpells
     }
  };
 
-//7.3.2.25549
-// 77758 - Thrash
-class spell_dru_thrash : public SpellScript
+// Thrash (Bear Form) - 77758
+class spell_dru_thrash_bear : public SpellScript
 {
-    PrepareSpellScript(spell_dru_thrash);
+    PrepareSpellScript(spell_dru_thrash_bear);
 
     void OnHit(SpellEffIndex /*effIndex*/)
     {
@@ -142,19 +141,19 @@ class spell_dru_thrash : public SpellScript
         if (!caster || !target)
             return;
 
-        caster->CastSpell(target, SPELL_DRUID_THRASH_PERIODIC_DAMAGE, true);
+        caster->CastSpell(target, SPELL_DRUID_THRASH_BEAR_PERIODIC_DAMAGE, true);
     }
 
     void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_dru_thrash::OnHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        OnEffectHitTarget += SpellEffectFn(spell_dru_thrash_bear::OnHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
 
-// Thrash periodic damage - 192090
-class spell_dru_thrash_periodic_damage : public AuraScript
+// Thrash (Bear Form) periodic damage aura - 192090
+class aura_dru_thrash_bear : public AuraScript
 {
-    PrepareAuraScript(spell_dru_thrash_periodic_damage);
+    PrepareAuraScript(aura_dru_thrash_bear);
 
     void OnTick(AuraEffect const* auraEff)
     {
@@ -167,14 +166,14 @@ class spell_dru_thrash_periodic_damage : public AuraScript
                     int32 dmg = player->GetUInt32Value(UNIT_FIELD_ATTACK_POWER) * 0.605f;
                     dmg = (dmg * GetStackAmount()) / 5;
                     aurEff->SetDamage(dmg);
-                } 
+                }
             }
         }
     }
 
     void Register() override
     {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_dru_thrash_periodic_damage::OnTick, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+        OnEffectPeriodic += AuraEffectPeriodicFn(aura_dru_thrash_bear::OnTick, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -2576,6 +2575,35 @@ private:
     bool m_awardComboPoint = true;
 };
 
+// Thrash (Cat Form) - 106830
+class spell_dru_thrash_cat : public SpellScript
+{
+    PrepareSpellScript(spell_dru_thrash_cat);
+
+    void HandleOnEffectHitTarget(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetHitUnit();
+        if (!caster || !target)
+            return;
+
+        // This prevent awarding multiple Combo Points when multiple targets hit with Thrash AoE
+        if(m_awardComboPoint)
+            // Awards the caster 1 Combo Point
+            caster->ModifyPower(POWER_COMBO_POINTS, 1);
+
+        m_awardComboPoint = false;
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_dru_thrash_cat::HandleOnEffectHitTarget, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+
+private:
+    bool m_awardComboPoint = true;
+};
+
 void AddSC_druid_spell_scripts()
 {
     // Spells Scripts
@@ -2621,8 +2649,8 @@ void AddSC_druid_spell_scripts()
     new spell_dru_travel_form();
     new spell_dru_mangle();
 
-    RegisterSpellScript(spell_dru_thrash);
-    RegisterAuraScript(spell_dru_thrash_periodic_damage);
+    RegisterSpellScript(spell_dru_thrash_bear);
+    RegisterAuraScript(aura_dru_thrash_bear);
     RegisterSpellScript(spell_dru_blessing_of_the_ancients);
     RegisterAuraScript(spell_dru_gore);
     RegisterAuraScript(spell_dru_power_of_goldrinn);
@@ -2639,7 +2667,8 @@ void AddSC_druid_spell_scripts()
     RegisterAuraScript(spell_dru_charm_woodland_creature);
     RegisterSpellScript(spell_dru_swipe);
     RegisterSpellScript(spell_dru_brutal_slash);
-
+    RegisterSpellScript(spell_dru_thrash_cat);
+    
     // AreaTrigger Scripts
     new at_dru_solar_beam();
     RegisterAreaTriggerAI(at_dru_starfall);
