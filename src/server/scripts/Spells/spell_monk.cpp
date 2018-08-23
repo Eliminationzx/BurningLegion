@@ -157,7 +157,8 @@ enum MonkSpells
     SPELL_MONK_ZEN_PULSE_HEAL                           = 198487,
     SPELL_MONK_LIFE_COCOON                              = 116849,
     SPELL_MONK_EFFUSE                                   = 116694,
-    SPELL_MONK_STAVE_OFF                                = 238093
+    SPELL_MONK_STAVE_OFF                                = 238093,
+    SPELL_MONK_YULONS_GIFT                              = 159534
 };
 
 enum StormEarthAndFireSpells
@@ -205,7 +206,7 @@ public:
             if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            if (caster->HasAura(SPELL_MONK_ITEM_PVP_GLOVES_BONUS))
+            if (caster->HasAura(SPELL_MONK_ITEM_PVP_GLOVES_BONUS) || caster->HasAura(SPELL_MONK_YULONS_GIFT))
                 caster->RemoveAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
         }
 
@@ -1532,7 +1533,7 @@ public:
                         _player->CastSpell((*itr), spell, true);
                     }
 
-                    if (caster->HasAura(SPELL_MONK_ITEM_PVP_GLOVES_BONUS))
+                    if (caster->HasAura(SPELL_MONK_ITEM_PVP_GLOVES_BONUS) || caster->HasAura(SPELL_MONK_YULONS_GIFT))
                         caster->RemoveAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
                 }
             }
