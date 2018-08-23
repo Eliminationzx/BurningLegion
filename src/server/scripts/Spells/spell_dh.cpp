@@ -156,6 +156,8 @@ enum DHSpells
     SPELL_DH_VENGEFUL_RETREAT               = 198793,
     SPELL_DH_VENGEFUL_RETREAT_FURY          = 203650,
     SPELL_DH_VENGEFUL_RETREAT_TRIGGER       = 198813,
+    SPELL_DH_SOUL_CARVER_PERIODIC_DAMAGE    = 207407,
+    SPELL_DH_SOUL_CARVER_DUMMY              = 214740
 };
 
 enum NemesisTargets
@@ -3012,6 +3014,38 @@ public:
     }
 };
 
+class spell_dh_soul_carver : public SpellScriptLoader
+{
+public:
+    spell_dh_soul_carver() : SpellScriptLoader("spell_dh_soul_carver") {}
+
+    class spell_dh_soul_carver_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dh_soul_carver_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_DH_SOUL_CARVER_PERIODIC_DAMAGE });
+        }
+
+        void HandleAfterHit()
+        {
+            if (Unit* target = GetHitUnit())
+                GetCaster()->CastSpell(target, SPELL_DH_SOUL_CARVER_PERIODIC_DAMAGE, true);
+        }
+
+        void Register() override
+        {
+            AfterHit += SpellHitFn(spell_dh_soul_carver_SpellScript::HandleAfterHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_dh_soul_carver_SpellScript();
+    }
+};
+
 void AddSC_demon_hunter_spell_scripts()
 {
     new spell_dh_annihilation();
@@ -3073,6 +3107,7 @@ void AddSC_demon_hunter_spell_scripts()
     RegisterAuraScript(aura_dh_chaos_cleave);
     new spell_dh_desperate_instincts();
     new spell_dh_demonic_infusion();
+    new spell_dh_soul_carver();
 
     /// AreaTrigger Scripts
     RegisterAreaTriggerAI(at_dh_darkness);
