@@ -4907,6 +4907,48 @@ public:
     }
 };
 
+class aura_gen_adaptation : public AuraScript
+{
+    PrepareAuraScript(aura_gen_adaptation);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Mechanic & IMMUNE_TO_LOSS_CONTROL_MASK && 
+            eventInfo.GetSpellInfo()->GetMaxDuration() > 5000;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(aura_gen_adaptation::CheckProc);
+    }
+};
+
+class spell_gen_adaptation_dummy : public SpellScriptLoader
+{
+public:
+    spell_gen_adaptation_dummy() : SpellScriptLoader("spell_gen_adaptation_dummy") { }
+
+    class spell_gen_adaptation_dummy_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_gen_adaptation_dummy_AuraScript);
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            GetUnitOwner()->RemoveAurasWithMechanic(IMMUNE_TO_LOSS_CONTROL_MASK);
+        }
+
+        void Register() override
+        {
+            AfterEffectApply += AuraEffectRemoveFn(spell_gen_adaptation_dummy_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_gen_adaptation_dummy_AuraScript();
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     new spell_gen_absorb0_hitlimit1();
@@ -5021,4 +5063,6 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_light_judgement);
     new playerscript_light_reckoning();
     new spell_gen_concordance_of_legionfall();
+    RegisterAuraScript(aura_gen_adaptation);
+    new spell_gen_adaptation_dummy();
 }
