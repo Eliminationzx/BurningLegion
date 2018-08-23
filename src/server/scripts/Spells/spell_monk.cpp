@@ -156,7 +156,8 @@ enum MonkSpells
     SPELL_MONK_ZEN_PULSE_DAMAGE                         = 124081,
     SPELL_MONK_ZEN_PULSE_HEAL                           = 198487,
     SPELL_MONK_LIFE_COCOON                              = 116849,
-    SPELL_MONK_EFFUSE                                   = 116694
+    SPELL_MONK_EFFUSE                                   = 116694,
+    SPELL_MONK_STAVE_OFF                                = 238093
 };
 
 enum StormEarthAndFireSpells
@@ -1005,6 +1006,19 @@ public:
     {
         PrepareSpellScript(spell_monk_keg_smash_SpellScript);
 
+        void HandleAfterCast()
+        {
+            Unit* caster = GetCaster();
+            Unit* target = GetHitUnit();
+            if (!caster || !target)
+                return;
+
+            // Stave off can activate Keg Smash tvice
+            if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_MONK_STAVE_OFF, EFFECT_0))
+                if (roll_chance_i(aurEff->GetAmount()))
+                    caster->CastSpell(target, GetSpellInfo()->Id, true);
+        }
+
         void HandleOnHit()
         {
             if (Unit* caster = GetCaster())
@@ -1027,6 +1041,7 @@ public:
         void Register() override
         {
             OnHit += SpellHitFn(spell_monk_keg_smash_SpellScript::HandleOnHit);
+            AfterCast += SpellCastFn(spell_monk_keg_smash_SpellScript::HandleAfterCast);
         }
     };
 
