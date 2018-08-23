@@ -4914,7 +4914,7 @@ class aura_gen_adaptation : public AuraScript
     bool CheckProc(ProcEventInfo& eventInfo)
     {
         return eventInfo.GetSpellInfo()->Mechanic & IMMUNE_TO_LOSS_CONTROL_MASK && 
-            eventInfo.GetSpellInfo()->GetMaxDuration() > 5000;
+            eventInfo.GetSpellInfo()->GetDuration() > 5000;
     }
 
     void Register() override
@@ -4946,6 +4946,44 @@ public:
     AuraScript* GetAuraScript() const override
     {
         return new spell_gen_adaptation_dummy_AuraScript();
+    }
+};
+
+class spell_gen_hardiness : public SpellScriptLoader
+{
+public:
+    spell_gen_hardiness() : SpellScriptLoader("spell_gen_hardiness") { }
+
+    class spell_gen_hardiness_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_gen_hardiness_AuraScript);
+
+        void CalculateAmount(const AuraEffect* /*aurEff*/, int32& amount, bool & /*canBeRecalculated*/)
+        {
+             amount = 0;
+        }
+
+        void OnAbsorb(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& absorbAmount)
+        {
+            Unit* owner = GetUnitOwner();
+            Unit* target = dmgInfo.GetVictim();
+            if (!owner || !target || target != owner)
+                return;
+
+            if (owner->HealthAbovePct(GetEffect(EFFECT_1)->GetAmount()))
+                absorbAmount = CalculatePct(dmgInfo.GetDamage(), GetEffect(EFFECT_0)->GetAmount());
+        }
+
+        void Register() override
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_hardiness_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+            OnEffectAbsorb += AuraEffectAbsorbFn(spell_gen_hardiness_AuraScript::OnAbsorb, EFFECT_0);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_gen_hardiness_AuraScript();
     }
 };
 
@@ -5065,4 +5103,5 @@ void AddSC_generic_spell_scripts()
     new spell_gen_concordance_of_legionfall();
     RegisterAuraScript(aura_gen_adaptation);
     new spell_gen_adaptation_dummy();
+    new spell_gen_hardiness();
 }
