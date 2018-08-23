@@ -4965,12 +4965,11 @@ public:
 
         void OnAbsorb(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& absorbAmount)
         {
-            Unit* owner = GetUnitOwner();
-            Unit* target = dmgInfo.GetVictim();
-            if (!owner || !target || target != owner)
+            Unit* target = GetTarget();
+            if (!target)
                 return;
 
-            if (owner->HealthAbovePct(GetEffect(EFFECT_1)->GetAmount()))
+            if (target->HealthAbovePct(GetEffect(EFFECT_1)->GetAmount()))
                 absorbAmount = CalculatePct(dmgInfo.GetDamage(), GetEffect(EFFECT_0)->GetAmount());
         }
 
