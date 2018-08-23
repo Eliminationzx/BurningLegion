@@ -2826,7 +2826,7 @@ struct at_dh_sigil_of_flame : AreaTriggerAI
 };
 
 // Sigil of Chains - 202138
-// AreaTriggerID - 6031
+// AreaTriggerID - 10718
 struct at_dh_sigil_of_chains : AreaTriggerAI
 {
     at_dh_sigil_of_chains(AreaTrigger* areatrigger) : AreaTriggerAI(areatrigger) { }
@@ -2844,11 +2844,8 @@ struct at_dh_sigil_of_chains : AreaTriggerAI
         {
             if (Unit* unit = ObjectAccessor::GetUnit(*caster, objguid))
             {
-                if (caster->IsValidAttackTarget(unit))
-                {
-                    caster->CastSpell(unit, SPELL_DH_SIGIL_OF_CHAINS_SLOW, true);
-                    unit->CastSpell(at->GetPosition(), SPELL_DH_SIGIL_OF_CHAINS_TRIGGER, true);
-                }
+                caster->CastSpell(unit, SPELL_DH_SIGIL_OF_CHAINS_SLOW, true);
+                unit->CastSpell(at->GetPosition(), SPELL_DH_SIGIL_OF_CHAINS_TRIGGER, true);
             }
         }
     }
