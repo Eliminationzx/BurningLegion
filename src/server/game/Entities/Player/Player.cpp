@@ -29287,9 +29287,11 @@ void Player::LearnSpecializationSpells()
             if (!spellInfo || spellInfo->SpellLevel > getLevel())
                 continue;
 
-            LearnSpell(specSpell->SpellID, false);
-            if (specSpell->OverridesSpellID)
-                AddOverrideSpell(specSpell->OverridesSpellID, specSpell->SpellID);
+            if (!HasSpell(spellInfo->Id))
+                LearnSpell(spellInfo->Id, false);
+
+            if (SpellInfo const* overrideSpellInfo = sSpellMgr->GetSpellInfo(specSpell->OverridesSpellID))
+                AddOverrideSpell(overrideSpellInfo->Id, spellInfo->Id);
         }
     }
 }
