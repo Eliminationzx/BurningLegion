@@ -1014,6 +1014,7 @@ public:
                 return;
 
             // Stave off can activate Keg Smash tvice
+            if (!GetSpell()->IsTriggered())
             if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_MONK_STAVE_OFF, EFFECT_0))
                 if (roll_chance_i(aurEff->GetAmount()))
                     caster->CastSpell(target, GetSpellInfo()->Id, true);
