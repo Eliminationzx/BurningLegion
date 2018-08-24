@@ -3648,6 +3648,21 @@ class spell_warl_incinerate : public SpellScript
     }
 };
 
+class spell_warl_empowered_life_tap : public AuraScript
+{
+    PrepareAuraScript(spell_warl_empowered_life_tap);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetSpellInfo()->Id == SPELL_WARLOCK_LIFE_TAP;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_warl_empowered_life_tap::CheckProc);
+    }
+};
+
 void AddSC_warlock_spell_scripts()
 {
     RegisterAuraScript(spell_warl_demonskin);
@@ -3726,6 +3741,7 @@ void AddSC_warlock_spell_scripts()
     new spell_warl_eradication();
     RegisterAuraScript(aura_warl_phantomatic_singularity);
     RegisterAuraScript(spell_warl_grimoire_of_service_aura);
+    RegisterAuraScript(spell_warl_empowered_life_tap);
     RegisterSpellScript(spell_warl_incinerate);
 
     ///AreaTrigger scripts
