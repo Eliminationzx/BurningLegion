@@ -1268,8 +1268,7 @@ class spell_pal_judgment : public SpellScript
             SPELL_PALADIN_JUDGMENT_RETRI_DEBUFF, 
             SPELL_PALADIN_JUDGMENT_HOLY_DEBUFF, 
             SPELL_PALADIN_FIST_OF_JUSTICE,
-            SPELL_PALADIN_HAMMER_OF_JUSTICE,
-            SPELL_PALADIN_DIVINE_PUNISHER
+            SPELL_PALADIN_HAMMER_OF_JUSTICE
         });
     }
 
