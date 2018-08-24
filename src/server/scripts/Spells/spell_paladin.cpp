@@ -1268,7 +1268,8 @@ class spell_pal_judgment : public SpellScript
             SPELL_PALADIN_JUDGMENT_RETRI_DEBUFF, 
             SPELL_PALADIN_JUDGMENT_HOLY_DEBUFF, 
             SPELL_PALADIN_FIST_OF_JUSTICE,
-            SPELL_PALADIN_HAMMER_OF_JUSTICE
+            SPELL_PALADIN_HAMMER_OF_JUSTICE,
+            SPELL_PALADIN_DIVINE_PUNISHER
         });
     }
 
@@ -2538,6 +2539,38 @@ class spell_pal_painful_truths : public AuraScript
     }
 };
 
+class spell_pal_divine_punisher : public AuraScript
+{
+    PrepareAuraScript(spell_pal_divine_punisher);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        Unit* target = eventInfo.GetActionTarget();
+        if (!target)
+            return false;
+
+        if (target->HasAura(SPELL_PALADIN_JUDGMENT_RETRI_DEBUFF, GetCaster()->GetGUID()) && eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_JUDGMENT)
+            return true;
+
+        return false;
+    }
+
+    void HandleEffectProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+
+        Unit* caster = GetCaster();
+
+        caster->ModifyPower(POWER_HOLY_POWER, GetEffectInfo(EFFECT_0)->BasePoints);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_pal_divine_punisher::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_pal_divine_punisher::HandleEffectProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     new spell_pal_bastion_of_light();
@@ -2601,6 +2634,7 @@ void AddSC_paladin_spell_scripts()
     RegisterAuraScript(spell_pal_blessed_stalwart);
     RegisterAuraScript(spell_pal_blessed_stalwart_trigger);
     RegisterAuraScript(spell_pal_painful_truths);
+    RegisterAuraScript(spell_pal_divine_punisher);
 
     new spell_pal_consecration_heal();
     new spell_pal_retribution_aura();
