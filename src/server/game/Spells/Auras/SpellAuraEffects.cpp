@@ -1652,7 +1652,7 @@ void AuraEffect::HandleSpiritOfRedemption(AuraApplication const* aurApp, uint8 m
         target->setDeathState(JUST_DIED);
 }
 
-void AuraEffect::HandleAuraAllowTalentSwapping(AuraApplication const* aurApp, uint8 mode, bool apply) const
+void AuraEffect::HandleAuraAllowTalentSwapping(AuraApplication const* /*aurApp*/, uint8 mode, bool /*apply*/) const
 {
     if (!(mode & AURA_EFFECT_HANDLE_REAL))
         return;
