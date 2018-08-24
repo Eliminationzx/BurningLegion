@@ -167,6 +167,7 @@ enum WarriorSpells
     SPELL_WARRIOR_WHIRLWIND_OFFHAND                 = 44949,
     SPELL_WARRIOR_WRECKING_BALL_EFFECT              = 215570,
     SPELL_WARRIOR_COMMANDING_SHOUT                  = 97463,
+    SPELL_WARRIOR_OVERPOWER                         = 7384,
 
     NPC_WARRIOR_RAVAGER                             = 76168,
 };
@@ -2728,19 +2729,6 @@ public:
     {
         PrepareAuraScript(spell_warrior_overpower_proc_AuraScript);
 
-        bool CheckProc(ProcEventInfo& eventInfo)
-        {
-            //"Your other melee abilities have a chance to activate Overpower."
-            //According to sources it should only proc on Whirlwind, Colossus Smash, Mortal Strike and Slam with a 5% chance.
-            uint32 _spellId = eventInfo.GetSpellInfo()->Id;
-            std::vector<uint32> spellList = { 1680, 167105, 12294, 1464 };
-            for (auto id : spellList)
-                if (_spellId == id)
-                    return true;
-
-            return false;
-        }
-
         void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
         {
             Unit* caster = GetCaster();
@@ -2752,7 +2740,6 @@ public:
         void Register() override
         {
             OnEffectProc += AuraEffectProcFn(spell_warrior_overpower_proc_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
-            DoCheckProc += AuraCheckProcFn(spell_warrior_overpower_proc_AuraScript::CheckProc);
         }
     };
 
@@ -3026,6 +3013,32 @@ public:
     }
 };
 
+class spell_warr_overpower_trigger : public SpellScriptLoader
+{
+public:
+    spell_warr_overpower_trigger() : SpellScriptLoader("spell_warr_overpower_trigger") {}
+
+    class spell_warr_overpower_trigger_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_warr_overpower_trigger_AuraScript);
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            return eventInfo.GetSpellInfo()->Id == SPELL_WARRIOR_OVERPOWER;
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(spell_warr_overpower_trigger_AuraScript::CheckProc);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_warr_overpower_trigger_AuraScript();
+    }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     new spell_warr_berzerker_rage();
@@ -3093,6 +3106,7 @@ void AddSC_warrior_spell_scripts()
     new spell_warr_rallying_cry();
     new spell_warr_jump_to_skyhold();
     new spell_warr_shield_slam_reset();
+    new spell_warr_overpower_trigger();
     RegisterSpellScript(spell_warr_commanding_shout);
     RegisterSpellAndAuraScriptPair(spell_warr_ravager, aura_warr_ravager);
     RegisterSpellScript(spell_warr_ravager_damage);

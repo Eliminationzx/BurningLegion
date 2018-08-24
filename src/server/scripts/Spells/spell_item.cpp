@@ -4636,8 +4636,7 @@ class spell_item_brutal_kinship : public SpellScriptLoader
 
 enum WarbreakerSpells
 {
-    SPELL_WARBREAKER_DAMAGE = 209577,
-
+    SPELL_WARBREAKER_DAMAGE      = 209577,
     SPELL_WARRIOR_COLOSSUS_SMASH = 167105
 };
 
@@ -4660,8 +4659,7 @@ public:
             if (!player)
                 return;
 
-            if (!player->HasSpell(SPELL_WARBREAKER_DAMAGE))
-                player->LearnSpell(SPELL_WARBREAKER_DAMAGE, false);
+            player->AddTemporarySpell(SPELL_WARBREAKER_DAMAGE);
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -4674,8 +4672,7 @@ public:
             if (!player)
                 return;
 
-            if (player->HasSpell(SPELL_WARBREAKER_DAMAGE))
-                player->RemoveSpell(SPELL_WARBREAKER_DAMAGE);
+            player->RemoveTemporarySpell(SPELL_WARBREAKER_DAMAGE);
         }
 
         void Register() override
@@ -4709,7 +4706,7 @@ public:
         {
             Unit* caster = GetCaster();
             if (Unit* target = GetHitUnit())
-                caster->CastSpell(target, SPELL_WARRIOR_COLOSSUS_SMASH, true);
+                caster->AddAura(SPELL_WARRIOR_COLOSSUS_SMASH, target);
         }
 
         void Register() override
