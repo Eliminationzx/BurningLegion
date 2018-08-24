@@ -3621,18 +3621,30 @@ class spell_warl_incinerate : public SpellScript
         GetCaster()->ModifyPower(POWER_SOUL_SHARDS, 20);
     }
 
-    void HandleOnHitTarget(SpellEffIndex /*effIndex*/)
+    void CorrectTargets(std::list<WorldObject*>& targets)
     {
-        if (Unit* target = GetHitUnit())
+        std::list<WorldObject*> correctedTargets;
+        for (WorldObject* obj : targets)
+        {
             if (!GetCaster()->HasAura(SPELL_WARLOCK_FIRE_AND_BRIMSTONE))
-                if (target != GetExplTargetUnit())
-                    PreventHitDamage();
+            {
+                if (obj == GetExplTargetUnit())
+                {
+                    correctedTargets.push_back(obj);
+                    break;
+                }
+            }
+            else
+                correctedTargets.push_back(obj);
+        }
+
+        targets = correctedTargets;
     }
 
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_warl_incinerate::HandleOnHitMainTarget, EFFECT_0, SPELL_EFFECT_DUMMY);
-        OnEffectHitTarget += SpellEffectFn(spell_warl_incinerate::HandleOnHitTarget, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_warl_incinerate::CorrectTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENEMY);
     }
 };
 
