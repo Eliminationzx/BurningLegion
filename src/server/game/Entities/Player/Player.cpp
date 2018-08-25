@@ -9051,10 +9051,10 @@ void Player::SendNotifyLootItemRemoved(ObjectGuid lootObj, uint8 lootSlot) const
     GetSession()->SendPacket(packet.Write());
 }
 
-void Player::SendUpdateWorldState(uint32 variable, uint32 value, bool hidden /*= false*/) const
+void Player::SendUpdateWorldState(uint32 variableID, uint32 value, bool hidden /*= false*/) const
 {
     WorldPackets::WorldState::UpdateWorldState worldstate;
-    worldstate.VariableID = variable;
+    worldstate.VariableID = static_cast<WorldStates>(variableID);
     worldstate.Value = value;
     worldstate.Hidden = hidden;
     SendDirectMessage(worldstate.Write());

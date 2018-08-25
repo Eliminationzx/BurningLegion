@@ -400,7 +400,7 @@ class TC_GAME_API Battleground
         void RewardReputationToTeam(uint32 faction_id, uint32 Reputation, uint32 TeamID);
         void RewardChestToTeam(uint32 TeamID);
         void KillCreditQuestToTeam(uint32 TeamID, uint32 questID, uint32 killCreditEntry);
-        void UpdateWorldState(uint32 variable, uint32 value, bool hidden = false);
+        void UpdateWorldState(uint32 variableID, uint32 value, bool hidden = false);
         virtual void EndBattleground(uint32 winner);
         void BlockMovement(Player* player);
 
