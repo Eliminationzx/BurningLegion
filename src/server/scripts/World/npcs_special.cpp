@@ -2352,6 +2352,7 @@ public:
         openAlliedRaceDetailsGiver.Guid = creature->GetGUID();
         openAlliedRaceDetailsGiver.RaceId = _raceId;
         player->SendDirectMessage(openAlliedRaceDetailsGiver.Write());
+        return true;
     }
      uint32 _raceId;
 };
