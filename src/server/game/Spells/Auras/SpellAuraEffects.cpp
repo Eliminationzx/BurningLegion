@@ -1652,12 +1652,19 @@ void AuraEffect::HandleSpiritOfRedemption(AuraApplication const* aurApp, uint8 m
         target->setDeathState(JUST_DIED);
 }
 
-void AuraEffect::HandleAuraAllowTalentSwapping(AuraApplication const* /*aurApp*/, uint8 mode, bool /*apply*/) const
+void AuraEffect::HandleAuraAllowTalentSwapping(AuraApplication const* aurApp, uint8 mode, bool apply) const
 {
     if (!(mode & AURA_EFFECT_HANDLE_REAL))
         return;
+    Unit* target = aurApp->GetTarget();
 
-    // TODO: need set special flag for caster
+    if (!target->IsPlayer())
+        return;
+
+    if (apply)
+        target->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHANGING_TALENTS);
+    else
+        target->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHANGING_TALENTS);
 }
 
 void AuraEffect::HandleAuraGhost(AuraApplication const* aurApp, uint8 mode, bool apply) const
