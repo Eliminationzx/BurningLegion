@@ -16,6 +16,7 @@
  */
 
 #include "WorldStatePackets.h"
+#include "World.h"
 
 WorldPackets::WorldState::InitWorldStates::InitWorldStates()
     : ServerPacket(SMSG_INIT_WORLD_STATES, 16) { }
@@ -45,7 +46,7 @@ WorldPackets::WorldState::UpdateWorldState::UpdateWorldState()
 
 WorldPacket const* WorldPackets::WorldState::UpdateWorldState::Write()
 {
-    _worldPacket << uint32(VariableID);
+    _worldPacket << static_cast<WorldStates>(VariableID);
     _worldPacket << int32(Value);
     _worldPacket.WriteBit(Hidden);
     _worldPacket.FlushBits();
