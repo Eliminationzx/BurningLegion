@@ -2277,6 +2277,22 @@ class spell_mage_pet_freeze : public AuraScript
     }
 };
 
+enum ConjureRefershmentTables
+{
+    SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_1  = 120056,
+    SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_2  = 120055,
+    SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_3  = 120054,
+    SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_4  = 120053,
+    SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_5  = 92739,
+    SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_6  = 92799,
+    SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_7  = 92802,
+    SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_8  = 92805,
+    SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_9  = 74625,
+    SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_10 = 42956,
+    SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_11 = 92727,
+    SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_12 = 116130
+};
+
 // Conjure Refreshment - 190336
 class spell_mage_conjure_refreshment : public SpellScriptLoader
 {
@@ -2289,14 +2305,39 @@ public:
 
         void HandleOnHit()
         {
-            if (Player* player = GetCaster()->ToPlayer())
+            if (Player* _player = GetCaster()->ToPlayer())
             {
-                Group* group = player->GetGroup();
-
+                Group* group = _player->GetGroup();
                 if (group)
-                    player->CastSpell(player, SPELL_MAGE_CONJURE_REFRESHMENT_GROUP, true);
+                {
+                    if (_player->getLevel() < 80)
+                        _player->CastSpell(_player, SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_1, true);  // Conjure Refreshment Table
+                    else if (_player->getLevel() < 85)
+                        _player->CastSpell(_player, SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_2, true);  // Conjure Refreshment Table
+                    else if (_player->getLevel() < 90)
+                        _player->CastSpell(_player, SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_3, true);  // Conjure Refreshment Table
+                    else
+                        _player->CastSpell(_player, SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_4, true);  // Conjure Refreshment Table
+                }
                 else
-                    player->CastSpell(player, SPELL_MAGE_CONJURE_REFRESHMENT_SOLO, true);
+                {
+                    if (_player->getLevel() < 44)
+                        _player->CastSpell(_player, SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_5, true);
+                    else if (_player->getLevel() < 54)
+                        _player->CastSpell(_player, SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_6, true);
+                    else if (_player->getLevel() < 64)
+                        _player->CastSpell(_player, SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_7, true);
+                    else if (_player->getLevel() < 74)
+                        _player->CastSpell(_player, SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_8, true);
+                    else if (_player->getLevel() < 80)
+                        _player->CastSpell(_player, SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_9, true);
+                    else if (_player->getLevel() < 85)
+                        _player->CastSpell(_player, SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_10, true);
+                    else if (_player->getLevel() < 90)
+                        _player->CastSpell(_player, SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_11, true);
+                    else
+                        _player->CastSpell(_player, SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_12, true);
+                }
             }
         }
 
@@ -2311,7 +2352,6 @@ public:
         return new spell_mage_conjure_refreshment_SpellScript();
     }
 };
-
 
 // Meteor - 177345
 // AreaTriggerID - 3467
