@@ -5129,6 +5129,14 @@ void AuraEffect::HandleAuraOverrideSpells(AuraApplication const* aurApp, uint8 m
 
     if (apply)
     {
+        // Check other override aura spells
+        Unit::AuraEffectList const& overrideAuraSpells = target->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_SPELLS);
+        for (auto overrideAura : overrideAuraSpells)
+        {
+            if (overrideAura->GetId() != GetId())
+                overrideAura->GetBase()->Remove();
+        }
+
         target->SetUInt16Value(PLAYER_FIELD_BYTES3, PLAYER_BYTES_3_OVERRIDE_SPELLS_UINT16_OFFSET, overrideId);
         if (OverrideSpellDataEntry const* overrideSpells = sOverrideSpellDataStore.LookupEntry(overrideId))
             for (uint8 i = 0; i < MAX_OVERRIDE_SPELL; ++i)
