@@ -21,7 +21,7 @@
 #include "GameEventMgr.h"
 #include "ObjectMgr.h"
 #include "DisableMgr.h"
-#include "AreaTriggerData.h"
+#include "AreaTriggerDataStore.h"
 #include "PoolMgr.h"
 
 QuestPOI::QuestPOI() : BlobIndex(0), ObjectiveIndex(0), QuestObjectiveID(0), QuestObjectID(0), MapID(0), WorldMapAreaID(0), Floor(0), Priority(0), Flags(0), WorldEffectID(0), PlayerConditionID(0), SpawnTrackingID(0), AlwaysAllowMergingBlobs{false} { }
