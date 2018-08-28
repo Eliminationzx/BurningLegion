@@ -552,16 +552,26 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPackets::Movement::SetActiveM
 
 void WorldSession::HandleMoveKnockBackAck(WorldPackets::Movement::MoveKnockBackAck& movementAck)
 {
-    GetPlayer()->ValidateMovementInfo(&movementAck.Ack.Status);
-
-    if (_player->m_unitMovedByMe->GetGUID() != movementAck.Ack.Status.guid)
+    Player* player = GetPlayer();
+    Unit* mover = player->m_unitMovedByMe;
+    if (!mover)
         return;
 
-    _player->m_movementInfo = movementAck.Ack.Status;
+    player->ValidateMovementInfo(&movementAck.Ack.Status);
 
+    if (mover->GetGUID() != movementAck.Ack.Status.guid)
+        return;
+
+    // update time
+    movementAck.Ack.Status.time = getMSTime();
+    
+    // relocate
     WorldPackets::Movement::MoveUpdateKnockBack updateKnockBack;
-    updateKnockBack.Status = &_player->m_movementInfo;
-    _player->SendMessageToSet(updateKnockBack.Write(), false);
+    updateKnockBack.Status = &player->m_movementInfo;
+    player->SendMessageToSet(updateKnockBack.Write(), false);
+
+    player->UpdateFallInformationIfNeed(movementAck.Ack.Status, movementAck.GetOpcode());
+    player->ClearUnitState(UNIT_STATE_JUMPING);
 }
 
 void WorldSession::HandleMovementAckMessage(WorldPackets::Movement::MovementAckMessage& movementAck)
