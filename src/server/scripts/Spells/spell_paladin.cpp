@@ -2569,7 +2569,7 @@ public:
         void Register() override
         {
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pal_blessed_hammer_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
-            OnEffectAbsorb += AuraEffectAbsorbFn(spell_pal_blessed_hammer_AuraScript::Absorb, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+            OnEffectAbsorb += AuraEffectAbsorbFn(spell_pal_blessed_hammer_AuraScript::Absorb, EFFECT_0);
         }
     };
 
