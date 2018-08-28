@@ -703,6 +703,53 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                 return bf->IsWarTime();
             break;
         }
+        case 240010: //Class Hall Banishing
+            {
+                switch (player->GetCurrentAreaID())
+                {
+                    case 7679: //DK Hall
+                        if (player->getClass() == CLASS_DEATH_KNIGHT)
+                            return false;
+                        break;
+                    case 7752: //Shaman Hall
+                    case 7753:
+                        if (player->getClass() == CLASS_SHAMAN)
+                            return false;
+                        break;
+                    case 7813: //Warrior Hall
+                        if (player->getClass() == CLASS_WARRIOR)
+                            return false;
+                        break;
+                    case 7879: //Mage Hall
+                        if (player->getClass() == CLASS_MAGE)
+                            return false;
+                        break;
+                    case 8012: //Rogue Hall
+                        if (player->getClass() == CLASS_ROGUE)
+                            return false;
+                        break;
+                    case 7875: //Warlock Hall
+                        if (player->getClass() == CLASS_WARLOCK)
+                            return false;
+                        break;
+                    case 7903: //Monk Hall
+                        if (player->getClass() == CLASS_MONK)
+                            return false;
+                        break;
+                    case 7834: //Priest Hall
+                    case 8356:
+                        if (player->getClass() == CLASS_PRIEST)
+                            return false;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            }
+            default:
+                break;
+        }
+
 
     }
 
