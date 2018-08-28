@@ -705,7 +705,7 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
         }
         case 240010: //Class Hall Banishing
             {
-                switch (player->GetCurrentAreaID())
+                switch (player->GetAreaId())
                 {
                     case 7679: //DK Hall
                         if (player->getClass() == CLASS_DEATH_KNIGHT)
@@ -3701,8 +3701,8 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 108211 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AuraInterruptFlags.fill(0);
-	});
-	
+    });
+    
     // Void Suppression
     ApplySpellFix({ 260888 }, [](SpellInfo* spellInfo)
     {
