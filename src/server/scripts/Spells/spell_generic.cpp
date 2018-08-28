@@ -4989,60 +4989,6 @@ public:
     }
 };
 
-//! 213170 spell
-class spell_class_hall_panel : public SpellScriptLoader
-{
-public:
-    spell_class_hall_panel() : SpellScriptLoader("spell_class_hall_panel") { }
-
-    class spell_class_hall_panel_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_class_hall_panel_AuraScript);
-
-        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* target = GetTarget();
-            if (target->GetTypeId() != TYPEID_PLAYER)
-                return;
-
-            Player* player = target->ToPlayer();
-            if (!player)
-                return;
-
-            GarrisonPtr garrison = player->GetGarrisonPtr();
-            if ((!garrison || !garrison->HasGarrison(GARRISON_TYPE_CLASS_ORDER)) && player->getLevel() >= 100)
-            {
-                if (player->GetTeam() == HORDE)
-                {
-                    // if (GetQuestRewardStatus(40518))
-                    player->CastSpell(player, 192191, true);
-                }
-                else // if (GetQuestRewardStatus(42740))
-                    player->CastSpell(player, 185506, true);
-            }
-
-            if (target->GetTypeId() == TYPEID_UNIT)
-                target->ToCreature()->SetReactState(REACT_PASSIVE);
-        }
-
-        void HandleEffectRemove(AuraEffect const * /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* target = GetTarget();
-            target->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_class_hall_panel_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_class_hall_panel_AuraScript();
-    }
-};
-
 void AddSC_generic_spell_scripts()
 {
     new spell_gen_absorb0_hitlimit1();
@@ -5106,7 +5052,6 @@ void AddSC_generic_spell_scripts()
     new spell_gen_proc_below_pct_damaged("spell_item_petrified_twilight_scale_heroic");
     new spell_gen_parachute();
     new spell_gen_pet_summoned();
-    new spell_class_hall_panel();
     new spell_gen_profession_research();
     new spell_gen_pvp_trinket();
     new spell_gen_remove_flight_auras();
