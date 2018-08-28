@@ -4958,25 +4958,28 @@ public:
     {
         PrepareAuraScript(spell_gen_hardiness_AuraScript);
 
+        uint32 absorbPct;
+        uint32 healthPct;
+
         void CalculateAmount(const AuraEffect* /*aurEff*/, int32& amount, bool & /*canBeRecalculated*/)
         {
-             amount = 0;
+            absorbPct = GetSpellInfo()->GetEffect(EFFECT_0)->CalcValue(GetCaster());
+            healthPct = GetSpellInfo()->GetEffect(EFFECT_1)->CalcValue(GetCaster());
+            // Set absorbtion amount to unlimited
+            amount = -1;
         }
 
         void OnAbsorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
         {
-            Unit* target = GetTarget();
-            if (!target)
-                return;
-
-            if (target->HealthAbovePct(GetEffect(EFFECT_1)->GetAmount()))
-                absorbAmount = CalculatePct(dmgInfo.GetDamage(), GetEffect(EFFECT_0)->GetAmount());
+            absorbAmount = 0;
+            if (GetTarget()->GetHealthPct() >= healthPct)
+                absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
         }
 
         void Register() override
         {
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_hardiness_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
-            OnEffectAbsorb += AuraEffectAbsorbFn(spell_gen_hardiness_AuraScript::OnAbsorb, EFFECT_0);
+            OnEffectAbsorb += AuraEffectAbsorbFn(spell_gen_hardiness_AuraScript::OnAbsorb, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
         }
     };
 

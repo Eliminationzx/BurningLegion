@@ -130,7 +130,7 @@ enum PaladinSpells
     SPELL_PALADIN_THE_FIRES_OF_JUSTICE          = 209785,
     SPELL_PALADIN_WORD_OF_GLORY                 = 210191,
     SPELL_PALADIN_WORD_OF_GLORY_HEAL            = 214894,
-    SPELL_PALDIN_BLESSED_HAMMER                 = 204019,
+    SPELL_PALDIN_BLESSED_HAMMER                 = 204301,
     SPELL_PALADIN_GREATER_JUDGEMENT             = 218178,
     SPELL_PALADIN_AEGIS_OF_LIGHT                = 204335,
     SPELL_PALADIN_AURA_OF_SACRIFICE             = 183416,
@@ -2536,6 +2536,51 @@ class spell_pal_divine_punisher : public AuraScript
     }
 };
 
+// Blessed Hammer - 229976
+class spell_pal_blessed_hammer : public SpellScriptLoader
+{
+public:
+    spell_pal_blessed_hammer() : SpellScriptLoader("spell_pal_blessed_hammer") { }
+
+    class spell_pal_blessed_hammer_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_pal_blessed_hammer_AuraScript);
+
+        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
+        {
+            // Set absorbtion amount to unlimited
+            amount = -1;
+        }
+
+        void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
+        {
+            absorbAmount = 0;
+            Unit* caster = GetCaster();
+            Unit* attacker = dmgInfo.GetAttacker();
+            if (!caster || !attacker)
+                return;
+
+            AuraEffect* aurEff = attacker->GetAuraEffect(SPELL_PALDIN_BLESSED_HAMMER, EFFECT_1);
+            if (!aurEff || !aurEff->GetBase() || caster != aurEff->GetBase()->GetCaster())
+                return;
+
+            absorbAmount = CalculatePct(dmgInfo.GetDamage(), aurEff->GetAmount());
+            aurEff->GetBase()->Remove();
+        }
+
+        void Register() override
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pal_blessed_hammer_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+            OnEffectAbsorb += AuraEffectAbsorbFn(spell_pal_blessed_hammer_AuraScript::Absorb, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_pal_blessed_hammer_AuraScript();
+    }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     new spell_pal_bastion_of_light();
@@ -2555,6 +2600,9 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_light_of_the_martyr();
     new spell_pal_greater_blessing_of_kings();
     new spell_pal_zeal();
+    new spell_pal_consecration_heal();
+    new spell_pal_retribution_aura();
+    new spell_pal_blessed_hammer();
     
     //7.3.2.25549
     RegisterSpellScript(spell_pal_holy_shock);
@@ -2599,9 +2647,6 @@ void AddSC_paladin_spell_scripts()
     RegisterAuraScript(spell_pal_blessed_stalwart);
     RegisterAuraScript(spell_pal_blessed_stalwart_trigger);
     RegisterAuraScript(spell_pal_divine_punisher);
-
-    new spell_pal_consecration_heal();
-    new spell_pal_retribution_aura();
 
     // Areatriggers
     new at_pal_aegis_of_light();
