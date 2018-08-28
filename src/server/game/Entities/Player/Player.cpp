@@ -26457,6 +26457,13 @@ void Player::ResyncRunes() const
     GetSession()->SendPacket(data.Write());
 }
 
+void Player::AddRunePower(uint8 index) const
+{
+    WorldPackets::Spells::AddRunePower addRunePower;
+    addRunePower.AddedRunesMask = uint32(1 << index);
+    GetSession()->SendPacket(addRunePower.Write());
+}
+
 void Player::InitRunes()
 {
     if (getClass() != CLASS_DEATH_KNIGHT)
