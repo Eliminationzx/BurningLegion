@@ -33,6 +33,7 @@
 #include "SplineChainMovementGenerator.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
+#include "Transport.h"
 
 inline bool IsStatic(MovementGenerator* movement)
 {
@@ -425,10 +426,7 @@ void MotionMaster::MoveCharge(PathGenerator const& path, float speed /*= SPEED_C
 void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, float speedZ, Movement::SpellEffectExtraData const* spellEffectExtraData /*= nullptr*/)
 {
     //this function may make players fall below map
-    if (_owner->GetTypeId() == TYPEID_PLAYER)
-        return;
-
-    if (speedXY <= 0.1f)
+    if (_owner->IsPlayer())
         return;
 
     float x, y, z;
@@ -436,18 +434,44 @@ void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, floa
     float dist = 2 * moveTimeHalf * speedXY;
     float max_height = -Movement::computeFallElevation(moveTimeHalf, false, -speedZ);
 
-    _owner->GetNearPoint(_owner, x, y, z, _owner->GetObjectSize(), dist, _owner->GetAngle(srcX, srcY) + float(M_PI));
+    for (uint8 i = 0; i < 5; ++i)
+    {
+        switch (i)
+        {
+            case 0:
+                _owner->GetNearPoint(_owner, x, y, z, _owner->GetObjectSize(), dist, _owner->GetAngle(srcX, srcY) + M_PI);
+                break;
+            case 1:
+                _owner->GetNearPoint(_owner, x, y, z, _owner->GetObjectSize(), dist*0.8, _owner->GetAngle(srcX, srcY) + M_PI);
+                break;
+            case 2:
+                _owner->GetNearPoint(_owner, x, y, z, _owner->GetObjectSize(), dist*0.5, _owner->GetAngle(srcX, srcY) + M_PI);
+                break;
+            case 3:
+                _owner->GetNearPoint(_owner, x, y, z, _owner->GetObjectSize(), dist*0.25, _owner->GetAngle(srcX, srcY) + M_PI);
+                break;
+            case 4:
+                _owner->GetNearPoint(_owner, x, y, z, _owner->GetObjectSize(), dist*0.1, _owner->GetAngle(srcX, srcY) + M_PI);
+                break;
+        }
 
-    Movement::MoveSplineInit init(_owner);
-    init.MoveTo(x, y, z);
-    init.SetParabolic(max_height, 0);
-    init.SetOrientationFixed(true);
-    init.SetVelocity(speedXY);
-    if (spellEffectExtraData)
-        init.SetSpellEffectExtraData(*spellEffectExtraData);
+        if (_owner->IsWithinLOS(x, y, z))
+        {
+            if (Transport* transport = _owner->GetTransport())
+                transport->CalculatePassengerOffset(x, y, z);
 
-    init.Launch();
-    Mutate(new EffectMovementGenerator(0), MOTION_SLOT_CONTROLLED);
+            Movement::MoveSplineInit init(_owner);
+            init.MoveTo(x, y, z);
+            init.SetParabolic(max_height, 0);
+            init.SetOrientationFixed(true);
+            init.SetVelocity(speedXY);
+            if (spellEffectExtraData)
+                init.SetSpellEffectExtraData(*spellEffectExtraData);
+            init.Launch();
+            Mutate(new EffectMovementGenerator(0, x, y, z), MOTION_SLOT_CONTROLLED);
+            break;
+        }
+    }
 }
 
 void MotionMaster::MoveJumpTo(float angle, float speedXY, float speedZ)

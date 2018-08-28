@@ -701,10 +701,10 @@ void Battleground::KillCreditQuestToTeam(uint32 TeamID, uint32 questID, uint32 k
                 player->KilledMonsterCredit(killCreditEntry);
 }
 
-void Battleground::UpdateWorldState(uint32 variable, uint32 value, bool hidden /*= false*/)
+void Battleground::UpdateWorldState(uint32 variableID, uint32 value, bool hidden /*= false*/)
 {
     WorldPackets::WorldState::UpdateWorldState worldstate;
-    worldstate.VariableID = variable;
+    worldstate.VariableID = static_cast<WorldStates>(variableID);
     worldstate.Value = value;
     worldstate.Hidden = hidden;
     SendPacketToAll(worldstate.Write());

@@ -12526,6 +12526,8 @@ void Unit::SendMoveKnockBack(Unit* unit, float vcos, float vsin, float speedXY, 
         return;
     }
 
+    AddUnitState(UNIT_STATE_JUMPING);
+
     WorldPackets::Movement::MoveKnockBack moveKnockBack;
     moveKnockBack.MoverGUID = mover->GetGUID();
     moveKnockBack.SequenceIndex = m_movementCounter++;

@@ -151,6 +151,7 @@ class TC_GAME_API AuraEffect
         void HandleModStealthLevel(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleModStealthDetect(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleSpiritOfRedemption(AuraApplication const* aurApp, uint8 mode, bool apply) const;
+        void HandleAuraAllowTalentSwapping(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleAuraGhost(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandlePhase(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandlePhaseGroup(AuraApplication const* aurApp, uint8 mode, bool apply) const;

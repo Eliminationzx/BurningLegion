@@ -457,10 +457,10 @@ void Battlefield::SendWarning(uint8 id, WorldObject const* target /*= nullptr*/)
         sCreatureTextMgr->SendChat(stalker, id, target);
 }
 
-void Battlefield::SendUpdateWorldState(uint32 variable, uint32 value, bool hidden /*= false*/)
+void Battlefield::SendUpdateWorldState(uint32 variableID, uint32 value, bool hidden /*= false*/)
 {
     WorldPackets::WorldState::UpdateWorldState worldstate;
-    worldstate.VariableID = variable;
+    worldstate.VariableID = static_cast<WorldStates>(variableID);
     worldstate.Value = value;
     worldstate.Hidden = hidden;
     BroadcastPacketToZone(worldstate.Write());

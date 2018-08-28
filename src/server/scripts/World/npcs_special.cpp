@@ -25,6 +25,7 @@
 #include "GameObjectAI.h"
 #include "GridNotifiersImpl.h"
 #include "Log.h"
+#include "MiscPackets.h"
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -2341,6 +2342,21 @@ public:
     }
 };
 
+class npc_allied_race_infos : public CreatureScript
+{
+public:
+    npc_allied_race_infos(const char* name, uint32 raceId) : CreatureScript(name), _raceId(raceId) { }
+     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
+    {
+        WorldPackets::Misc::OpenAlliedRaceDetailsGiver openAlliedRaceDetailsGiver;
+        openAlliedRaceDetailsGiver.Guid = creature->GetGUID();
+        openAlliedRaceDetailsGiver.RaceId = _raceId;
+        player->SendDirectMessage(openAlliedRaceDetailsGiver.Write());
+        return true;
+    }
+     uint32 _raceId;
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -2364,4 +2380,8 @@ void AddSC_npcs_special()
     new npc_creature_damage_limit();
     new npc_regzar();
     new npc_hati();
+    new npc_allied_race_infos("npc_allied_race_infos_nightborne", 27);
+    new npc_allied_race_infos("npc_allied_race_infos_tauren", 28);
+    new npc_allied_race_infos("npc_allied_race_infos_voidelf", 29);
+    new npc_allied_race_infos("npc_allied_race_infos_draenei", 30);
 }

@@ -9051,10 +9051,10 @@ void Player::SendNotifyLootItemRemoved(ObjectGuid lootObj, uint8 lootSlot) const
     GetSession()->SendPacket(packet.Write());
 }
 
-void Player::SendUpdateWorldState(uint32 variable, uint32 value, bool hidden /*= false*/) const
+void Player::SendUpdateWorldState(uint32 variableID, uint32 value, bool hidden /*= false*/) const
 {
     WorldPackets::WorldState::UpdateWorldState worldstate;
-    worldstate.VariableID = variable;
+    worldstate.VariableID = static_cast<WorldStates>(variableID);
     worldstate.Value = value;
     worldstate.Hidden = hidden;
     SendDirectMessage(worldstate.Write());
@@ -26459,9 +26459,9 @@ void Player::ResyncRunes() const
 
 void Player::AddRunePower(uint8 index) const
 {
-    WorldPacket data(SMSG_ADD_RUNE_POWER, 4);
-    data << uint32(1 << index);                             // mask (0x00-0x3F probably)
-    GetSession()->SendPacket(&data);
+    WorldPackets::Spells::AddRunePower addRunePower;
+    addRunePower.AddedRunesMask = uint32(1 << index);
+    GetSession()->SendPacket(addRunePower.Write());
 }
 
 void Player::InitRunes()

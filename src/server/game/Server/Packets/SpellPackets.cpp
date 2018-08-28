@@ -875,6 +875,12 @@ WorldPacket const* WorldPackets::Spells::ResyncRunes::Write()
     return &_worldPacket;
 }
 
+WorldPacket const* WorldPackets::Spells::AddRunePower::Write()
+{
+    _worldPacket << uint32(AddedRunesMask);
+    return &_worldPacket;
+}
+
 void WorldPackets::Spells::MissileTrajectoryCollision::Read()
 {
     _worldPacket >> Target;

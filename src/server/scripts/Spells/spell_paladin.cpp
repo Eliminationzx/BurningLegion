@@ -2308,25 +2308,6 @@ public:
     }
 };
 
-class spell_pal_light_of_the_titans : public AuraScript
-{
-    PrepareAuraScript(spell_pal_light_of_the_titans);
-
-    bool CheckProc(ProcEventInfo& eventInfo)
-    {
-        if (eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_LIGHT_OF_THE_PROTECTOR ||
-            eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_HAND_OF_THE_PROTECTOR)
-            return true;
-
-        return false;
-    }
-
-    void Register() override
-    {
-        DoCheckProc += AuraCheckProcFn(spell_pal_light_of_the_titans::CheckProc);
-    }
-};
-
 class at_pal_aegis_of_light : public AreaTriggerEntityScript
 {
 public:
@@ -2523,18 +2504,35 @@ class spell_pal_blessed_stalwart_trigger : public AuraScript
     }
 };
 
-class spell_pal_painful_truths : public AuraScript
+class spell_pal_divine_punisher : public AuraScript
 {
-    PrepareAuraScript(spell_pal_painful_truths);
+    PrepareAuraScript(spell_pal_divine_punisher);
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return eventInfo.GetTypeMask() & (PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK | PROC_FLAG_TAKEN_SPELL_MELEE_DMG_CLASS);
+        Unit* target = eventInfo.GetActionTarget();
+        if (!target)
+            return false;
+
+        if (target->HasAura(SPELL_PALADIN_JUDGMENT_RETRI_DEBUFF, GetCaster()->GetGUID()) && eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_JUDGMENT)
+            return true;
+
+        return false;
+    }
+
+    void HandleEffectProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+
+        Unit* caster = GetCaster();
+
+        caster->ModifyPower(POWER_HOLY_POWER, GetEffectInfo(EFFECT_0)->BasePoints);
     }
 
     void Register() override
     {
-        DoCheckProc += AuraCheckProcFn(spell_pal_painful_truths::CheckProc);
+        DoCheckProc += AuraCheckProcFn(spell_pal_divine_punisher::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_pal_divine_punisher::HandleEffectProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
 
@@ -2600,7 +2598,7 @@ void AddSC_paladin_spell_scripts()
     RegisterAuraScript(spell_pal_vindicator);
     RegisterAuraScript(spell_pal_blessed_stalwart);
     RegisterAuraScript(spell_pal_blessed_stalwart_trigger);
-    RegisterAuraScript(spell_pal_painful_truths);
+    RegisterAuraScript(spell_pal_divine_punisher);
 
     new spell_pal_consecration_heal();
     new spell_pal_retribution_aura();
@@ -2610,8 +2608,6 @@ void AddSC_paladin_spell_scripts()
 
     // NPC Scripts
     RegisterCreatureAI(npc_pal_lights_hammer);
-
-    RegisterAuraScript(spell_pal_light_of_the_titans);
 
     // Area Trigger scripts
     RegisterAreaTriggerAI(at_pal_aura_of_sacrifice);
