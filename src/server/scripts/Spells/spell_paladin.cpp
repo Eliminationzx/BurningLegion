@@ -2544,7 +2544,7 @@ public:
     {
         PrepareAuraScript(spell_pal_blessed_hammer_AuraScript);
 
-        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
+        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
         {
             // Set absorbtion amount to unlimited
             amount = -1;
