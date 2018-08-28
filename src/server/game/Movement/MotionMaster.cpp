@@ -468,7 +468,7 @@ void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, floa
             if (spellEffectExtraData)
                 init.SetSpellEffectExtraData(*spellEffectExtraData);
             init.Launch();
-            Mutate(new EffectMovementGenerator(0, x, y, z), MOTION_SLOT_CONTROLLED);
+            Mutate(new EffectMovementGenerator(0), MOTION_SLOT_CONTROLLED);
             break;
         }
     }
