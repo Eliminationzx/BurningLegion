@@ -136,7 +136,9 @@ enum PaladinSpells
     SPELL_PALADIN_AURA_OF_SACRIFICE             = 183416,
     SPELL_PALADIN_AURA_OF_SACRIFICE_ALLY        = 210372,
     SPELL_PALADIN_AURA_OF_SACRIFICE_DAMAGE      = 210380,
-    SPELL_PALADIN_AURA_OF_SACRIFICE_HEAL        = 210383
+    SPELL_PALADIN_AURA_OF_SACRIFICE_HEAL        = 210383,
+    SPELL_PALADIN_JUDGE_UNWORTHY                = 238134,
+    SPELL_PALADIN_JUDGMENT_AURA                 = 231661 
 };
 
 enum PaladinNPCs
@@ -1265,10 +1267,13 @@ class spell_pal_judgment : public SpellScript
         return ValidateSpellInfo({ 
             SPELL_PALADIN_GREATER_JUDGEMENT, 
             SPELL_PALADIN_JUDGMENT,
+            SPELL_PALADIN_JUDGMENT_AURA,
             SPELL_PALADIN_JUDGMENT_RETRI_DEBUFF, 
             SPELL_PALADIN_JUDGMENT_HOLY_DEBUFF, 
             SPELL_PALADIN_FIST_OF_JUSTICE,
-            SPELL_PALADIN_HAMMER_OF_JUSTICE
+            SPELL_PALADIN_HAMMER_OF_JUSTICE,
+            SPELL_PALADIN_GREATER_JUDGEMENT,
+            SPELL_PALADIN_JUDGE_UNWORTHY
         });
     }
 
@@ -1282,38 +1287,6 @@ class spell_pal_judgment : public SpellScript
             case TALENT_SPEC_PALADIN_RETRIBUTION:
             {
                 caster->CastSpell(target, SPELL_PALADIN_JUDGMENT_RETRI_DEBUFF);
-
-                if (Creature* tempSumm = caster->SummonCreature(WORLD_TRIGGER, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 200))
-                {
-                    tempSumm->setFaction(caster->getFaction());
-                    tempSumm->SetGuidValue(UNIT_FIELD_SUMMONEDBY, caster->GetGUID());
-                    PhasingHandler::InheritPhaseShift(tempSumm, caster);
-
-                    float judgmenetDist = 30.0f;
-                    std::list<Unit*> targets;
-                    Trinity::AnyUnitInObjectRangeCheck u_check(tempSumm, judgmenetDist);
-                    Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck> searcher(tempSumm, targets, u_check);
-                    Cell::VisitAllObjects(tempSumm, searcher, judgmenetDist);
-
-                    targets.remove(target);
-
-                    for (std::list<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
-                    {
-                        if (!tempSumm->IsWithinLOSInMap(*tIter) || (*tIter)->IsTotem() || (*tIter)->IsSpiritService() || (*tIter)->IsCritter() ||
-                            !caster->IsValidAttackTarget(*tIter))
-                            targets.erase(tIter++);
-                        else
-                            ++tIter;
-                    }
-
-                    Trinity::Containers::RandomResize(targets, 1 + (caster->HasAura(SPELL_PALADIN_GREATER_JUDGEMENT) ? sSpellMgr->GetSpellInfo(SPELL_PALADIN_GREATER_JUDGEMENT)->GetEffect(EFFECT_1)->BasePoints : 0));
-
-                    if (!targets.empty())
-                    {
-                        for (auto nearbyTarget : targets)
-                             tempSumm->CastSpell(nearbyTarget, SPELL_PALADIN_JUDGMENT, true, nullptr, nullptr, caster->GetGUID());
-                    }
-                }
                 break;
             }
             case TALENT_SPEC_PALADIN_HOLY:
@@ -1340,10 +1313,35 @@ class spell_pal_judgment : public SpellScript
             }
         }
     }
+    
+    void HandleJump(uint32& AddJumpTarget)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_PALADIN_GREATER_JUDGEMENT, EFFECT_1)) // Greater Judgment
+                AddJumpTarget += aurEff->GetAmount();
+
+            if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_PALADIN_JUDGMENT_AURA, EFFECT_0)) // Judgment
+                AddJumpTarget += aurEff->GetAmount();
+
+            if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_PALADIN_JUDGE_UNWORTHY, EFFECT_0)) // Judge Unworthy
+            {
+                if (Unit* unitTarget = GetExplTargetUnit())
+                {
+                    if (unitTarget->HasAura(SPELL_PALADIN_JUDGMENT_RETRI_DEBUFF))
+                    {
+                        if (roll_chance_i(aurEff->GetAmount()))
+                            AddJumpTarget += 1;
+                    }
+                }
+            }
+        }
+    }
 
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_pal_judgment::HandleDummy, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        OnObjectJumpTarget += SpellObjectJumpTargetFn(spell_pal_judgment_SpellScript::HandleJump, EFFECT_0, TARGET_UNIT_TARGET_ENEMY);
     }
 };
 

@@ -1819,6 +1819,8 @@ void Spell::SelectImplicitChainTargets(SpellEffIndex effIndex, SpellImplicitTarg
     if (Player* modOwner = m_caster->GetSpellModOwner())
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_JUMP_TARGETS, maxTargets, this);
 
+    CallScriptObjectJumpTargetHandlers(maxTargets, effIndex);
+
     if (maxTargets > 1)
     {
         // mark damage multipliers as used
@@ -1837,6 +1839,20 @@ void Spell::SelectImplicitChainTargets(SpellEffIndex effIndex, SpellImplicitTarg
         for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
             if (Unit* unit = (*itr)->ToUnit())
                 AddUnitTarget(unit, effMask, false);
+    }
+
+    switch (m_spellInfo->Id)
+    {
+        case 120755: // Glave Toss for visual back(off-like)
+        case 120756: // Glave Toss for visual back(off-like)
+        case 31935: // Avenger's Shield
+        case 162638: // Avenger's Shield
+        case 187219: // Avenger's Shield
+        case 221704: // Avenger's Shield
+            AddTargetVisualHit(m_caster);
+            break;
+        default:
+            break;
     }
 }
 
@@ -2496,6 +2512,25 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
 
     // Add target to list
     m_UniqueTargetInfo.push_back(targetInfo);
+}
+
+void Spell::AddTargetVisualHit(Unit* target)
+{
+    if (!m_spellInfo)
+        return;
+
+    // Get spell hit result on target
+    TargetInfo targetInfo;
+    targetInfo.targetGUID = target->GetGUID();                         // Store target GUID
+    targetInfo.effectMask = 7;                         // Store all effects not immune
+    targetInfo.processed = false;                              // Effects not apply on target
+    targetInfo.alive = target->IsAlive();
+    targetInfo.damage = 0;
+    targetInfo.crit = false;
+    targetInfo.scaleAura = false;
+
+    // Add target to list
+    m_VisualHitTargetInfo.push_back(targetInfo);
 }
 
 void Spell::AddGOTarget(GameObject* go, uint32 effectMask)
@@ -4584,6 +4619,9 @@ void Spell::UpdateSpellCastDataTargets(WorldPackets::Spells::SpellCastData& data
             data.MissStatus.push_back(missStatus);
         }
     }
+
+    for (TargetInfo const& targetInfo : m_VisualHitTargetInfo)
+        data.HitTargets.push_back(targetInfo.targetGUID);
 
     for (GOTargetInfo const& targetInfo : m_UniqueGOTargetInfo)
         data.HitTargets.push_back(targetInfo.targetGUID); // Always hits
@@ -7923,6 +7961,20 @@ void Spell::CallScriptObjectTargetSelectHandlers(WorldObject*& target, SpellEffI
                 hookItr->Call(*scritr, target);
 
         (*scritr)->_FinishScriptCall();
+    }
+}
+
+void Spell::CallScriptObjectJumpTargetHandlers(uint32& maxTargets, SpellEffIndex effIndex)
+{
+    for (auto& m_loadedScript : m_loadedScripts)
+    {
+        m_loadedScript->_PrepareScriptCall(SPELL_SCRIPT_HOOK_OBJECT_JUMP_TARGET);
+        auto hookItrEnd = m_loadedScript->OnObjectJumpTarget.end(), hookItr = m_loadedScript->OnObjectJumpTarget.begin();
+        for (; hookItr != hookItrEnd; ++hookItr)
+            if ((*hookItr).IsEffectAffected(m_spellInfo, effIndex))
+                (*hookItr).Call(m_loadedScript, maxTargets);
+
+        m_loadedScript->_FinishScriptCall();
     }
 }
 
