@@ -376,8 +376,8 @@ void SpellScript::ObjectTargetSelectHandler::Call(SpellScript* spellScript, Worl
     (spellScript->*pObjectTargetSelectHandlerScript)(target);
 }
 
-SpellScript::ObjectJumpTargetHandler::ObjectJumpTargetHandler(SpellObjectJumpTargetFnType _pObjectJumpTargetHandlerScript, uint8 _effIndex, uint16 _targetType) : 
-    TargetHook(_effIndex, _targetType, false, false)
+SpellScript::ObjectJumpTargetHandler::ObjectJumpTargetHandler(SpellObjectJumpTargetFnType _pObjectJumpTargetHandlerScript, uint8 _effIndex, uint16 _targetType) 
+    : TargetHook(_effIndex, _targetType, false, false)
 {
     pObjectJumpTargetHandlerScript = _pObjectJumpTargetHandlerScript;
 }
