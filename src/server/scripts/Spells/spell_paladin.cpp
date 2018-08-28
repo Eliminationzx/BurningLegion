@@ -1341,7 +1341,7 @@ class spell_pal_judgment : public SpellScript
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_pal_judgment::HandleDummy, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-        OnObjectJumpTarget += SpellObjectJumpTargetFn(spell_pal_judgment_SpellScript::HandleJump, EFFECT_0, TARGET_UNIT_TARGET_ENEMY);
+        OnObjectJumpTarget += SpellObjectJumpTargetFn(spell_pal_judgment::HandleJump, EFFECT_0, TARGET_UNIT_TARGET_ENEMY);
     }
 };
 

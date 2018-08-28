@@ -4979,7 +4979,7 @@ public:
         void Register() override
         {
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_hardiness_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
-            OnEffectAbsorb += AuraEffectAbsorbFn(spell_gen_hardiness_AuraScript::OnAbsorb, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+            OnEffectAbsorb += AuraEffectAbsorbFn(spell_gen_hardiness_AuraScript::OnAbsorb, EFFECT_0);
         }
     };
 
