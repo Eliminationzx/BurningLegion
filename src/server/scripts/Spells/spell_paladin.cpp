@@ -2579,6 +2579,34 @@ public:
     }
 };
 
+// Lawbringer (Honor Talent) - 246867
+class spell_pal_lawbringer : public SpellScriptLoader
+{
+public:
+    spell_pal_lawbringer() : SpellScriptLoader("spell_pal_lawbringer") { }
+
+    class spell_pal_lawbringer_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_pal_lawbringer_SpellScript);
+
+        void HandleOnHit(SpellEffIndex /*effIndex*/)
+        {
+            if (Unit* target = GetHitUnit())
+                SetHitDamage(target->CountPctFromMaxHealth(GetEffectInfo()->CalcValue(GetCaster())));
+        }
+
+        void Register() override
+        {
+            OnEffectLaunchTarget += SpellEffectFn(spell_pal_lawbringer_SpellScript::HandleOnHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_pal_lawbringer_SpellScript();
+    }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     new spell_pal_bastion_of_light();
@@ -2601,6 +2629,7 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_consecration_heal();
     new spell_pal_retribution_aura();
     new spell_pal_blessed_hammer();
+    new spell_pal_lawbringer();
     
     //7.3.2.25549
     RegisterSpellScript(spell_pal_holy_shock);
