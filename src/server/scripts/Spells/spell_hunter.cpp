@@ -68,6 +68,7 @@ enum HunterSpells
     SPELL_HUNTER_CAMOUFLAGE                         = 199483,
     SPELL_HUNTER_COBRA_SHOT                         = 193455,
     SPELL_HUNTER_DIRE_BEAST_GENERIC                 = 120679,
+    SPELL_HUNTER_DIRE_BEAST_ENERGIZE                = 120694,
     SPELL_HUNTER_DIRE_FRENZY                        = 217200,
     SPELL_HUNTER_DIRE_FRENZY_DAMAGE                 = 217207,
     SPELL_HUNTER_DISENGAGE                          = 781,
@@ -938,6 +939,9 @@ public:
             {
                 if (Unit* target = GetHitUnit())
                 {
+                    // 213466 - charges to target
+                    player->CastSpell(player, SPELL_HUNTER_DIRE_BEAST_ENERGIZE, true);
+
                     // Summon's skin is different function of Map or Zone ID
                     switch (player->GetZoneId())
                     {
