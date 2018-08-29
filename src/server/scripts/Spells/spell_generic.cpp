@@ -4989,6 +4989,46 @@ public:
     }
 };
 
+class spell_gen_sparring : public SpellScriptLoader
+{
+public:
+    spell_gen_sparring() : SpellScriptLoader("spell_gen_sparring") { }
+
+    class spell_gen_sparring_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_gen_sparring_AuraScript);
+
+        uint32 absorbPct;
+        uint32 chancePct;
+
+        void CalculateAmount(const AuraEffect* /*aurEff*/, int32& amount, bool & /*canBeRecalculated*/)
+        {
+            chancePct = GetSpellInfo()->GetEffect(EFFECT_0)->CalcValue(GetCaster());
+            absorbPct = GetSpellInfo()->GetEffect(EFFECT_1)->CalcValue(GetCaster());
+            // Set absorbtion amount to unlimited
+            amount = -1;
+        }
+
+        void OnAbsorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
+        {
+            absorbAmount = 0;
+            if (roll_chance_i(chancePct))
+                absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
+        }
+
+        void Register() override
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_sparring_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+            OnEffectAbsorb += AuraEffectAbsorbFn(spell_gen_sparring_AuraScript::OnAbsorb, EFFECT_0);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_gen_sparring_AuraScript();
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     new spell_gen_absorb0_hitlimit1();
@@ -5106,4 +5146,5 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(aura_gen_adaptation);
     new spell_gen_adaptation_dummy();
     new spell_gen_hardiness();
+    new spell_gen_sparring();
 }
