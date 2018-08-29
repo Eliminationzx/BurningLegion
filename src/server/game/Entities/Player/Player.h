@@ -1109,6 +1109,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Unit* caster) const override;
 
+        SpellModContainer GetSpellModContainer(SpellModOp op, SpellModType type) const { return m_spellMods[op][type]; }
+
         void SetInWater(bool apply);
 
         bool IsInWater() const override { return m_isInWater; }
