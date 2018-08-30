@@ -2311,7 +2311,7 @@ public:
             }
         }
 
-        void OnUpdate(uint32 diff, AuraEffect* aurEff)
+        void OnUpdate(uint32 diff, AuraEffect* /*aurEff*/)
         {
             if (canProc)
                 return;
