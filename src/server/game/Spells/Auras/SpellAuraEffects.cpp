@@ -966,6 +966,8 @@ void AuraEffect::ApplySpellMod(Unit* target, bool apply)
 
 void AuraEffect::Update(uint32 diff, Unit* caster)
 {
+    GetBase()->CallScriptEffectUpdateHandlers(diff, this);
+
     if (m_isPeriodic && (GetBase()->GetDuration() >=0 || GetBase()->IsPassive() || GetBase()->IsPermanent()))
     {
         if (m_periodicTimer > int32(diff))
