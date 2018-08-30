@@ -35,6 +35,7 @@ EndContentData */
 #include "SpellInfo.h"
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
+#include "TemporarySummon.h"
 
 /*######
 ## npc_professor_phizzlethorpe
@@ -160,7 +161,9 @@ class spell_summon_myzrael : public SpellScript
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        if (Creature* myzrael = me->SummonCreature(NPC_MYZRAEL, -948.493f, -3113.98f, 50.4207f, 3.14159f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 90000))
+        Unit* caster = GetCaster();
+
+        if (TempSummon* myzrael = caster->SummonCreature(NPC_MYZRAEL, -948.493f, -3113.98f, 50.4207f, 3.14159f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 90000))
         {
             myzrael->SetReactState(REACT_AGGRESSIVE);
             myzrael->setFaction(14);
@@ -177,5 +180,5 @@ class spell_summon_myzrael : public SpellScript
 void AddSC_arathi_highlands()
 {
     RegisterCreatureAI(npc_professor_phizzlethorpe);
-    RegisterSpellScript(npc_myzrael_bunny);
+    RegisterSpellScript(spell_summon_myzrael);
 }

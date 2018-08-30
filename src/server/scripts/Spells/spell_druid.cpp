@@ -66,8 +66,7 @@ enum DruidSpells
     SPELL_DRUID_CELESTIAL_ALIGNMENT                 = 194223,
     SPELL_DRUID_WILD_GROWTH                         = 48438,
     SPELL_DRUID_REGROWTH                            = 8936,
-    SPELL_DRUID_MANGLE_TALENT                       = 231064,
-    SPELL_DRUID_MANGLE                              = 33917
+    SPELL_DRUID_MANGLE_TALENT                       = 231064
 };
 
 enum ShapeshiftFormSpells
