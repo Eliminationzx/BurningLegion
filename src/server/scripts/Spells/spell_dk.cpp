@@ -2293,7 +2293,7 @@ public:
             }
         }
 
-        void OnStackChange(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        void OnStackChange(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
             if (!target)
