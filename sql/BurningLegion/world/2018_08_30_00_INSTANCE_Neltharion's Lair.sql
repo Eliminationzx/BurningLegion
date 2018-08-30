@@ -282,3 +282,14 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (91001, 0, 3, 0, 0, 0, 100, 0, 35000, 36000, 24000, 26000, 11, 183465, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, "NL - ever 24-26 - cast"),
 
 (98406, 0, 0, 0, 0, 0, 100, 0, 16000, 17000, 16000, 1700, 11, 193941, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, "NL - ever 17 - cast");
+
+update creature set spawntimesecs = 86400 where id = 91005;
+update creature_template set inhabittype = 7, mechanic_immune_mask = 617299967, ScriptName = 'boss_naraxas', flags_extra = 1 where entry = 91005;
+update creature_template_wdb set classification = 3 where entry = 91005;
+update creature_template set ScriptName = 'npc_naraxas_wormspeaker_devout' where entry = 101075;
+
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES 
+(200086, 'spell_naraxas_gain_energy'); 
+
+update creature set position_z = '-60' where id = 91005;
+update creature_template set flags_extra = 536870913 where entry = 91005; 
