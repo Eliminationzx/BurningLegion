@@ -1777,44 +1777,40 @@ public:
     {
         PrepareAuraScript(spell_mage_incanters_flow_AuraScript);
 
-        bool m_Up = true;
-        bool m_Changed = false;
+        bool direction = false;
 
         void OnTick(AuraEffect const* /*auraEff*/)
         {
-            if (Unit* caster = GetCaster())
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
+            if (caster->IsInCombat())
             {
-                /// Break the cycle if caster is out of combat
-                if (!caster->IsInCombat())
-                    return;
-
-                if (caster->HasAura(SPELL_MAGE_INCANTERS_FLOW_BUFF))
+                if (Aura* aura = caster->GetAura(SPELL_MAGE_INCANTERS_FLOW_BUFF))
                 {
-                    if (Aura* incantersFlow = caster->GetAura(SPELL_MAGE_INCANTERS_FLOW_BUFF))
+                    if (!direction)
                     {
-                        m_Changed = false;
-
-                        if (incantersFlow->GetStackAmount() == 5 && m_Up)
+                        if (aura->GetStackAmount() < 5)
+                            aura->ModStackAmount(1);
+                        else
                         {
-                            m_Up = false;
-                            m_Changed = true;
+                            direction = true;
+                            aura->ModStackAmount(-1);
                         }
-                        else if (incantersFlow->GetStackAmount() == 1 && !m_Up)
+                    }
+                    else if (direction)
+                    {
+                        if (aura->GetStackAmount() > 1)
+                            aura->ModStackAmount(-1);
+                        else
                         {
-                            m_Up = true;
-                            m_Changed = true;
+                            direction = false;
+                            aura->ModStackAmount(1);
                         }
-
-                        if (!m_Changed)
-                            incantersFlow->ModStackAmount(m_Up ? 1 : -1);
                     }
                 }
-                else if (caster->IsInCombat())
-                {
+                else
                     caster->CastSpell(caster, SPELL_MAGE_INCANTERS_FLOW_BUFF, true);
-                    m_Up = true;
-                    m_Changed = false;
-                }
             }
         }
 
