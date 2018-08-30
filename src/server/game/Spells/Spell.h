@@ -805,6 +805,7 @@ class TC_GAME_API Spell
             bool   scaleAura;
         };
         std::vector<TargetInfo> m_UniqueTargetInfo;
+        std::vector<TargetInfo> m_VisualHitTargetInfo;
         uint32 m_channelTargetEffectMask;                        // Mask req. alive targets
 
         struct GOTargetInfo
@@ -828,6 +829,7 @@ class TC_GAME_API Spell
         void AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid = true, bool implicit = true, Position const* losPosition = nullptr);
         void AddGOTarget(GameObject* target, uint32 effectMask);
         void AddItemTarget(Item* item, uint32 effectMask);
+        void AddTargetVisualHit(Unit* target);
         void AddDestTarget(SpellDestination const& dest, uint32 effIndex);
 
         void DoAllEffectOnTarget(TargetInfo* target);
@@ -860,6 +862,7 @@ class TC_GAME_API Spell
         void CallScriptAfterHitHandlers();
         void CallScriptObjectAreaTargetSelectHandlers(std::list<WorldObject*>& targets, SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType);
         void CallScriptObjectTargetSelectHandlers(WorldObject*& target, SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType);
+        void CallScriptObjectJumpTargetHandlers(uint32& maxTargets, SpellEffIndex effIndex);
         void CallScriptOnSummonHandlers(Creature* creature);
         void CallScriptDestinationTargetSelectHandlers(SpellDestination& target, SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType);
         bool CheckScriptEffectImplicitTargets(uint32 effIndex, uint32 effIndexToCheck);

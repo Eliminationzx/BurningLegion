@@ -4958,19 +4958,22 @@ public:
     {
         PrepareAuraScript(spell_gen_hardiness_AuraScript);
 
+        uint32 absorbPct;
+        uint32 healthPct;
+
         void CalculateAmount(const AuraEffect* /*aurEff*/, int32& amount, bool & /*canBeRecalculated*/)
         {
-             amount = 0;
+            absorbPct = GetSpellInfo()->GetEffect(EFFECT_0)->CalcValue(GetCaster());
+            healthPct = GetSpellInfo()->GetEffect(EFFECT_1)->CalcValue(GetCaster());
+            // Set absorbtion amount to unlimited
+            amount = -1;
         }
 
         void OnAbsorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
         {
-            Unit* target = GetTarget();
-            if (!target)
-                return;
-
-            if (target->HealthAbovePct(GetEffect(EFFECT_1)->GetAmount()))
-                absorbAmount = CalculatePct(dmgInfo.GetDamage(), GetEffect(EFFECT_0)->GetAmount());
+            absorbAmount = 0;
+            if (GetTarget()->GetHealthPct() >= healthPct)
+                absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
         }
 
         void Register() override
@@ -4986,57 +4989,43 @@ public:
     }
 };
 
-//! 213170 spell
-class spell_class_hall_panel : public SpellScriptLoader
+class spell_gen_sparring : public SpellScriptLoader
 {
 public:
-    spell_class_hall_panel() : SpellScriptLoader("spell_class_hall_panel") { }
+    spell_gen_sparring() : SpellScriptLoader("spell_gen_sparring") { }
 
-    class spell_class_hall_panel_AuraScript : public AuraScript
+    class spell_gen_sparring_AuraScript : public AuraScript
     {
-        PrepareAuraScript(spell_class_hall_panel_AuraScript);
+        PrepareAuraScript(spell_gen_sparring_AuraScript);
 
-        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        uint32 absorbPct;
+        uint32 chancePct;
+
+        void CalculateAmount(const AuraEffect* /*aurEff*/, int32& amount, bool & /*canBeRecalculated*/)
         {
-            Unit* target = GetTarget();
-            if (target->GetTypeId() != TYPEID_PLAYER)
-                return;
-
-            Player* player = target->ToPlayer();
-            if (!player)
-                return;
-
-            GarrisonPtr garrison = player->GetGarrisonPtr();
-            if ((!garrison || !garrison->HasGarrison(GARRISON_TYPE_CLASS_ORDER)) && player->getLevel() >= 100)
-            {
-                if (player->GetTeam() == HORDE)
-                {
-                    // if (GetQuestRewardStatus(40518))
-                    player->CastSpell(player, 192191, true);
-                }
-                else // if (GetQuestRewardStatus(42740))
-                    player->CastSpell(player, 185506, true);
-            }
-
-            if (target->GetTypeId() == TYPEID_UNIT)
-                target->ToCreature()->SetReactState(REACT_PASSIVE);
+            chancePct = GetSpellInfo()->GetEffect(EFFECT_0)->CalcValue(GetCaster());
+            absorbPct = GetSpellInfo()->GetEffect(EFFECT_1)->CalcValue(GetCaster());
+            // Set absorbtion amount to unlimited
+            amount = -1;
         }
 
-        void HandleEffectRemove(AuraEffect const * /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        void OnAbsorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
         {
-            Unit* target = GetTarget();
-            target->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+            absorbAmount = 0;
+            if (roll_chance_i(chancePct))
+                absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
         }
 
         void Register() override
         {
-            OnEffectApply += AuraEffectApplyFn(spell_class_hall_panel_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_sparring_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+            OnEffectAbsorb += AuraEffectAbsorbFn(spell_gen_sparring_AuraScript::OnAbsorb, EFFECT_0);
         }
     };
 
     AuraScript* GetAuraScript() const override
     {
-        return new spell_class_hall_panel_AuraScript();
+        return new spell_gen_sparring_AuraScript();
     }
 };
 
@@ -5103,7 +5092,6 @@ void AddSC_generic_spell_scripts()
     new spell_gen_proc_below_pct_damaged("spell_item_petrified_twilight_scale_heroic");
     new spell_gen_parachute();
     new spell_gen_pet_summoned();
-    new spell_class_hall_panel();
     new spell_gen_profession_research();
     new spell_gen_pvp_trinket();
     new spell_gen_remove_flight_auras();
@@ -5158,4 +5146,5 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(aura_gen_adaptation);
     new spell_gen_adaptation_dummy();
     new spell_gen_hardiness();
+    new spell_gen_sparring();
 }

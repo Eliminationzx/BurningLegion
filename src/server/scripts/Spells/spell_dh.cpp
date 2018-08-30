@@ -2751,10 +2751,13 @@ public:
             Unit* target = eventInfo.GetActionTarget();
             if (!target)
                 return false;
+            
+            if (!eventInfo.GetDamageInfo())
+                return false;
 
             if (Aura* fear = GetAura())
             {
-                uint64 const dmg = fear->Variables.GetValue<uint64>("SigilOfMiseryFearDamage");
+                uint64 const dmg = fear->Variables.GetValue<uint64>("SigilOfMiseryFearDamage", 0);
                 uint64 newdamage = eventInfo.GetDamageInfo()->GetDamage() + dmg;
                 if (newdamage > target->CountPctFromMaxHealth(10))
                     fear->SetDuration(0);
