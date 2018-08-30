@@ -18,8 +18,8 @@
 
 #include "ScriptMgr.h"
 #include "neltharions_lair.h"
+#include "ScriptedCreature.h"
 
 void AddSC_boss_dargrul_the_underking()
 {
-
 }

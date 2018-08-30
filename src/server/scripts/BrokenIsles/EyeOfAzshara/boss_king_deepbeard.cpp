@@ -64,7 +64,7 @@ struct boss_king_deepbeard : public BossAI
         me->GetInstanceScript()->SetData(DATA_BOSS_DIED, 0);
     }
 
-    void EnterEvadeMode(EvadeReason /*why*/) override
+    void EnterEvadeMode(EvadeReason why) override
     {
         BossAI::EnterEvadeMode(why);
 
