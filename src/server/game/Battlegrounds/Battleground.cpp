@@ -679,6 +679,9 @@ void Battleground::RewardReputationToTeam(uint32 faction_id, uint32 Reputation, 
         if (!player)
             continue;
 
+        if (player->GetNativeTeam() != TeamID)
+            continue;
+
         uint32 repGain = Reputation;
         AddPct(repGain, player->GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN));
         AddPct(repGain, player->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_FACTION_REPUTATION_GAIN, faction_id));
@@ -690,7 +693,7 @@ void Battleground::RewardChestToTeam(uint32 TeamID)
 {
     for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
         if (Player* player = _GetPlayerForTeam(TeamID, itr, "RewardChestToTeam"))
-            player->AddItem(player->IsInAlliance() ? ITEM_BG_ALLIANCE_CHEST : ITEM_BG_HORDE_CHEST, 1);
+            player->AddItem(player->GetNativeTeam() == ALLIANCE ? ITEM_BG_ALLIANCE_CHEST : ITEM_BG_HORDE_CHEST, 1);
 }
 
 void Battleground::KillCreditQuestToTeam(uint32 TeamID, uint32 questID, uint32 killCreditEntry)
@@ -929,6 +932,8 @@ void Battleground::RemovePlayerAtLeave(ObjectGuid guid, bool Transport, bool Sen
             player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
 
         player->RemoveAurasByType(SPELL_AURA_MOUNTED);
+        player->RemoveAurasByType(SPELL_AURA_SWITCH_TEAM);
+        player->RemoveAurasByType(SPELL_AURA_MOD_FACTION);
 
         if (!player->IsAlive())                              // resurrect on exit
         {
@@ -1121,6 +1126,17 @@ void Battleground::AddPlayer(Player* player)
             startTimer.TotalTime = countdownMaxForBGType;
 
             player->SendDirectMessage(startTimer.Write());
+        }
+
+        if (player->HasAura(SPELL_MERCENARY_CONTRACT_HORDE))
+        {
+            player->CastSpell(player, SPELL_MERCENARY_HORDE_1, true);
+            player->CastSpell(player, SPELL_MERCENARY_HORDE_2, true);
+        }
+        else if (player->HasAura(SPELL_MERCENARY_CONTRACT_ALLIANCE))
+        {
+            player->CastSpell(player, SPELL_MERCENARY_ALLIANCE_1, true);
+            player->CastSpell(player, SPELL_MERCENARY_ALLIANCE_2, true);
         }
     }
 
