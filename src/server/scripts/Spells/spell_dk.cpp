@@ -150,7 +150,8 @@ enum DeathKnightSpells
     SPELL_DK_VAMPIRIC_BLOOD                     = 55233,
     SPELL_DK_UMBILICUS_ETERNUS                  = 193213,
     SPELL_DK_UMBILICUS_ETERNUS_SHIELD           = 193320,
-    SPELL_DK_DEFILE_DAMAGE                      = 156000
+    SPELL_DK_DEFILE_DAMAGE                      = 156000,
+    SPELL_DK_CONSUMPTION_LEECH                  = 205224
 };
 
 // 70656 - Advantage (T10 4P Melee Bonus)
@@ -2592,6 +2593,37 @@ class spell_dk_defile : public AuraScript
     }
 };
 
+// Consumption (Artifact) - 205223
+class spell_dk_consumption : public SpellScriptLoader
+{
+public:
+    spell_dk_consumption() : SpellScriptLoader("spell_dk_consumption") { }
+
+    class spell_dk_consumption_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dk_consumption_SpellScript);
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                int32 bp = CalculatePct(GetSpellInfo()->GetEffect(EFFECT_2)->CalcValue(caster), GetHitDamage());
+                caster->CastCustomSpell(caster, SPELL_DK_CONSUMPTION_LEECH, &bp, nullptr, nullptr, true);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_dk_consumption_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_WEAPON_PERCENT_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_dk_consumption_SpellScript();
+    }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     new spell_dk_advantage_t10_4p();
@@ -2651,4 +2683,5 @@ void AddSC_deathknight_spell_scripts()
     new spell_dk_umbilicus_eternus();
     new spell_dk_umbilicus_eternus_dummy();
     RegisterAuraScript(spell_dk_defile);
+    new spell_dk_consumption();
 }
