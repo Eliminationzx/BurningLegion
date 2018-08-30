@@ -2247,7 +2247,7 @@ public:
     {
         PrepareAuraScript(spell_dk_bone_shield_AuraScript);
 
-        void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & canBeRecalculated)
+        void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
         {
             amount = -1;
         }
