@@ -262,6 +262,16 @@ class TC_GAME_API CreatureAI : public UnitAI
         {
             me->KillAllDelayedCombats();
         }
+        
+        void AddTimedDelayedOperation(uint64 timeOffset, std::function<void()>&& function)
+        {
+            me->AddTimedDelayedOperation(timeOffset, std::move(function));
+        }
+        
+        void KillAllDelayedEvents()
+        {
+            me->KillAllDelayedEvents();
+        }
 
     protected:
         virtual void MoveInLineOfSight(Unit* /*who*/);

@@ -1647,6 +1647,16 @@ class TC_GAME_API Unit : public WorldObject
         // Event handler
         EventProcessor m_Events;
         
+        void AddTimedDelayedOperation(uint64 timeOffset, std::function<void()>&& function)
+        {
+            m_Functions.AddTimedDelayedOperation(timeOffset, std::move(function));
+        }
+
+        void KillAllDelayedEvents()
+        {
+            m_Functions.KillAllFunctions();
+        }
+        
         void AddDelayedCombat(uint64 timeOffset, std::function<void()>&& function)
         {
             m_CombatFunctions.AddTimedDelayedOperation(timeOffset, std::move(function));
@@ -2116,7 +2126,8 @@ class TC_GAME_API Unit : public WorldObject
         uint32 m_currentPetBattleId;
 
         std::unordered_map<ObjectGuid, uint32/*entry*/> m_SummonedCreatures;
-        
+
+        EventProcessor m_Functions;        
         EventProcessor m_CombatFunctions;
 };
 
