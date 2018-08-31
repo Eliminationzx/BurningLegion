@@ -58,7 +58,7 @@ public:
             LoadDoorData(doorData);
         }
 
-        void OnCreatureCreate(Creature* creature) override
+        void OnCreatureCreate(Creature* /*creature*/) override
         {
             /* switch (creature->GetEntry())
             {

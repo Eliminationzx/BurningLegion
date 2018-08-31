@@ -143,7 +143,7 @@ public:
             events.ScheduleEvent(EVENT_CALL_ANGRY_CROWD, 4000); //Не повторяется
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             BossAI::EnterEvadeMode();
 
