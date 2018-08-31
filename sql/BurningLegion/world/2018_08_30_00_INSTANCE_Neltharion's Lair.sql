@@ -292,4 +292,22 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (200086, 'spell_naraxas_gain_energy'); 
 
 update creature set position_z = '-60' where id = 91005;
-update creature_template set flags_extra = 536870913 where entry = 91005; 
+update creature_template set flags_extra = 536870913 where entry = 91005;
+
+update creature set spawntimesecs = 86400 where id = 91007;
+update creature_template set inhabittype = 7, mechanic_immune_mask = 617299967, ScriptName = 'boss_dargrul_the_underking', flags_extra = 1 where entry = 91007;
+update creature_template set ScriptName = 'npc_dargrul_molten_charskin' where entry = 101476;
+update creature_template set ScriptName = 'npc_dargrul_crystal_wall', flags_extra = 128 where entry = 101593;
+update creature_template set ScriptName = 'npc_emberhusk_dominator' where entry in (102295);
+update creature_template set ScriptName = 'npc_dargrul_lava_geyser' where entry = 108926;
+
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES 
+(201444, 'spell_dargrul_gain_energy'),
+(209920, 'spell_dargrul_magma_breaker'),
+(200721, 'spell_dargrul_landslide_filter'),
+(200404, 'spell_dargrul_magma_wave_filter'),
+(200732, 'spell_dargrul_molten_crash'),
+(216368, 'spell_dargrul_magma_breaker');
+
+INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES 
+(200404, 209947, 0, 'Cast Magma Wave');
