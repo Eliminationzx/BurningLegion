@@ -371,7 +371,7 @@ public:
             events.Reset();
         }
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(Unit* /*summoner*/) override
         {
             events.ScheduleEvent(EFFECT_1, 1000);
         }
@@ -442,7 +442,7 @@ public:
     {
         PrepareAuraScript(spell_naraxas_gain_energy_AuraScript);
 
-        void OnTick(AuraEffect const* aurEff)
+        void OnTick(AuraEffect const* /*aurEff*/)
         {
             Unit* caster = GetCaster();
             if (!caster)
