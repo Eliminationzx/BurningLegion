@@ -1646,6 +1646,16 @@ class TC_GAME_API Unit : public WorldObject
 
         // Event handler
         EventProcessor m_Events;
+        
+        void AddDelayedCombat(uint64 timeOffset, std::function<void()>&& function)
+        {
+            m_CombatFunctions.AddTimedDelayedOperation(timeOffset, std::move(function));
+        }
+
+        void KillAllDelayedCombats()
+        {
+            m_CombatFunctions.KillAllFunctions();
+        }
 
         // stat system
         bool HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, float amount, bool apply);
@@ -2106,6 +2116,8 @@ class TC_GAME_API Unit : public WorldObject
         uint32 m_currentPetBattleId;
 
         std::unordered_map<ObjectGuid, uint32/*entry*/> m_SummonedCreatures;
+        
+        EventProcessor m_CombatFunctions;
 };
 
 namespace Trinity

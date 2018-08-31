@@ -22,6 +22,8 @@
 #include "Define.h"
 #include <map>
 
+typedef std::multimap<uint64, std::function<void()>> FunctionList;
+
 class EventProcessor;
 
 // Note. All times are in milliseconds here.
@@ -76,12 +78,20 @@ class TC_COMMON_API EventProcessor
 
         void Update(uint32 p_time);
         void KillAllEvents(bool force);
+        void KillAllFunctions();
         void AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime = true);
+        void AddTimedDelayedOperation(uint64 t_offset, std::function<void()>&& function);
+        void AddFunction(std::function<void()> && Function, uint64 e_time);
+        void AddFunctionsFromQueue();
         uint64 CalculateTime(uint64 t_offset) const;
 
     protected:
         uint64 m_time;
         std::multimap<uint64, BasicEvent*> m_events;
+        FunctionList m_functions;
+        FunctionList m_functions_queue;
+        std::recursive_mutex m_queue_lock;
+        bool clean;
 };
 
 #endif

@@ -106,9 +106,9 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         bool CanSwim() const override { return (GetCreatureTemplate()->InhabitType & INHABIT_WATER) != 0 || IsPet(); }
         bool CanFly()  const override { return (GetCreatureTemplate()->InhabitType & INHABIT_AIR) != 0; }
 
-        void SetReactState(ReactStates st) { m_reactState = st; }
-        ReactStates GetReactState() const { return m_reactState; }
-        bool HasReactState(ReactStates state) const { return (m_reactState == state); }
+        void SetReactState(ReactStates st, uint32 delay = 0);
+        ReactStates GetReactState();
+        bool HasReactState(ReactStates state) const;
         void InitializeReactState();
 
         /// @todo Rename these properly

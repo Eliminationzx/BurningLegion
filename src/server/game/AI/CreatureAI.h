@@ -22,8 +22,12 @@
 #include "UnitAI.h"
 #include "Common.h"
 #include "ObjectDefines.h"
+#include "Creature.h"
 
 class AreaBoundary;
+class Unit;
+class Player;
+class SpellInfo;
 class AreaTrigger;
 class Creature;
 class DynamicObject;
@@ -237,7 +241,7 @@ class TC_GAME_API CreatureAI : public UnitAI
 
         virtual void OnSpellClick(Unit* /*clicker*/, bool& /*result*/) { }
 
-        virtual bool CanSeeAlways(WorldObject const* /*obj*/) { return false; }
+        virtual bool CanSeeAlways(WorldObject const* /*obj*/) { return false; }        
 
         // Called when a player is charmed by the creature
         // If a PlayerAI* is returned, that AI is placed on the player instead of the default charm AI
@@ -248,6 +252,16 @@ class TC_GAME_API CreatureAI : public UnitAI
         int32 VisualizeBoundary(uint32 duration, Unit* owner=nullptr, bool fill=false) const;
         virtual bool CheckInRoom();
         CreatureBoundary const* GetBoundary() const { return _boundary; }
+        
+        void AddDelayedCombat(uint64 timeOffset, std::function<void()>&& function)
+        {
+            me->AddDelayedCombat(timeOffset, std::move(function));
+        }
+
+        void KillAllDelayedCombats()
+        {
+            me->KillAllDelayedCombats();
+        }
 
     protected:
         virtual void MoveInLineOfSight(Unit* /*who*/);
