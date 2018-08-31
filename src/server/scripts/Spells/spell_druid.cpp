@@ -66,7 +66,11 @@ enum DruidSpells
     SPELL_DRUID_CELESTIAL_ALIGNMENT                 = 194223,
     SPELL_DRUID_WILD_GROWTH                         = 48438,
     SPELL_DRUID_REGROWTH                            = 8936,
-    SPELL_DRUID_MANGLE_TALENT                       = 231064
+    SPELL_DRUID_MANGLE_TALENT                       = 231064,
+    SPELL_DRUID_ABUNDANCE                           = 207383,
+    SPELL_DRUID_ABUNDANCE_BUFF                      = 207640,
+    SPELL_DRUID_AMANTHULS_WISDOM                    = 208221,
+    SPELL_DRUID_AMANTHULS_WISDOM_DUMMY              = 208220
 };
 
 enum ShapeshiftFormSpells
@@ -2213,42 +2217,111 @@ public:
     }
 };
 
-class spell_dru_rejuvenation : public SpellScriptLoader
+// Rejuvenation - 774, 155777 
+class spell_druid_rejuvenation : public SpellScriptLoader
 {
-public:
-    spell_dru_rejuvenation() : SpellScriptLoader("spell_dru_rejuvenation") {}
+    public:
+        spell_druid_rejuvenation() : SpellScriptLoader("spell_druid_rejuvenation") { }
 
-    class spell_dru_rejuvenation_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_dru_rejuvenation_AuraScript);
-
-
-        bool Validate(SpellInfo const* /*spellInfo*/) override
+        class spell_dru_rejuvenation_SpellScript : public SpellScript
         {
-            return ValidateSpellInfo({ SPELL_DRUID_GERMINATION, SPELL_DRUID_GERMINATION_REJUVENATION });
+            PrepareSpellScript(spell_dru_rejuvenation_SpellScript);
+
+            int32 rejuvAur = 0;
+
+            void HandleAfterHit()
+            {
+                Unit* caster = GetCaster();
+                Unit* target = GetHitUnit();
+                if (!caster || !target)
+                    return;
+
+                Aura* rejuv = target->GetAura(SPELL_DRUID_REJUVENATION, caster->GetGUID());
+                if (rejuv && rejuvAur > 0)
+                    rejuv->SetDuration(rejuvAur);
+            }
+
+            void HandleBeforeHit(SpellMissInfo /*missInfo*/)
+            {
+                Unit* caster = GetCaster();
+                Unit* target = GetHitUnit();
+                if (!caster || !target)
+                    return;
+
+                if (caster->HasAura(SPELL_DRUID_GERMINATION) && target->HasAura(SPELL_DRUID_REJUVENATION, caster->GetGUID()))
+                {
+                    Aura* rejuv = target->GetAura(SPELL_DRUID_REJUVENATION, caster->GetGUID());
+                    if (!rejuv)
+                        return;
+
+                    if (!target->HasAura(SPELL_DRUID_GERMINATION_REJUVENATION, caster->GetGUID()))
+                    {
+                        caster->CastSpell(target, SPELL_DRUID_GERMINATION_REJUVENATION, true);
+                        rejuvAur = rejuv->GetDuration();
+                    }
+                    else
+                    {
+                        Aura* germination = target->GetAura(SPELL_DRUID_GERMINATION_REJUVENATION, caster->GetGUID());
+                        Aura* rejuv = target->GetAura(SPELL_DRUID_REJUVENATION, caster->GetGUID());
+                        if (germination && rejuv)
+                        {
+                            int32 germinationDur = germination->GetDuration();
+                            int32 rejuvDur = rejuv->GetDuration();
+                            if (germinationDur > rejuvDur)
+                                caster->AddAura(SPELL_DRUID_REJUVENATION, target);
+                            else
+                            {
+                                caster->CastSpell(target, SPELL_DRUID_GERMINATION_REJUVENATION, true);
+                                rejuvAur = rejuvDur;
+                            }
+                        }
+                    }
+                }
+            }
+
+            void Register()
+            {
+                BeforeHit += BeforeSpellHitFn(spell_dru_rejuvenation_SpellScript::HandleBeforeHit);
+                AfterHit += SpellHitFn(spell_dru_rejuvenation_SpellScript::HandleAfterHit);
+            }
+        };
+
+        class spell_druid_rejuvenation_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_druid_rejuvenation_AuraScript);
+
+            void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if (Unit* caster = GetCaster())
+                    if(caster->HasAura(SPELL_DRUID_ABUNDANCE))
+                        caster->CastSpellDelay(caster, SPELL_DRUID_ABUNDANCE_BUFF, true, 50);
+            }
+
+            void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if(Unit* caster = GetCaster())
+                {
+                    if (Aura* aura = caster->GetAura(SPELL_DRUID_ABUNDANCE_BUFF))
+                        aura->ModStackAmount(-1);
+                }
+            }
+
+            void Register() override
+            {
+                AfterEffectApply += AuraEffectApplyFn(spell_druid_rejuvenation_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
+                AfterEffectRemove += AuraEffectRemoveFn(spell_druid_rejuvenation_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const override
+        {
+            return new spell_druid_rejuvenation_AuraScript();
         }
 
-        void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        SpellScript* GetSpellScript() const
         {
-            Unit* caster = GetCaster();
-            Unit* target = GetTarget();
-            if (!caster || !target)
-                return;
-
-            if (caster->HasAura(SPELL_DRUID_GERMINATION) && target->HasAura(GetId()))
-                caster->CastSpell(target, SPELL_DRUID_GERMINATION_REJUVENATION, true, nullptr, aurEff);
+            return new spell_dru_rejuvenation_SpellScript();
         }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_dru_rejuvenation_AuraScript::OnApply, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_dru_rejuvenation_AuraScript();
-    }
 };
 
 // 783 - Travel Form (dummy)
