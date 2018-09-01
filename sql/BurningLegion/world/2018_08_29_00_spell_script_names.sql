@@ -7,5 +7,5 @@ INSERT INTO `spell_script_names` VALUE
 (1463,  "spell_mage_incanters_flow"),
 (194844,  "spell_dk_bonestorm"),
 (205223,  "spell_dk_consumption"),
-(155777,  "spell_druid_rejuvenation"),
+(155777,  "spell_dru_rejuvenation"),
 (246867, "spell_pal_lawbringer");

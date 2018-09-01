@@ -2218,10 +2218,10 @@ public:
 };
 
 // Rejuvenation - 774, 155777 
-class spell_druid_rejuvenation : public SpellScriptLoader
+class spell_dru_rejuvenation : public SpellScriptLoader
 {
     public:
-        spell_druid_rejuvenation() : SpellScriptLoader("spell_druid_rejuvenation") { }
+        spell_dru_rejuvenation() : SpellScriptLoader("spell_dru_rejuvenation") { }
 
         class spell_dru_rejuvenation_SpellScript : public SpellScript
         {
@@ -2286,9 +2286,9 @@ class spell_druid_rejuvenation : public SpellScriptLoader
             }
         };
 
-        class spell_druid_rejuvenation_AuraScript : public AuraScript
+        class spell_dru_rejuvenation_AuraScript : public AuraScript
         {
-            PrepareAuraScript(spell_druid_rejuvenation_AuraScript);
+            PrepareAuraScript(spell_dru_rejuvenation_AuraScript);
 
             void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
@@ -2308,14 +2308,14 @@ class spell_druid_rejuvenation : public SpellScriptLoader
 
             void Register() override
             {
-                AfterEffectApply += AuraEffectApplyFn(spell_druid_rejuvenation_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
-                AfterEffectRemove += AuraEffectRemoveFn(spell_druid_rejuvenation_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
+                AfterEffectApply += AuraEffectApplyFn(spell_dru_rejuvenation_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
+                AfterEffectRemove += AuraEffectRemoveFn(spell_dru_rejuvenation_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
         AuraScript* GetAuraScript() const override
         {
-            return new spell_druid_rejuvenation_AuraScript();
+            return new spell_dru_rejuvenation_AuraScript();
         }
 
         SpellScript* GetSpellScript() const override
@@ -2917,10 +2917,10 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScript(spell_dru_maim);
     new spell_dru_rip();
     new spell_dru_bloodtalons();
-    new spell_dru_rejuvenation();
     new spell_dru_travel_form_dummy();
     new spell_dru_travel_form();
     new spell_dru_mangle();
+    new spell_dru_rejuvenation();
 
     RegisterSpellScript(spell_dru_thrash_bear);
     RegisterAuraScript(aura_dru_thrash_bear);
