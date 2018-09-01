@@ -21,6 +21,7 @@
 #include "ScriptedCreature.h"
 #include "Spell.h"
 #include "GameObject.h"
+#include "Unit.h"
 
 enum Says
 {
@@ -383,11 +384,11 @@ public:
 
             despawn = true;
 
-            /*me->AddTimedDelayedOperation(200, [this] () -> void
+            me->AddTimedDelayedOperation(200, [this] () -> void
             {
                 if (me)
                     me->DespawnOrUnsummon();
-            });*/
+            });
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage) override
