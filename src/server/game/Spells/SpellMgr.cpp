@@ -703,7 +703,51 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                 return bf->IsWarTime();
             break;
         }
-
+        case 240010: //Class Hall Banishing
+        {
+            switch (player->GetAreaId())
+            {
+                case 7679: //DK Hall
+                    if (player->getClass() == CLASS_DEATH_KNIGHT)
+                        return false;
+                    break;
+                case 7752: //Shaman Hall
+                case 7753:
+                    if (player->getClass() == CLASS_SHAMAN)
+                        return false;
+                    break;
+                case 7813: //Warrior Hall
+                    if (player->getClass() == CLASS_WARRIOR)
+                        return false;
+                    break;
+                case 7879: //Mage Hall
+                    if (player->getClass() == CLASS_MAGE)
+                        return false;
+                    break;
+                case 8012: //Rogue Hall
+                    if (player->getClass() == CLASS_ROGUE)
+                        return false;
+                    break;
+                case 7875: //Warlock Hall
+                    if (player->getClass() == CLASS_WARLOCK)
+                        return false;
+                    break;
+                case 7903: //Monk Hall
+                    if (player->getClass() == CLASS_MONK)
+                        return false;
+                    break;
+                case 7834: //Priest Hall
+                case 8356:
+                    if (player->getClass() == CLASS_PRIEST)
+                        return false;
+                    break;
+                default:
+                    break;
+            }
+            break;
+        }
+        default:
+            break;
     }
 
     return true;
@@ -3654,12 +3698,20 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 108211 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AuraInterruptFlags.fill(0);
-	});
-	
+    });
+    
     // Void Suppression
     ApplySpellFix({ 260888 }, [](SpellInfo* spellInfo)
     {
         const_cast<SpellEffectInfo*>(spellInfo->GetEffect(EFFECT_1))->Effect = 0;
+    });
+    
+    // Horde / Alliance
+    ApplySpellFix({ 195838, 195843 }, [](SpellInfo* spellInfo)
+    {
+        const_cast<SpellEffectInfo*>(spellInfo->GetEffect(EFFECT_0))->Effect = SPELL_EFFECT_APPLY_AURA;
+        const_cast<SpellEffectInfo*>(spellInfo->GetEffect(EFFECT_1))->Effect = SPELL_EFFECT_APPLY_AURA;
+        const_cast<SpellEffectInfo*>(spellInfo->GetEffect(EFFECT_2))->Effect = SPELL_EFFECT_APPLY_AURA;
     });
 
     SpellInfo* spellInfo = NULL;

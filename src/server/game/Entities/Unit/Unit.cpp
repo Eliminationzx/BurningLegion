@@ -1132,6 +1132,38 @@ bool Unit::CastSpell(GameObject* go, uint32 spellId, bool triggered, Item* castI
     return CastSpell(targets, spellInfo, nullptr, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, castItem, triggeredByAura, originalCaster);
 }
 
+void Unit::CastSpellDelay(Unit* victim, uint32 spellId, bool triggered, uint32 delay, Item* castItem, AuraEffect const* triggeredByAura, ObjectGuid originalCaster)
+{
+    if (m_cleanupDone)
+        return;
+
+    ObjectGuid targetGUID = victim->GetGUID();
+    AddDelayedCombat(delay, [this, spellId, triggered, castItem, triggeredByAura, originalCaster, targetGUID]() -> void
+    {
+        Unit* target = ObjectAccessor::GetUnit(*this, targetGUID);
+        if (!target)
+            return;
+
+        CastSpell(target, spellId, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, castItem, triggeredByAura, originalCaster);
+    });
+}
+
+void Unit::CastSpellDelay(Position pos, uint32 spellId, bool triggered, uint32 delay, Item* castItem, AuraEffect const* triggeredByAura, ObjectGuid originalCaster)
+{
+    if (m_cleanupDone)
+        return;
+
+    if (!delay)
+        CastSpell(pos, spellId, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, castItem, triggeredByAura, originalCaster);
+    else
+    {
+        AddDelayedCombat(delay, [this, pos, spellId, triggered, castItem, triggeredByAura, originalCaster]() -> void
+        {
+            CastSpell(pos, spellId, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, castItem, triggeredByAura, originalCaster);
+        });
+    }
+}
+
 void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 damage, SpellInfo const* spellInfo, WeaponAttackType attackType, bool crit)
 {
     if (damage < 0)
@@ -4168,7 +4200,14 @@ void Unit::RemoveAurasOnEvade()
 
     // don't remove vehicle auras, passengers aren't supposed to drop off the vehicle
     // don't remove clone caster on evade (to be verified)
-    RemoveAllAurasExceptType(SPELL_AURA_CONTROL_VEHICLE, SPELL_AURA_CLONE_CASTER);
+    // don't remove positive auras with SPELL_ATTR3_DEATH_PERSISTENT
+    RemoveAppliedAuras([this](AuraApplication const* aurApp)
+    {
+        Aura const* aura = aurApp->GetBase();
+        return !aura->GetSpellInfo()->HasAura(GetMap()->GetDifficultyID(), SPELL_AURA_CONTROL_VEHICLE)
+            && !aura->GetSpellInfo()->HasAura(GetMap()->GetDifficultyID(), SPELL_AURA_CLONE_CASTER)
+            && (!aurApp->IsPositive() || !aura->GetSpellInfo()->HasAttribute(SPELL_ATTR3_DEATH_PERSISTENT));
+    });
 }
 
 void Unit::RemoveAllAurasOnDeath()

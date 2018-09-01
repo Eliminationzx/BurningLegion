@@ -267,6 +267,7 @@ class TC_GAME_API Aura
         void CallScriptAfterEffectApplyHandlers(AuraEffect const* aurEff, AuraApplication const* aurApp, AuraEffectHandleModes mode);
         void CallScriptAfterEffectRemoveHandlers(AuraEffect const* aurEff, AuraApplication const* aurApp, AuraEffectHandleModes mode);
         bool CallScriptEffectPeriodicHandlers(AuraEffect const* aurEff, AuraApplication const* aurApp);
+        void CallScriptEffectUpdateHandlers(uint32 diff, AuraEffect* aurEff);
         void CallScriptEffectUpdatePeriodicHandlers(AuraEffect* aurEff);
         void CallScriptAuraUpdateHandlers(uint32 diff);
         void CallScriptEffectCalcAmountHandlers(AuraEffect const* aurEff, int32 & amount, bool & canBeRecalculated);

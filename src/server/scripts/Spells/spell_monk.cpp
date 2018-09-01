@@ -158,7 +158,8 @@ enum MonkSpells
     SPELL_MONK_LIFE_COCOON                              = 116849,
     SPELL_MONK_EFFUSE                                   = 116694,
     SPELL_MONK_STAVE_OFF                                = 238093,
-    SPELL_MONK_YULONS_GIFT                              = 159534
+    SPELL_MONK_YULONS_GIFT                              = 159534,
+    SPELL_MONK_THE_BLACK_FLAME_GAMBLE                   = 216992
 };
 
 enum StormEarthAndFireSpells
@@ -3659,6 +3660,69 @@ class spell_monk_tiger_palm : public SpellScript
     }
 };
 
+// Thunder Focus Tea - 116680
+class spell_monk_thunder_focus_tea : public SpellScriptLoader
+{
+public:
+    spell_monk_thunder_focus_tea() : SpellScriptLoader("spell_monk_thunder_focus_tea") {}
+
+    class spell_monk_thunder_focus_tea_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_monk_thunder_focus_tea_AuraScript);
+
+        void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                if (Player* plr = caster->ToPlayer())
+                {
+                    for (auto itr : plr->GetSpellModContainer(SPELLMOD_DAMAGE, SPELLMOD_PCT))
+                    {
+                        if (itr->spellId == SPELL_MONK_THE_BLACK_FLAME_GAMBLE)
+                        {
+                            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_MONK_THE_BLACK_FLAME_GAMBLE))
+                                itr->value = 0.f;
+
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        void RemoveEff(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                if (Player* plr = caster->ToPlayer())
+                {
+                    for (auto itr : plr->GetSpellModContainer(SPELLMOD_DAMAGE, SPELLMOD_PCT))
+                    {
+                        if (itr->spellId == SPELL_MONK_THE_BLACK_FLAME_GAMBLE)
+                        {
+                            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_MONK_THE_BLACK_FLAME_GAMBLE))
+                                itr->value = spellInfo->GetEffect(EFFECT_0)->BasePoints;
+
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_monk_thunder_focus_tea_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+            OnEffectRemove += AuraEffectRemoveFn(spell_monk_thunder_focus_tea_AuraScript::RemoveEff, EFFECT_1, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_monk_thunder_focus_tea_AuraScript();
+    }
+};
+
 void AddSC_monk_spell_scripts()
 {
     RegisterAreaTriggerAI(at_monk_gift_of_the_ox_sphere);
@@ -3739,6 +3803,6 @@ void AddSC_monk_spell_scripts()
     new playerScript_monk_whirling_dragon_punch();
     RegisterAuraScript(spell_monk_whirling_dragon_punch);
     RegisterSpellScript(spell_monk_tiger_palm);
-
     RegisterCreatureAI(npc_monk_sef_spirit);
+    new spell_monk_thunder_focus_tea();
 }

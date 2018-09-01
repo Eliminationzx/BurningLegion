@@ -230,4 +230,5 @@ void AddSC_boss_king_deepbeard()
     RegisterAuraScript(aura_king_deepbeard_gain_energy);
 
     RegisterAreaTriggerAI(at_king_deepbeard_call_the_seas);
+    
 }

@@ -1274,6 +1274,8 @@ class TC_GAME_API Unit : public WorldObject
         bool CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
         bool CastSpell(float x, float y, float z, uint32 spellId, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
         bool CastSpell(GameObject* go, uint32 spellId, bool triggered, Item* castItem = nullptr, AuraEffect* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
+        void CastSpellDelay(Unit* victim, uint32 spellId, bool triggered, uint32 delay, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
+        void CastSpellDelay(Position pos, uint32 spellId, bool triggered, uint32 delay, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
         bool CastCustomSpell(Unit* victim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
         bool CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* victim, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
         bool CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* victim = nullptr, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
@@ -1646,6 +1648,26 @@ class TC_GAME_API Unit : public WorldObject
 
         // Event handler
         EventProcessor m_Events;
+        
+        void AddTimedDelayedOperation(uint64 timeOffset, std::function<void()>&& function)
+        {
+            m_Functions.AddTimedDelayedOperation(timeOffset, std::move(function));
+        }
+
+        void KillAllDelayedEvents()
+        {
+            m_Functions.KillAllFunctions();
+        }
+        
+        void AddDelayedCombat(uint64 timeOffset, std::function<void()>&& function)
+        {
+            m_CombatFunctions.AddTimedDelayedOperation(timeOffset, std::move(function));
+        }
+
+        void KillAllDelayedCombats()
+        {
+            m_CombatFunctions.KillAllFunctions();
+        }
 
         // stat system
         bool HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, float amount, bool apply);
@@ -2106,6 +2128,9 @@ class TC_GAME_API Unit : public WorldObject
         uint32 m_currentPetBattleId;
 
         std::unordered_map<ObjectGuid, uint32/*entry*/> m_SummonedCreatures;
+
+        EventProcessor m_Functions;        
+        EventProcessor m_CombatFunctions;
 };
 
 namespace Trinity

@@ -170,6 +170,7 @@ enum SpellScriptHookType
     SPELL_SCRIPT_HOOK_AFTER_HIT,
     SPELL_SCRIPT_HOOK_OBJECT_AREA_TARGET_SELECT,
     SPELL_SCRIPT_HOOK_OBJECT_TARGET_SELECT,
+    SPELL_SCRIPT_HOOK_OBJECT_JUMP_TARGET,
     SPELL_SCRIPT_HOOK_DESTINATION_TARGET_SELECT,
     SPELL_SCRIPT_HOOK_CHECK_CAST,
     SPELL_SCRIPT_HOOK_BEFORE_CAST,
@@ -201,6 +202,7 @@ class TC_GAME_API SpellScript : public _SpellScript
             typedef void(CLASSNAME::*SpellCastFnType)(); \
             typedef void(CLASSNAME::*SpellObjectAreaTargetSelectFnType)(std::list<WorldObject*>&); \
             typedef void(CLASSNAME::*SpellObjectTargetSelectFnType)(WorldObject*&); \
+            typedef void(CLASSNAME::*SpellObjectJumpTargetFnType)(uint32& maxTargets); \
             typedef void(CLASSNAME::*SpellOnPrepareFnType)(); \
             typedef void(CLASSNAME::*SpellDestinationTargetSelectFnType)(SpellDestination&); \
             typedef void(CLASSNAME::*SpellOnSummonFnType)(Creature* summon); \
@@ -333,6 +335,15 @@ class TC_GAME_API SpellScript : public _SpellScript
                 SpellObjectTargetSelectFnType pObjectTargetSelectHandlerScript;
         };
 
+        class TC_GAME_API ObjectJumpTargetHandler : public TargetHook
+        {
+            public:
+                ObjectJumpTargetHandler(SpellObjectJumpTargetFnType _pObjectJumpTargetHandlerScript, uint8 _effIndex, uint16 _targetType);
+                void Call(SpellScript* spellScript, uint32 & AddJumpTargets);
+            private:
+                SpellObjectJumpTargetFnType pObjectJumpTargetHandlerScript;
+        };
+
         class TC_GAME_API DestinationTargetSelectHandler : public TargetHook
         {
             public:
@@ -354,6 +365,7 @@ class TC_GAME_API SpellScript : public _SpellScript
         class BeforeHitHandlerFunction : public SpellScript::BeforeHitHandler { public: BeforeHitHandlerFunction(SpellBeforeHitFnType pBeforeHitHandlerScript) : SpellScript::BeforeHitHandler((SpellScript::SpellBeforeHitFnType)pBeforeHitHandlerScript) { } }; \
         class ObjectAreaTargetSelectHandlerFunction : public SpellScript::ObjectAreaTargetSelectHandler { public: ObjectAreaTargetSelectHandlerFunction(SpellObjectAreaTargetSelectFnType _pObjectAreaTargetSelectHandlerScript, uint8 _effIndex, uint16 _targetType) : SpellScript::ObjectAreaTargetSelectHandler((SpellScript::SpellObjectAreaTargetSelectFnType)_pObjectAreaTargetSelectHandlerScript, _effIndex, _targetType) { } }; \
         class ObjectTargetSelectHandlerFunction : public SpellScript::ObjectTargetSelectHandler { public: ObjectTargetSelectHandlerFunction(SpellObjectTargetSelectFnType _pObjectTargetSelectHandlerScript, uint8 _effIndex, uint16 _targetType) : SpellScript::ObjectTargetSelectHandler((SpellScript::SpellObjectTargetSelectFnType)_pObjectTargetSelectHandlerScript, _effIndex, _targetType) { } }; \
+        class ObjectJumpTargetHandlerFunction : public SpellScript::ObjectJumpTargetHandler { public: ObjectJumpTargetHandlerFunction(SpellObjectJumpTargetFnType _pObjectJumpTargetHandlerScript, uint8 _effIndex, uint16 _targetType) : SpellScript::ObjectJumpTargetHandler((SpellScript::SpellObjectJumpTargetFnType)_pObjectJumpTargetHandlerScript, _effIndex, _targetType) {} }; \
         class DestinationTargetSelectHandlerFunction : public SpellScript::DestinationTargetSelectHandler { public: DestinationTargetSelectHandlerFunction(SpellDestinationTargetSelectFnType _DestinationTargetSelectHandlerScript, uint8 _effIndex, uint16 _targetType) : SpellScript::DestinationTargetSelectHandler((SpellScript::SpellDestinationTargetSelectFnType)_DestinationTargetSelectHandlerScript, _effIndex, _targetType) { } }; \
         class OnCalcCritChanceHandlerFunction : public SpellScript::OnCalcCritChanceHandler { public: OnCalcCritChanceHandlerFunction(SpellOnCalcCritChanceFnType _onCalcCritChanceHandlerScript) : SpellScript::OnCalcCritChanceHandler((SpellScript::SpellOnCalcCritChanceFnType)_onCalcCritChanceHandlerScript) {} };
 
@@ -426,6 +438,11 @@ class TC_GAME_API SpellScript : public _SpellScript
         // where function is void function(std::list<WorldObject*>& targets)
         HookList<ObjectAreaTargetSelectHandler> OnObjectAreaTargetSelect;
         #define SpellObjectAreaTargetSelectFn(F, I, N) ObjectAreaTargetSelectHandlerFunction(&F, I, N)
+
+        // example: OnObjectJumpTarget += SpellObjectJumpTargetFn(class::function, EffectIndexSpecifier, TargetsNameSpecifier);
+        // where function is void function(int32 AddJumpTarget)
+        HookList<ObjectJumpTargetHandler> OnObjectJumpTarget;
+        #define SpellObjectJumpTargetFn(F, I, N) ObjectJumpTargetHandlerFunction(&F, I, N)
 
         // example: OnObjectTargetSelect += SpellObjectTargetSelectFn(class::function, EffectIndexSpecifier, TargetsNameSpecifier);
         // where function is void function(WorldObject*& target)
@@ -509,6 +526,8 @@ class TC_GAME_API SpellScript : public _SpellScript
         // returns: Item which was selected as an explicit spell target or NULL if there's no target
         Item* GetExplTargetItem() const;
 
+        ObjectGuid GetOrigUnitTargetGUID() const;
+
         // methods useable only during spell hit on target, or during spell launch on target:
         // returns: target of current effect if it was Unit otherwise NULL
         Unit* GetHitUnit() const;
@@ -577,6 +596,7 @@ enum AuraScriptHookType
     AURA_SCRIPT_HOOK_EFFECT_REMOVE,
     AURA_SCRIPT_HOOK_EFFECT_AFTER_REMOVE,
     AURA_SCRIPT_HOOK_EFFECT_PERIODIC,
+    AURA_SCRIPT_HOOK_EFFECT_UPDATE,
     AURA_SCRIPT_HOOK_ON_UPDATE,
     AURA_SCRIPT_HOOK_EFFECT_UPDATE_PERIODIC,
     AURA_SCRIPT_HOOK_EFFECT_CALC_AMOUNT,
@@ -619,6 +639,7 @@ class TC_GAME_API AuraScript : public _SpellScript
         typedef void(CLASSNAME::*AuraEffectApplicationModeFnType)(AuraEffect const*, AuraEffectHandleModes); \
         typedef void(CLASSNAME::*AuraEffectPeriodicFnType)(AuraEffect const*); \
         typedef void(CLASSNAME::*AuraUpdateFnType)(uint32); \
+        typedef void(CLASSNAME::*AuraEffectUpdateFnType)(uint32, AuraEffect*); \
         typedef void(CLASSNAME::*AuraEffectUpdatePeriodicFnType)(AuraEffect*); \
         typedef void(CLASSNAME::*AuraEffectCalcAmountFnType)(AuraEffect const*, int32 &, bool &); \
         typedef void(CLASSNAME::*AuraEffectCalcPeriodicFnType)(AuraEffect const*, bool &, int32 &); \
@@ -671,6 +692,14 @@ class TC_GAME_API AuraScript : public _SpellScript
                 void Call(AuraScript* auraScript, uint32 diff);
             private:
                 AuraUpdateFnType pEffectHandlerScript;
+        };
+        class TC_GAME_API EffectUpdateHandler : public EffectBase
+        {
+            public:
+                EffectUpdateHandler(AuraEffectUpdateFnType _pEffectHandlerScript, uint8 _effIndex, uint16 _effName);
+                void Call(AuraScript* auraScript, uint32 diff, AuraEffect* aurEff);
+            private:
+                AuraEffectUpdateFnType pEffectHandlerScript;
         };
         class TC_GAME_API EffectUpdatePeriodicHandler : public EffectBase
         {
@@ -783,6 +812,7 @@ class TC_GAME_API AuraScript : public _SpellScript
         class AuraDispelFunction : public AuraScript::AuraDispelHandler { public: AuraDispelFunction(AuraDispelFnType _pHandlerScript) : AuraScript::AuraDispelHandler((AuraScript::AuraDispelFnType)_pHandlerScript) { } }; \
         class EffectPeriodicHandlerFunction : public AuraScript::EffectPeriodicHandler { public: EffectPeriodicHandlerFunction(AuraEffectPeriodicFnType _pEffectHandlerScript, uint8 _effIndex, uint16 _effName) : AuraScript::EffectPeriodicHandler((AuraScript::AuraEffectPeriodicFnType)_pEffectHandlerScript, _effIndex, _effName) { } }; \
         class AuraUpdateHandlerFunction : public AuraScript::AuraUpdateHandler { public: AuraUpdateHandlerFunction(AuraUpdateFnType _pEffectHandlerScript) : AuraScript::AuraUpdateHandler((AuraScript::AuraUpdateFnType)_pEffectHandlerScript) {} }; \
+        class EffectUpdateHandlerFunction : public AuraScript::EffectUpdateHandler { public: EffectUpdateHandlerFunction(AuraEffectUpdateFnType _pEffectHandlerScript, uint8 _effIndex, uint16 _effName) : AuraScript::EffectUpdateHandler((AuraScript::AuraEffectUpdateFnType)_pEffectHandlerScript, _effIndex, _effName) {} }; \
         class EffectUpdatePeriodicHandlerFunction : public AuraScript::EffectUpdatePeriodicHandler { public: EffectUpdatePeriodicHandlerFunction(AuraEffectUpdatePeriodicFnType _pEffectHandlerScript, uint8 _effIndex, uint16 _effName) : AuraScript::EffectUpdatePeriodicHandler((AuraScript::AuraEffectUpdatePeriodicFnType)_pEffectHandlerScript, _effIndex, _effName) { } }; \
         class EffectCalcAmountHandlerFunction : public AuraScript::EffectCalcAmountHandler { public: EffectCalcAmountHandlerFunction(AuraEffectCalcAmountFnType _pEffectHandlerScript, uint8 _effIndex, uint16 _effName) : AuraScript::EffectCalcAmountHandler((AuraScript::AuraEffectCalcAmountFnType)_pEffectHandlerScript, _effIndex, _effName) { } }; \
         class EffectCalcPeriodicHandlerFunction : public AuraScript::EffectCalcPeriodicHandler { public: EffectCalcPeriodicHandlerFunction(AuraEffectCalcPeriodicFnType _pEffectHandlerScript, uint8 _effIndex, uint16 _effName) : AuraScript::EffectCalcPeriodicHandler((AuraScript::AuraEffectCalcPeriodicFnType)_pEffectHandlerScript, _effIndex, _effName) { } }; \
@@ -879,6 +909,12 @@ class TC_GAME_API AuraScript : public _SpellScript
         // where function is: void function (const uint32 diff);
         HookList<AuraUpdateHandler> OnAuraUpdate;
         #define AuraUpdateFn(F) AuraUpdateHandlerFunction(&F)
+
+        // executed when aura effect is updated
+        // example: OnEffectUpdate += AuraEffectUpdateFn(class::function, EffectIndexSpecifier, EffectAuraNameSpecifier);
+        // where function is: void function (AuraEffect* aurEff);
+        HookList<EffectUpdateHandler> OnEffectUpdate;
+        #define AuraEffectUpdateFn(F, I, N) EffectUpdateHandlerFunction(&F, I, N)
 
         // executed when periodic aura effect is updated
         // example: OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(class::function, EffectIndexSpecifier, EffectAuraNameSpecifier);

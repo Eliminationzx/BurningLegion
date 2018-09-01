@@ -123,3 +123,29 @@ uint64 EventProcessor::CalculateTime(uint64 t_offset) const
 {
     return(m_time + t_offset);
 }
+
+void EventProcessor::KillAllFunctions()
+{
+    clean = true;
+}
+
+void EventProcessor::AddTimedDelayedOperation(uint64 t_offset, std::function<void()>&& function)
+{
+    AddFunction(std::move(function), m_time + t_offset);
+}
+
+void EventProcessor::AddFunction(std::function<void()> && Function, uint64 e_time)
+{
+    std::lock_guard<std::recursive_mutex> _queue_lock(m_queue_lock);
+    m_functions_queue.insert(std::make_pair(e_time, Function));
+}
+
+void EventProcessor::AddFunctionsFromQueue()
+{
+    std::lock_guard<std::recursive_mutex> _queue_lock(m_queue_lock);
+    FunctionList::iterator itr = m_functions_queue.begin();
+    for(; itr != m_functions_queue.end(); ++itr)
+        m_functions.insert(std::make_pair(itr->first, itr->second));
+
+    m_functions_queue.clear();
+}

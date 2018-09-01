@@ -150,7 +150,15 @@ enum DeathKnightSpells
     SPELL_DK_VAMPIRIC_BLOOD                     = 55233,
     SPELL_DK_UMBILICUS_ETERNUS                  = 193213,
     SPELL_DK_UMBILICUS_ETERNUS_SHIELD           = 193320,
-    SPELL_DK_DEFILE_DAMAGE                      = 156000
+    SPELL_DK_DEFILE_DAMAGE                      = 156000,
+    SPELL_DK_CONSUMPTION_LEECH                  = 205224,
+    SPELL_DK_BLOOD_TAP                          = 221699,
+    SPELL_DK_ITEM_T21_BLOOD_2P_BONUS            = 251876,
+    SPELL_DK_DANCING_RUNE_WEAPON                = 49028,
+    SPELL_DK_OSSUARY                            = 219786,
+    SPELL_DK_OSSUARY_BUFF                       = 219788,
+    SPELL_DK_SPECTRAL_DEFLECTION                = 211078,
+    SPELL_DK_SKELETAL_SHATTERING                = 192558
 };
 
 // 70656 - Advantage (T10 4P Melee Bonus)
@@ -1297,21 +1305,20 @@ class spell_dk_howling_blast_aoe : public SpellScript
 
     void HandleBeforeCast()
     {
-        if (Unit* target = GetExplTargetUnit())
-            tar = target->GetGUID();
+        tar = GetOrigUnitTargetGUID();
     }
 
-    void HandleOnHit(SpellEffIndex effIndex)
+    void HandleOnHit(SpellEffIndex /*effIndex*/)
     {
         if (Unit* target = GetHitUnit())
             if (target->GetGUID() == tar)
-                PreventHitDefaultEffect(effIndex);
+                PreventHitDamage();
     }
 
     void Register() override
     {
         BeforeCast += SpellCastFn(spell_dk_howling_blast_aoe::HandleBeforeCast);
-        OnEffectHit += SpellEffectFn(spell_dk_howling_blast_aoe::HandleOnHit, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
+        OnEffectHitTarget += SpellEffectFn(spell_dk_howling_blast_aoe::HandleOnHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
 
@@ -2239,21 +2246,90 @@ public:
     {
         PrepareAuraScript(spell_dk_bone_shield_AuraScript);
 
-        void CalculateAmount(AuraEffect const* /*p_AuraEffect*/, int32& p_Amount, bool& /*p_CanBeRecalculated*/)
+        void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
         {
-            p_Amount = -1;
+            amount = -1;
         }
 
-        void Absorb(AuraEffect* /*p_AuraEffect*/, DamageInfo& /*p_DmgInfo*/, uint32& p_AbsorbAmount)
+        uint32 update = 2000;
+        bool canProc = true;
+
+        void Absorb(AuraEffect* /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
         {
-            p_AbsorbAmount = 0; //This is set at 0 because we don't want to absorb
-            GetCaster()->GetAura(SPELL_DK_BONE_SHIELD)->ModStackAmount(-1);
+            absorbAmount = 0;
+            Unit* target = GetTarget();
+            if (!target || !canProc)
+                return;
+
+            canProc = false;
+            int32 absorbPerc = GetSpellInfo()->GetEffect(EFFECT_4)->CalcValue(target);
+            int32 absorbStack = 1;
+            if (AuraEffect* aurEff = target->GetAuraEffect(SPELL_DK_SPECTRAL_DEFLECTION, EFFECT_0))
+            {
+                if (target->CountPctFromMaxHealth(aurEff->GetAmount()) < dmgInfo.GetDamage())
+                {
+                    absorbPerc *= 2;
+                    absorbStack *= 2;
+                    ModStackAmount(-1);
+                }
+            }
+            if (AuraEffect* aurEff = target->GetAuraEffect(SPELL_DK_SKELETAL_SHATTERING, EFFECT_0)) 
+            {
+                if (roll_chance_f(target->GetFloatValue(PLAYER_SPELL_CRIT_PERCENTAGE1)))
+                    absorbPerc += aurEff->GetAmount();
+            }
+            absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPerc);
+            ModStackAmount(-1);
+
+            if (Player* _player = target->ToPlayer())
+            {
+                if (_player->HasSpell(SPELL_DK_BLOOD_TAP))
+                    if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_DK_BLOOD_TAP))
+                        _player->GetSpellHistory()->ModifyCooldown(SPELL_DK_BLOOD_TAP, IN_MILLISECONDS * spellInfo->GetEffect(EFFECT_1)->CalcValue(target) * absorbStack);
+
+                if (AuraEffect const* aurEff = _player->GetAuraEffect(SPELL_DK_ITEM_T21_BLOOD_2P_BONUS, EFFECT_0))
+                    _player->GetSpellHistory()->ModifyCooldown(SPELL_DK_DANCING_RUNE_WEAPON, aurEff->GetAmount() * absorbStack);
+            }
+        }
+
+        void OnStackChange(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* target = GetTarget();
+            if (!target)
+                return;
+
+            if (AuraEffect* aurEff = target->GetAuraEffect(SPELL_DK_OSSUARY, EFFECT_0))
+            {
+                if (GetStackAmount() >= aurEff->GetAmount())
+                {
+                    if (!target->HasAura(SPELL_DK_OSSUARY_BUFF))
+                        target->CastSpell(target, SPELL_DK_OSSUARY_BUFF, true);
+                }
+                else
+                    target->RemoveAurasDueToSpell(SPELL_DK_OSSUARY_BUFF);
+            }
+        }
+
+        void OnUpdate(uint32 diff, AuraEffect* /*aurEff*/)
+        {
+            if (canProc)
+                return;
+
+            if (update > diff)
+                update -= diff;
+            else
+            {
+                canProc = true;
+                update = 2000;
+            }
         }
 
         void Register() override
         {
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_bone_shield_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
             OnEffectAbsorb += AuraEffectAbsorbFn(spell_dk_bone_shield_AuraScript::Absorb, EFFECT_0);
+            OnEffectApply += AuraEffectApplyFn(spell_dk_bone_shield_AuraScript::OnStackChange, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+            OnEffectUpdate += AuraEffectUpdateFn(spell_dk_bone_shield_AuraScript::OnUpdate, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
         }
     };
 
@@ -2592,6 +2668,37 @@ class spell_dk_defile : public AuraScript
     }
 };
 
+// Consumption (Artifact) - 205223
+class spell_dk_consumption : public SpellScriptLoader
+{
+public:
+    spell_dk_consumption() : SpellScriptLoader("spell_dk_consumption") { }
+
+    class spell_dk_consumption_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dk_consumption_SpellScript);
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                int32 bp = CalculatePct(GetSpellInfo()->GetEffect(EFFECT_2)->CalcValue(caster), GetHitDamage());
+                caster->CastCustomSpell(caster, SPELL_DK_CONSUMPTION_LEECH, &bp, nullptr, nullptr, true);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_dk_consumption_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_WEAPON_PERCENT_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_dk_consumption_SpellScript();
+    }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     new spell_dk_advantage_t10_4p();
@@ -2651,4 +2758,5 @@ void AddSC_deathknight_spell_scripts()
     new spell_dk_umbilicus_eternus();
     new spell_dk_umbilicus_eternus_dummy();
     RegisterAuraScript(spell_dk_defile);
+    new spell_dk_consumption();
 }
