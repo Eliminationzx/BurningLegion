@@ -271,7 +271,7 @@ public:
             me->RemoveAurasDueToSpell(SPELL_MAGMA_BREAKER_AURA);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* /*target*/, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_FIXATE_PLR)
             {

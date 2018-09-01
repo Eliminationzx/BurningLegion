@@ -2318,7 +2318,7 @@ class spell_druid_rejuvenation : public SpellScriptLoader
             return new spell_druid_rejuvenation_AuraScript();
         }
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_dru_rejuvenation_SpellScript();
         }
