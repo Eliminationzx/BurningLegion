@@ -353,7 +353,7 @@ public:
 
         void Reset() override {}
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(Unit* summoner) override
         {
             if (!summoner->IsInCombat())
             {
