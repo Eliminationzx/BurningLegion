@@ -255,7 +255,7 @@ public:
 
         void Reset() override {}
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(Unit* /*summoner*/) override
         {
             DoZoneInCombat(me, 100.0f);
 
@@ -420,7 +420,7 @@ public:
 
         void Reset() override {}
         
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(Unit* /*summoner*/) override
         {
             DoCast(me, SPELL_LAVA_GEYSER_AT, true);
             DoCast(me, SPELL_FLAME_GOUT, true);
