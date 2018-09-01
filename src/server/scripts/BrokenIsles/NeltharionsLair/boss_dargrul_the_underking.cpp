@@ -151,7 +151,7 @@ public:
             }
         }
 
-        void DoAction(int32 const action) override
+        void DoAction(int32 const /*action*/) override
         {
             if (GetDifficulty() != DIFFICULTY_NORMAL)
                 events.ScheduleEvent(EVENT_LAVA_GEYSER, 1000);
