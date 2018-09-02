@@ -396,7 +396,7 @@ public:
             damage = 0;
         }
 
-        void UpdateAI(uint32 diff) override {}
+        void UpdateAI(uint32 /*diff*/) override {}
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -426,7 +426,7 @@ public:
             DoCast(me, SPELL_FLAME_GOUT, true);
         }
 
-        void UpdateAI(uint32 diff) override {}
+        void UpdateAI(uint32 /*diff*/) override {}
     };
 
     CreatureAI* GetAI(Creature* creature) const override
