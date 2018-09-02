@@ -371,7 +371,7 @@ public:
                 Despawn();
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
         {
             if (spell->Id == 200721 || spell->Id == 209947)
                 Despawn();
