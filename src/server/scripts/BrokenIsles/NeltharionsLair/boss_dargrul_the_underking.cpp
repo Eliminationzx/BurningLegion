@@ -445,7 +445,7 @@ public:
     {
         PrepareAuraScript(spell_dargrul_gain_energy_AuraScript);
 
-        void OnTick(AuraEffect const* aurEff)
+        void OnTick(AuraEffect const* /*aurEff*/)
         {
             Creature* caster = GetCaster()->ToCreature();
             if (!caster)
@@ -487,7 +487,7 @@ public:
     {
         PrepareAuraScript(spell_dargrul_magma_breaker_AuraScript);
 
-        void OnTick(AuraEffect const* aurEff)
+        void OnTick(AuraEffect const* /*aurEff*/)
         {
             Unit* caster = GetCaster();
             if (!caster)
