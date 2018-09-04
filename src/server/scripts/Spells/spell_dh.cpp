@@ -1010,7 +1010,7 @@ public:
         void HandlePeriodic(AuraEffect const* aurEff)
         {
             Unit* caster = aurEff->GetCaster();
-            if (!caster->HasAura(SPELL_DH_BURNING_ALIVE))
+            if (!caster || !caster->HasAura(SPELL_DH_BURNING_ALIVE))
                 return;
 
             WorldObject* owner = GetOwner();
