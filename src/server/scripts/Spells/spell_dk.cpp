@@ -2621,7 +2621,8 @@ public:
 class spell_dk_epidemic : public SpellScript
 {
     PrepareSpellScript(spell_dk_epidemic);
-     void HandleHit(SpellEffIndex /*effIndex*/)
+    
+    void HandleHit(SpellEffIndex /*effIndex*/)
     {
         if (Unit* target = GetHitUnit())
         {
@@ -2632,9 +2633,10 @@ class spell_dk_epidemic : public SpellScript
                 GetCaster()->CastSpell(target, SPELL_DK_EPIDEMIC_DAMAGE_AOE, true);
             }
         }
-         PreventHitDamage();
+        PreventHitDamage();
     }
-     void Register() override
+    
+    void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_dk_epidemic::HandleHit, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
@@ -2644,22 +2646,26 @@ class spell_dk_epidemic : public SpellScript
 class spell_dk_epidemic_aoe : public SpellScript
 {
     PrepareSpellScript(spell_dk_epidemic_aoe);
-     void HandleOnHitMain(SpellEffIndex /*effIndex*/)
+    
+    void HandleOnHitMain(SpellEffIndex /*effIndex*/)
     {
         if (Unit* target = GetHitUnit())
             explicitTarget = target->GetGUID();
     }
-     void HandleOnHitAOE(SpellEffIndex /*effIndex*/)
+    
+    void HandleOnHitAOE(SpellEffIndex /*effIndex*/)
     {
         if (Unit* target = GetHitUnit())
             if (target->GetGUID() == explicitTarget)
                 PreventHitDamage();
     }
-     void Register() override
+    
+    void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_dk_epidemic_aoe::HandleOnHitMain, EFFECT_0, SPELL_EFFECT_DUMMY);
         OnEffectHitTarget += SpellEffectFn(spell_dk_epidemic_aoe::HandleOnHitAOE, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
+    
 private:
     ObjectGuid explicitTarget;
 };
@@ -2668,20 +2674,23 @@ private:
 class aura_dk_virulent_plague : public AuraScript
 {
     PrepareAuraScript(aura_dk_virulent_plague);
-     void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
         uint32 eruptionChances = GetEffectInfo(EFFECT_1)->BasePoints;
         if (roll_chance_i(eruptionChances))
             GetAura()->Remove(AURA_REMOVE_BY_DEATH);
     }
-     void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         AuraRemoveMode removeMode = GetTargetApplication()->GetRemoveMode();
         if (removeMode == AURA_REMOVE_BY_DEATH)
             if (Unit* caster = GetCaster())
                 caster->CastSpell(GetTarget(), SPELL_DK_VIRULENT_ERUPTION, true);
     }
-     void Register() override
+    
+    void Register() override
     {
         OnEffectPeriodic += AuraEffectPeriodicFn(aura_dk_virulent_plague::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
         AfterEffectRemove += AuraEffectRemoveFn(aura_dk_virulent_plague::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
@@ -2692,7 +2701,8 @@ class aura_dk_virulent_plague : public AuraScript
 class aura_dk_defile : public AuraScript
 {
     PrepareAuraScript(aura_dk_defile);
-     void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
         if (Unit* caster = GetCaster())
         {
@@ -2704,17 +2714,19 @@ class aura_dk_defile : public AuraScript
             }
         }
     }
-     void Register() override
+    
+    void Register() override
     {
-        OnEffectPeriodic += AuraEffectPeriodicFn(aura_dk_defile::HandlePeriodic, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY);
+       OnEffectPeriodic += AuraEffectPeriodicFn(aura_dk_defile::HandlePeriodic, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
- // 55090 - Scourge Strike
+// 55090 - Scourge Strike
 class spell_dk_scourge_strike : public SpellScript
 {
     PrepareSpellScript(spell_dk_scourge_strike);
-     void HandleOnHit(SpellEffIndex /*effIndex*/)
+    
+    void HandleOnHit(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
         if (Unit* target = GetHitUnit())
@@ -2738,44 +2750,50 @@ class spell_dk_scourge_strike : public SpellScript
             }
         }
     }
-     void Register() override
+    
+    void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_dk_scourge_strike::HandleOnHit, EFFECT_0, SPELL_EFFECT_DUMMY);
+       OnEffectHitTarget += SpellEffectFn(spell_dk_scourge_strike::HandleOnHit, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
- // Spell 152280
+// Spell 152280
 // At 6212
 struct at_dk_defile : AreaTriggerAI
 {
     at_dk_defile(AreaTrigger* areatrigger) : AreaTriggerAI(areatrigger) { }
-     void OnUnitEnter(Unit* unit) override
+    
+    void OnUnitEnter(Unit* unit) override
     {
-        if (Unit* caster = at->GetCaster())
-            caster->CastSpell(unit, SPELL_DK_DEFILE_DUMMY, true);
+       if (Unit* caster = at->GetCaster())
+           caster->CastSpell(unit, SPELL_DK_DEFILE_DUMMY, true);
     }
-     void OnUnitExit(Unit* unit) override
+    
+    void OnUnitExit(Unit* unit) override
     {
         unit->RemoveAurasDueToSpell(SPELL_DK_DEFILE_DUMMY);
     }
 };
 
- // 195758 - Blighted Rune Weapon
+// 195758 - Blighted Rune Weapon
 class spell_dk_blighted_rune_weapon : public SpellScript
 {
     PrepareSpellScript(spell_dk_blighted_rune_weapon);
-     bool Validate(SpellInfo const* /*spellInfo*/) override
+    
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_DK_FESTERING_WOUND });
+       return ValidateSpellInfo({ SPELL_DK_FESTERING_WOUND });
     }
-     void HandleHit(SpellEffIndex effIndex)
+    
+    void HandleHit(SpellEffIndex /*effIndex*/)
     {
-        if (Unit* target = GetHitUnit())
-            GetCaster()->CastSpell(target, SPELL_DK_FESTERING_WOUND, true);
+       if (Unit* target = GetHitUnit())
+           GetCaster()->CastSpell(target, SPELL_DK_FESTERING_WOUND, true);
     }
-     void Register() override
+    
+    void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_dk_blighted_rune_weapon::HandleHit, EFFECT_0, SPELL_EFFECT_DUMMY);
+       OnEffectHitTarget += SpellEffectFn(spell_dk_blighted_rune_weapon::HandleHit, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
