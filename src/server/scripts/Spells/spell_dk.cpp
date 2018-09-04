@@ -2674,7 +2674,7 @@ class aura_dk_virulent_plague : public AuraScript
         if (roll_chance_i(eruptionChances))
             GetAura()->Remove(AURA_REMOVE_BY_DEATH);
     }
-     void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes mode)
+     void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         AuraRemoveMode removeMode = GetTargetApplication()->GetRemoveMode();
         if (removeMode == AURA_REMOVE_BY_DEATH)
