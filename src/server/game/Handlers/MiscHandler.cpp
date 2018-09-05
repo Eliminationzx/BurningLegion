@@ -128,6 +128,9 @@ void WorldSession::HandleWhoOpcode(WorldPackets::Who::WhoRequestPkt& whoRequest)
     /// ExactName
     /// ServerInfo
 
+    bool searchBool = false;
+    std::string searchName;
+
     std::vector<std::wstring> wWords;
     wWords.resize(request.Words.size());
     for (size_t i = 0; i < request.Words.size(); ++i)
@@ -139,6 +142,9 @@ void WorldSession::HandleWhoOpcode(WorldPackets::Who::WhoRequestPkt& whoRequest)
             continue;
 
         wstrToLower(wWords[i]);
+
+        searchBool = true;
+        searchName = request.Words[i].Word.c_str();
     }
 
     std::wstring wPlayerName;
@@ -268,6 +274,48 @@ void WorldSession::HandleWhoOpcode(WorldPackets::Who::WhoRequestPkt& whoRequest)
         // through config, but is unstable
         if (response.Response.Entries.size() >= sWorld->getIntConfig(CONFIG_MAX_WHO))
             break;
+    }
+
+    if (sWorld->getBoolConfig(CONFIG_FAKE_WHO_LIST) && response.Response.Entries.size() < sWorld->getIntConfig(CONFIG_MAX_WHO))
+    {
+        PreparedStatement* fake = CharacterDatabase.GetPreparedStatement(searchBool ? FAKE_CHAR_ONLINE_SEARCH : FAKE_CHAR_ONLINE);
+
+        fake->setUInt32(0, sWorld->getIntConfig(CONFIG_FAKE_WHO_ONLINE_INTERVAL));
+        if (searchBool)
+            fake->setString(1, searchName.c_str());
+
+        PreparedQueryResult fakeresult = CharacterDatabase.Query(fake);
+        if (fakeresult)
+        {
+            do
+            {
+                Field *fields = fakeresult->Fetch();
+
+                std::string pname = fields[0].GetString();  // player name
+                std::string gname;                          // guild name
+                uint32 plevel = fields[3].GetUInt32();      // player level
+                uint32 pclassid = fields[2].GetUInt32();    // player class
+                uint32 prace = fields[1].GetUInt32();       // player race
+                uint32 pzoneid = fields[4].GetUInt32();     // player zone id
+                uint8 psex = fields[5].GetUInt8();          // player gender
+
+                // Initialize fake player
+                WorldPackets::Who::WhoEntry whoEntry;
+                whoEntry.PlayerData.Name = pname;
+                whoEntry.PlayerData.Level = plevel;
+                whoEntry.PlayerData.ClassID = pclassid;
+                whoEntry.PlayerData.Race = prace;
+                whoEntry.PlayerData.Sex = psex;
+                whoEntry.GuildGUID = ObjectGuid::Empty;
+                whoEntry.GuildName = gname;
+                whoEntry.AreaID = pzoneid;
+
+                response.Response.Entries.push_back(whoEntry);
+
+                if (response.Response.Entries.size() == sWorld->getIntConfig(CONFIG_MAX_WHO))
+                    break;
+            } while (fakeresult->NextRow());
+        }
     }
 
     SendPacket(response.Write());

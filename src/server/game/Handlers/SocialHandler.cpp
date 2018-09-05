@@ -28,6 +28,8 @@
 #include "SocialMgr.h"
 #include "SocialPackets.h"
 #include "World.h"
+#include "Chat.h"
+#include "Language.h"
 
 void WorldSession::HandleContactListOpcode(WorldPackets::Social::SendContactList& packet)
 {
@@ -42,6 +44,27 @@ void WorldSession::HandleAddFriendOpcode(WorldPackets::Social::AddFriend& packet
 
     TC_LOG_DEBUG("network", "WorldSession::HandleAddFriendOpcode: %s asked to add friend: %s",
         GetPlayerInfo().c_str(), packet.Name.c_str());
+
+    // Fake online
+    if (sWorld->getBoolConfig(CONFIG_FAKE_WHO_LIST))
+    {
+        PreparedStatement* fake = CharacterDatabase.GetPreparedStatement(FAKE_CHAR_SEL_RACE_BY_NAME);
+        fake->setString(0, packet.Name.c_str());
+        PreparedQueryResult fakeresult = CharacterDatabase.Query(fake);
+
+        if (fakeresult)
+        {
+            Field* fields = fakeresult->Fetch();
+            uint32 team = Player::TeamForRace(fields[0].GetUInt8());
+
+            if (GetPlayer()->GetTeam() != team && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_ADD_FRIEND))
+                sSocialMgr->SendFriendStatus(_player, FRIEND_ENEMY, ObjectGuid::Empty);
+            else
+                ChatHandler(_player->GetSession()).PSendSysMessage(LANG_FAKE_NOT_DISTURB);
+
+            return;
+        }
+    }
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUID_RACE_ACC_BY_NAME);
     stmt->setString(0, packet.Name);
@@ -113,6 +136,21 @@ void WorldSession::HandleAddIgnoreOpcode(WorldPackets::Social::AddIgnore& packet
 
     TC_LOG_DEBUG("network", "WorldSession::HandleAddIgnoreOpcode: %s asked to Ignore: %s",
         GetPlayerInfo().c_str(), packet.Name.c_str());
+
+    // Fake online
+    if (sWorld->getBoolConfig(CONFIG_FAKE_WHO_LIST))
+    {
+        PreparedStatement* fake = CharacterDatabase.GetPreparedStatement(FAKE_CHAR_SEL_RACE_BY_NAME_IS_ONLINE);
+        fake->setUInt32(0, sWorld->getIntConfig(CONFIG_FAKE_WHO_ONLINE_INTERVAL));
+        fake->setString(1, packet.Name.c_str());
+        PreparedQueryResult fakeresult = CharacterDatabase.Query(fake);
+
+        if (fakeresult)
+        {
+            ChatHandler(_player->GetSession()).PSendSysMessage(LANG_FAKE_NOT_DISTURB);
+            return;
+        }
+    }
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUID_BY_NAME);
     stmt->setString(0, packet.Name);

@@ -4148,3 +4148,20 @@ Rate.ReputationGain.Boost.Premium       = 1
 
 #
 ###################################################################################################
+
+###################################################################################################
+#
+#    FAKE WHO LIST
+#
+#    Fake.WHO.List
+#        Add fake players to fill in WHO LIST (who is online list, "O" button) if there is less then
+#        50 real players online
+#        Default: 0 (disabled)
+#                 1 (enabled)
+
+Fake.WHO.List = 0
+Fake.WHO.Online.Interval = 5
+Fake.WHO.LevelUp.Interval = 2
+
+#
+###################################################################################################

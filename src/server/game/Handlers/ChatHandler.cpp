@@ -264,7 +264,11 @@ void WorldSession::HandleChatMessage(ChatMsg type, uint32 lang, std::string msg,
             Player* receiver = ObjectAccessor::FindConnectedPlayerByName(extName.Name);
             if (!receiver || (lang != LANG_ADDON && !receiver->isAcceptWhispers() && receiver->GetSession()->HasPermission(rbac::RBAC_PERM_CAN_FILTER_WHISPERS) && !receiver->IsInWhisperWhiteList(sender->GetGUID())))
             {
-                SendChatPlayerNotfoundNotice(target);
+                // If Fake WHO List system on then show player DND
+                if (sWorld->getBoolConfig(CONFIG_FAKE_WHO_LIST))
+                    ChatHandler(sender->GetSession()).PSendSysMessage(LANG_FAKE_NOT_DISTURB);
+                else
+                    SendChatPlayerNotfoundNotice(target);
                 return;
             }
             if (!sender->IsGameMaster() && sender->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ) && !receiver->IsInWhisperWhiteList(sender->GetGUID()))

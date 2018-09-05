@@ -1170,6 +1170,9 @@ enum TrinityStrings
     LANG_BREACHING_TRUESHOT_LODGE                 = 2300,
     LANG_EXP_NPC_COMBAT                           = 2301,
     LANG_EXP_NPC_LEVEL_UP                         = 2302,
-    LANG_EXP_NPC_LEVEL_ERROR                      = 2303
+    LANG_EXP_NPC_LEVEL_ERROR                      = 2303,
+
+    // Fake online
+    LANG_FAKE_NOT_DISTURB                         = 12001
 };
 #endif

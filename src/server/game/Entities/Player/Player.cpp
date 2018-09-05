@@ -1307,6 +1307,13 @@ void Player::Update(uint32 p_time)
             // m_nextSave reset in SaveToDB call
             SaveToDB();
             TC_LOG_DEBUG("entities.player", "Player::Update: Player '%s' (%s) saved", GetName().c_str(), GetGUID().ToString().c_str());
+
+             // If Fake WHO List system on then change player position with every SavePlayer Interval (usually 15min)
+            if (sWorld->getBoolConfig(CONFIG_FAKE_WHO_LIST))
+            {
+                CharacterDatabase.PExecute("UPDATE characters_fake SET zone = (FLOOR(50 * RAND()) + 1)");
+                CharacterDatabase.PExecute("UPDATE characters_fake SET level = level+1, lastup = NOW() WHERE level < 110 AND lastup < (NOW() - INTERVAL %u HOUR) AND HOUR(online) BETWEEN HOUR(NOW()) AND (HOUR(NOW()) + %u)", sWorld->getIntConfig(CONFIG_FAKE_WHO_LEVELUP_INTERVAL), sWorld->getIntConfig(CONFIG_FAKE_WHO_ONLINE_INTERVAL));
+            }
         }
         else
             m_nextSave -= p_time;
