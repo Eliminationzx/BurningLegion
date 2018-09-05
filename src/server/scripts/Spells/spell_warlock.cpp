@@ -3689,11 +3689,11 @@ void AddSC_warlock_spell_scripts()
     RegisterAuraScript(spell_warl_dark_regeneration);
     RegisterSpellScript(spell_warl_demonbolt);
     RegisterSpellScript(spell_warl_demonic_call);
-    RegisterAuraScript(spell_warl_demonic_circle_summon);
-    RegisterAuraScript(spell_warl_demonic_circle_teleport);
     RegisterSpellScript(spell_warl_demonic_empowerment);
     RegisterSpellScript(spell_warl_demonic_gateway);
     RegisterSpellScript(spell_warl_devour_magic);
+    new spell_warl_demonic_circle_summon();
+    new spell_warl_demonic_circle_teleport();
     new spell_warl_drain_soul();
     new spell_warl_fear();
     new spell_warl_fear_buff();
