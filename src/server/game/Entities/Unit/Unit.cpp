@@ -13796,6 +13796,8 @@ bool Unit::SetFlying(bool enable)
         AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
     else
         RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
+
+    return true;
 }
 
 bool Unit::SetDisableGravity(bool disable)
