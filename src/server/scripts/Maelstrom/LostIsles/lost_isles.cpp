@@ -142,7 +142,7 @@ struct npc_zapnozzle : public ScriptedAI
             });
     }
 
-    void sQuestReward(Player* /*player*/, Quest const* quest, uint32 /*opt*/)
+    void sQuestReward(Player* /*player*/, Quest const* quest, uint32 /*opt*/) override
     {
         if (quest->GetQuestId() == 14239)
             InitSecondEventSchedulers();
