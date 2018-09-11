@@ -5035,36 +5035,6 @@ enum SummonPremiumMinion
     NPC_PREMIUM_BUDDY = 555581
 };
 
-class spell_gen_premium_minion_summoner : public SpellScriptLoader
-{
-    public:
-        spell_gen_premium_minion_summoner() : SpellScriptLoader("spell_gen_premium_minion_summoner") { }
-
-        class spell_gen_premium_minion_summoner_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_gen_premium_minion_summoner_SpellScript);
-            
-            void SummonMinion()
-            {
-                Unit* caster = GetCaster();
-                caster->UnsummonCreatureByEntry(NPC_PREMIUM_BUDDY);
-                
-                if (Creature* minion = caster->SummonCreature(NPC_PREMIUM_BUDDY, caster->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, IN_MILLISECONDS * MINUTE * 5))
-                    minion->GetMotionMaster()->MoveFollow(caster, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
-            }
-
-            void Register() override
-            {
-                AfterCast += SpellCastFn(spell_gen_premium_minion_summoner_SpellScript::SummonMinion);
-            }
-        };
-
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_gen_premium_minion_summoner_SpellScript();
-        }
-};
-
 void AddSC_generic_spell_scripts()
 {
     new spell_gen_absorb0_hitlimit1();
@@ -5183,5 +5153,4 @@ void AddSC_generic_spell_scripts()
     new spell_gen_adaptation_dummy();
     new spell_gen_hardiness();
     new spell_gen_sparring();
-    new spell_gen_premium_minion_summoner();
 }

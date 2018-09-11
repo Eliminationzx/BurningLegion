@@ -1,4 +1,4 @@
-INSERT INTO `creature_template` VALUES ('555581', '0', '0', '0', '0', '0', '58570', '0', '0', '0', 'Premium buddy', null, null, null, null, '44467', '110', '110', '6', '0', '0', '35', '1', '1', '1.14286', '2', '0', '0', '0', '0', '1', '1', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '', '0', '3', '1', '1', '1', '1', '1', '1', '1', '1', '0', '0', '1', '0', '0', 'npc_premium_minion', '0');
+UPDATE creature_template SET npcflag = 1, gossip_menu_id = 44468 WHERE entry=84915;
 
 INSERT INTO `gossip_menu_option` VALUES 
 ('44468', '0', '0', 'Repair all items', '0', '1', '1', '0'),
@@ -14,7 +14,3 @@ INSERT INTO `gossip_menu_option` VALUES
 ('44468', '10', '0', 'Change my faction', '0', '1', '1', '0'),
 ('44468', '11', '0', 'Customize my character', '0', '1', '1', '0'),
 ('44468', '12', '0', 'Change personal rates', '0', '1', '1', '0');
-
-DELETE FROM `spell_script_names` WHERE `spell_id` IN (148335);
-INSERT INTO `spell_script_names` VALUE
-(148335, "spell_gen_premium_minion_summoner");
