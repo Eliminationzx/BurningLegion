@@ -731,8 +731,8 @@ void WorldPackets::Misc::AdventureJournalStartQuest::Read()
 
 WorldPacket const* WorldPackets::Misc::StartTimer::Write()
 {
-    _worldPacket << Type;
     _worldPacket << TimeLeft;
+    _worldPacket << Type;
     _worldPacket << TotalTime;
 
     return &_worldPacket;

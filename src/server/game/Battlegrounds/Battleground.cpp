@@ -412,13 +412,14 @@ inline void Battleground::_ProcessJoin(uint32 diff)
     if (m_CountdownTimer >= 10000)
     {
         uint32 countdownMaxForBGType = isArena() ? ARENA_COUNTDOWN_MAX : BATTLEGROUND_COUNTDOWN_MAX;
+        uint32 tTime = (countdownMaxForBGType - (GetElapsedTime() / 1000));
 
         WorldPackets::Misc::StartTimer startTimer;
-        startTimer.Type = 0;
-        startTimer.TimeLeft = countdownMaxForBGType - (GetElapsedTime() / 1000);
-        startTimer.TotalTime = countdownMaxForBGType;
-        WorldPacket const* startTimerPacket = startTimer.Write();
+        startTimer.Type = countdownMaxForBGType;
+        startTimer.TimeLeft = tTime;
+        startTimer.TotalTime = 0;
 
+        WorldPacket const* startTimerPacket = startTimer.Write();
         for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(itr->first))
                 player->SendDirectMessage(startTimerPacket);
@@ -1121,9 +1122,9 @@ void Battleground::AddPlayer(Player* player)
             int32 countdownMaxForBGType = isArena() ? ARENA_COUNTDOWN_MAX : BATTLEGROUND_COUNTDOWN_MAX;
 
             WorldPackets::Misc::StartTimer startTimer;
-            startTimer.Type = 0;
-            startTimer.TimeLeft = countdownMaxForBGType - (GetElapsedTime() / 1000);
-            startTimer.TotalTime = countdownMaxForBGType;
+            startTimer.TimeLeft = uint32(countdownMaxForBGType - (GetElapsedTime() / 1000));
+            startTimer.Type = countdownMaxForBGType;
+            startTimer.TotalTime = 0;
 
             player->SendDirectMessage(startTimer.Write());
         }
