@@ -19854,14 +19854,17 @@ void Player::_LoadQuestStatus(PreparedQueryResult result)
                 // add to quest log
                 if (slot < MAX_QUEST_LOG_SIZE && questStatusData.Status != QUEST_STATUS_NONE)
                 {
-                    SetQuestSlot(slot, quest_id, uint32(quest_time)); // cast can't be helped
+                    if (quest->Type != QUEST_TYPE_TASK)
+                    {
+                        SetQuestSlot(slot, quest_id, uint32(quest_time)); // cast can't be helped
 
-                    if (questStatusData.Status == QUEST_STATUS_COMPLETE)
-                        SetQuestSlotState(slot, QUEST_STATE_COMPLETE);
-                    else if (questStatusData.Status == QUEST_STATUS_FAILED)
-                        SetQuestSlotState(slot, QUEST_STATE_FAIL);
+                        if (questStatusData.Status == QUEST_STATUS_COMPLETE)
+                            SetQuestSlotState(slot, QUEST_STATE_COMPLETE);
+                        else if (questStatusData.Status == QUEST_STATUS_FAILED)
+                            SetQuestSlotState(slot, QUEST_STATE_FAIL);
 
-                    ++slot;
+                        ++slot;
+                    }
                 }
 
                 // Resize quest objective data to proper size
