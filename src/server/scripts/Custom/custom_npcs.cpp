@@ -20,6 +20,8 @@
 #include "Player.h"
 #include "ScriptedGossip.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "SpellHistory.h"
 #include "World.h"
 #include "WorldSession.h"
 #include "Log.h"
@@ -27,50 +29,10 @@
 #include "BattlegroundMgr.h"
 #include "BattlegroundQueue.h"
 #include "Group.h"
-#include "ScriptedCreature.h"
 #include "Language.h"
-
-class npc_rate_xp_modifier : public CreatureScript
-{
-    public:
-        npc_rate_xp_modifier() : CreatureScript("npc_rate_xp_modifier") { }
-
-        uint32 personalRates[11] = { 1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        bool OnGossipHello(Player* player, Creature* creature) override
-        {
-            for (uint32 i = 0; i < 11; ++i)
-            {               
-                if (personalRates[i] == player->GetPersonalRate())
-                    continue;
-
-                if (personalRates[i] == sWorld->getRate(RATE_XP_KILL) &&
-                    personalRates[i] == sWorld->getRate(RATE_REPUTATION_GAIN))
-                    continue;
-
-                std::ostringstream gossipText;
-                gossipText << "Rate x" << personalRates[i];
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, gossipText.str(), GOSSIP_SENDER_MAIN, personalRates[i]);
-            }
-
-            if (player->GetPersonalRate())
-            {
-                std::ostringstream gossipText;
-                gossipText << "Default Rate [XP/Reputation gain] - x" << sWorld->getRate(RATE_XP_KILL) << "/" << sWorld->getRate(RATE_REPUTATION_LOWLEVEL_QUEST);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, gossipText.str(), GOSSIP_SENDER_MAIN, 0);
-            }
-
-            SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-            return true;
-        }
-
-        bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*uiSender*/, uint32 uiAction) override
-        {
-            CloseGossipMenuFor(player);
-            player->SetPersonalRate(float(std::min(personalRates[10], uiAction)));
-            return true;
-        }
-};
+#include "MotionMaster.h"
+#include "ObjectAccessor.h"
+#include "Chat.h"
 
 enum Challenger
 {
@@ -288,8 +250,301 @@ public:
     }
 };
 
+enum PremiumMinion
+{
+    GOSSIP_MENU_ID_PREMIUM_MINION       = 44468,
+
+    // - 1 Premium trial
+    GOSSIP_ACTION_REPAIR_TOOL           = 100,
+    GOSSIP_ACTION_MORPH                 = 200,
+    GOSSIP_ACTION_DEMORPH               = 300,
+    GOSSIP_ACTION_OPEN_BANK             = 400,
+
+    // - 2 Premium normal
+    GOSSIP_ACTION_RESET_TALENTS         = 500,
+    GOSSIP_ACTION_CHEAT_TAXI            = 600,
+    GOSSIP_ACTION_TELE_HOME             = 700,
+    GOSSIP_ACTION_BUFF                  = 800,
+
+    // - 3 Premium elite
+    GOSSIP_ACTION_APPEAR_FRIEND         = 900,
+    GOSSIP_ACTION_CHANGE_RACE           = 1000,
+    GOSSIP_ACTION_CHANGE_FACTION        = 1100,
+    GOSSIP_ACTION_CHAR_CUSTOMIZE        = 1200,
+    GOSSIP_ACTION_CHOOSE_PERSONAL_RATES = 1300,
+    GOSSIP_ACTION_RENAME                = 1400
+
+    // TODO: Buffs
+};
+
+#define GOSSIP_TEXT_APPEAR_ERROR "Something wrong. We can't find your friend"
+#define GOSSIP_TEXT_SUCCESS_CHANGE_FACTION "Now you can change faction after logout"
+#define GOSSIP_TEXT_SUCCESS_CHANGE_RACE "Now you can change your race after logout"
+#define GOSSIP_TEXT_SUCCESS_CHAR_CUSTOMIZE "Now you can customize character after logout"
+#define GOSSIP_TEXT_SUCCESS_CHAR_RENAME "Now you can rename character after logout"
+#define GOSSIP_TEXT_SUCCESS_REPAIR "We successfully repair all your items"
+#define GOSSIP_TEXT_SUCCESS_MORPH "You looks better now!"
+#define GOSSIP_TEXT_SUCCESS_DEMORPH "You returned your natural form"
+#define GOSSIP_TEXT_SUCCESS_BUFF "Now you are stronger!"
+#define GOSSIP_TEXT_SUCCESS_TAXI "We successfully open all fly path for you"
+#define GOSSIP_TEXT_SUCCESS_RESET_TALENTS "We successfully reset your talents"
+#define GOSSIP_TEXT_SUCCESS_TELE_HOME "You successfully returned back to home!"
+#define GOSSIP_TEXT_SUCCESS_RATE_CHANGE "You successfully changed personal rates"
+#define GOSSIP_TEXT_ERROR_RATE_CHANGE "Something wrong. We can't allow you to change personal rates"
+
+#define MAX_PERSONAL_RATES 100
+
+class npc_premium_minion : public CreatureScript
+{
+public:
+    npc_premium_minion() : CreatureScript("npc_premium_minion") { }
+
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        if (player->GetSession()->IsPremium())
+        {
+            switch (player->GetSession()->GetPremiumType())
+            {
+                case PREMIUM_TRIAL:
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_REPAIR_TOOL);
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_MORPH);
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_DEMORPH);
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_OPEN_BANK);
+                    break;
+                case PREMIUM_NORMAL:
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_REPAIR_TOOL);
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_MORPH);
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_DEMORPH);
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_OPEN_BANK);
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_RESET_TALENTS);
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_CHEAT_TAXI);
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TELE_HOME);
+                    // TODO AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 7, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_BUFF);
+                    break;
+                case PREMIUM_ELITE:
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_REPAIR_TOOL);
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_MORPH);
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_DEMORPH);
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_OPEN_BANK);
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_RESET_TALENTS);
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_CHEAT_TAXI);
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TELE_HOME);
+                    // TODO AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 7, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_BUFF);
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 8, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_APPEAR_FRIEND);
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 9, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_CHANGE_RACE);
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 10, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_CHANGE_FACTION);
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 11, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_CHAR_CUSTOMIZE);
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 12, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_CHOOSE_PERSONAL_RATES);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+        return true;
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    {
+        ClearGossipMenuFor(player);
+
+        if (player->IsInCombat() || player->InArena() || player->InBattleground())
+            return false;
+
+        switch (action)
+        {
+            case GOSSIP_ACTION_REPAIR_TOOL:
+            {
+                player->DurabilityRepairAll(false, 0, false);
+                creature->Whisper(GOSSIP_TEXT_SUCCESS_REPAIR, LANG_UNIVERSAL, player);
+                CloseGossipMenuFor(player);
+                break;
+            }
+            case GOSSIP_ACTION_MORPH:
+            {
+                uint32 models[17] = { 25900, 18718, 29348, 22235, 30414, 736, 20582, 28213, 2345, 2344, 25409, 25418, 25422, 25432, 5555, 5554, 5556 };
+                player->SetDisplayId(models[urand(0, 16)]);
+                creature->Whisper(GOSSIP_TEXT_SUCCESS_MORPH, LANG_UNIVERSAL, player);
+                CloseGossipMenuFor(player);
+                break;
+            }
+            case GOSSIP_ACTION_DEMORPH:
+            {
+                player->DeMorph();
+                creature->Whisper(GOSSIP_TEXT_SUCCESS_DEMORPH, LANG_UNIVERSAL, player);
+                CloseGossipMenuFor(player);
+                break;
+            }
+            case GOSSIP_ACTION_OPEN_BANK:
+            {
+                player->GetSession()->SendShowBank(player->GetGUID());
+                CloseGossipMenuFor(player);
+                break;
+            }
+            case GOSSIP_ACTION_RESET_TALENTS:
+            {
+                player->ResetTalents(true);
+                player->ResetTalentSpecialization();
+                player->SendTalentsInfoData();
+                creature->Whisper(GOSSIP_TEXT_SUCCESS_RESET_TALENTS, LANG_UNIVERSAL, player);
+
+                CloseGossipMenuFor(player);
+                break;
+            }
+            case GOSSIP_ACTION_CHEAT_TAXI:
+            {
+                if (!player->isTaxiCheater())
+                {
+                    player->SetTaxiCheater(true);
+                    creature->Whisper(GOSSIP_TEXT_SUCCESS_TAXI, LANG_UNIVERSAL, player);
+                }
+
+                CloseGossipMenuFor(player);
+                break;
+            }
+            case GOSSIP_ACTION_TELE_HOME:
+            {
+                player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ);
+                creature->Whisper(GOSSIP_TEXT_SUCCESS_TELE_HOME, LANG_UNIVERSAL, player);
+                CloseGossipMenuFor(player);
+                break;
+            }
+            case GOSSIP_ACTION_BUFF:
+            {
+                /*std::vector<uint32> buffs;
+                buffs.resize(3);
+
+                buffs.push_back(1459);
+                buffs.push_back(21562);
+                buffs.push_back(546);
+      
+                for (auto buffId: buffs)
+                    player->AddAura(buffId, player);
+
+                creature->Whisper(GOSSIP_TEXT_SUCCESS_BUFF, LANG_UNIVERSAL, player);
+                CloseGossipMenuFor(player);
+                    */
+                break;
+            }          
+            case GOSSIP_ACTION_CHANGE_RACE:
+            {
+                player->SetAtLoginFlag(AT_LOGIN_CHANGE_RACE);
+                creature->Whisper(GOSSIP_TEXT_SUCCESS_CHANGE_RACE, LANG_UNIVERSAL, player);
+                CloseGossipMenuFor(player);
+                break;
+            }
+            case GOSSIP_ACTION_CHANGE_FACTION:
+            {
+                player->SetAtLoginFlag(AT_LOGIN_CHANGE_FACTION);
+                creature->Whisper(GOSSIP_TEXT_SUCCESS_CHANGE_FACTION, LANG_UNIVERSAL, player);
+                CloseGossipMenuFor(player);
+                break;
+            }
+            case GOSSIP_ACTION_CHAR_CUSTOMIZE:
+            {
+                player->SetAtLoginFlag(AT_LOGIN_CUSTOMIZE);
+                creature->Whisper(GOSSIP_TEXT_SUCCESS_CHAR_CUSTOMIZE, LANG_UNIVERSAL, player);
+                CloseGossipMenuFor(player);
+                break;
+            }
+            case GOSSIP_ACTION_RENAME:
+            {
+                player->SetAtLoginFlag(AT_LOGIN_RENAME);
+                creature->Whisper(GOSSIP_TEXT_SUCCESS_CHAR_RENAME, LANG_UNIVERSAL, player);
+                CloseGossipMenuFor(player);
+            }
+            default:
+                break;
+        }
+        return true;
+    }
+
+    bool OnGossipSelectCode(Player* player, Creature* creature, uint32 sender, uint32 action, char const* code) override
+    {
+        ClearGossipMenuFor(player);
+
+        if (player->IsInCombat() || player->InArena() || player->InBattleground())
+            return false;
+
+        if (sender == GOSSIP_SENDER_MAIN)
+        {
+            switch (action)
+            {
+                case GOSSIP_ACTION_CHOOSE_PERSONAL_RATES:
+                    ChangePersonalRates(player, creature, code);
+                    CloseGossipMenuFor(player);
+                    break;
+                case GOSSIP_ACTION_APPEAR_FRIEND:
+                    AppearFriend(player, creature, code);
+                    CloseGossipMenuFor(player);
+                    break;
+                default:
+                    break;
+            }
+        }
+        return true;
+    }
+
+    static void AppearFriend(Player* player, Creature* creature, const char* code)
+    {
+        const char* plrName = code;
+        char playerName[50];
+        strcpy(playerName, plrName);
+        for (int i = 0; i < 13; i++)
+        {
+            if (playerName[i] == '\0')
+                break;
+            if (i == 0 && playerName[i] > 96)
+                playerName[0] -= 32;
+            else if (playerName[i] < 97)
+                playerName[i] += 32;
+        }
+
+        if (Player* target = ObjectAccessor::FindPlayerByName(playerName))
+        {
+            if (target->IsInFlight() || target->InBattleground() || target->InArena() || !target->IsFriendlyTo(player))
+            {
+                creature->Whisper(GOSSIP_TEXT_APPEAR_ERROR, LANG_UNIVERSAL, player);
+                return;
+            }
+
+            // stop flight if need
+            if (player->IsInFlight())
+            {
+                player->GetMotionMaster()->MovementExpired();
+                player->CleanupAfterTaxiFlight();
+            }
+            // save only in non-flight case
+            else
+                player->SaveRecallPosition();
+
+            // to point to see at target with same orientation
+            float x, y, z;
+            target->GetContactPoint(player, x, y, z);
+
+            player->TeleportTo(target->GetMapId(), x, y, z, player->GetAngle(target));
+        }
+    }
+
+    static void ChangePersonalRates(Player* player, Creature* creature, const char* code)
+    {
+        int selectedRates = atoi(code);
+
+        if (selectedRates <= 0 || selectedRates > MAX_PERSONAL_RATES || 
+            player->GetPersonalRate() == float(selectedRates))
+        {
+            creature->Whisper(GOSSIP_TEXT_ERROR_RATE_CHANGE, LANG_UNIVERSAL, player);
+            return;
+        }
+
+        player->SetPersonalRate(float(selectedRates));
+        creature->Whisper(GOSSIP_TEXT_SUCCESS_RATE_CHANGE, LANG_UNIVERSAL, player);
+    }
+};
+
 void AddSC_custom_npcs()
 {
-    new npc_rate_xp_modifier();
     new npc_challenger();
+    new npc_premium_minion();
 }
