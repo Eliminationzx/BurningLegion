@@ -13,4 +13,9 @@ INSERT INTO `gossip_menu_option` VALUES
 ('44468', '9', '0', 'Change my race', '0', '1', '1', '0'),
 ('44468', '10', '0', 'Change my faction', '0', '1', '1', '0'),
 ('44468', '11', '0', 'Customize my character', '0', '1', '1', '0'),
-('44468', '12', '0', 'Change personal rates', '0', '1', '1', '0');
+('44468', '12', '0', 'Change personal rates', '0', '1', '1', '0'),
+('44468', '13', '0', 'Rename my character', '0', '1', '1', '0');
+
+INSERT INTO `gossip_menu_option_box` VALUES 
+('44468', '8', '1', '0', '', '0'),
+('44468', '12', '1', '0', '', '0');

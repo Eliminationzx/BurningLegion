@@ -287,6 +287,7 @@ enum PremiumMinion
 #define GOSSIP_TEXT_SUCCESS_DEMORPH "You returned your natural form"
 #define GOSSIP_TEXT_SUCCESS_BUFF "Now you are stronger!"
 #define GOSSIP_TEXT_SUCCESS_TAXI "We successfully open all fly path for you"
+#define GOSSIP_TEXT_FAIL_TAXI "You already have all open taxi paths"
 #define GOSSIP_TEXT_SUCCESS_RESET_TALENTS "We successfully reset your talents"
 #define GOSSIP_TEXT_SUCCESS_TELE_HOME "You successfully returned back to home!"
 #define GOSSIP_TEXT_SUCCESS_RATE_CHANGE "You successfully changed personal rates"
@@ -301,7 +302,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (player->GetSession()->IsPremium())
+        if (player->GetSession()->IsPremium() && creature->GetOwnerGUID() == player->GetGUID())
         {
             switch (player->GetSession()->GetPremiumType())
             {
@@ -335,6 +336,7 @@ public:
                     AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 10, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_CHANGE_FACTION);
                     AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 11, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_CHAR_CUSTOMIZE);
                     AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 12, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_CHOOSE_PERSONAL_RATES);
+                    AddGossipItemFor(player, GOSSIP_MENU_ID_PREMIUM_MINION, 13, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_RENAME);
                     break;
                 default:
                     break;
@@ -399,13 +401,15 @@ public:
                     player->SetTaxiCheater(true);
                     creature->Whisper(GOSSIP_TEXT_SUCCESS_TAXI, LANG_UNIVERSAL, player);
                 }
+                else
+                    creature->Whisper(GOSSIP_TEXT_FAIL_TAXI, LANG_UNIVERSAL, player);
 
                 CloseGossipMenuFor(player);
                 break;
             }
             case GOSSIP_ACTION_TELE_HOME:
             {
-                player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ);
+                player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
                 creature->Whisper(GOSSIP_TEXT_SUCCESS_TELE_HOME, LANG_UNIVERSAL, player);
                 CloseGossipMenuFor(player);
                 break;
@@ -502,30 +506,28 @@ public:
                 playerName[i] += 32;
         }
 
-        if (Player* target = ObjectAccessor::FindPlayerByName(playerName))
+        Player* target = ObjectAccessor::FindPlayerByName(playerName);
+        if (!target || target->IsInFlight() || target->InBattleground() || target->InArena() || !target->IsFriendlyTo(player) || target->IsGameMaster())
         {
-            if (target->IsInFlight() || target->InBattleground() || target->InArena() || !target->IsFriendlyTo(player))
-            {
-                creature->Whisper(GOSSIP_TEXT_APPEAR_ERROR, LANG_UNIVERSAL, player);
-                return;
-            }
-
-            // stop flight if need
-            if (player->IsInFlight())
-            {
-                player->GetMotionMaster()->MovementExpired();
-                player->CleanupAfterTaxiFlight();
-            }
-            // save only in non-flight case
-            else
-                player->SaveRecallPosition();
-
-            // to point to see at target with same orientation
-            float x, y, z;
-            target->GetContactPoint(player, x, y, z);
-
-            player->TeleportTo(target->GetMapId(), x, y, z, player->GetAngle(target));
+            creature->Whisper(GOSSIP_TEXT_APPEAR_ERROR, LANG_UNIVERSAL, player);
+            return;
         }
+
+        // stop flight if need
+        if (player->IsInFlight())
+        {
+            player->GetMotionMaster()->MovementExpired();
+            player->CleanupAfterTaxiFlight();
+        }
+        // save only in non-flight case
+        else
+            player->SaveRecallPosition();
+
+        // to point to see at target with same orientation
+        float x, y, z;
+        target->GetContactPoint(player, x, y, z);
+
+        player->TeleportTo(target->GetMapId(), x, y, z, player->GetAngle(target));
     }
 
     static void ChangePersonalRates(Player* player, Creature* creature, const char* code)
