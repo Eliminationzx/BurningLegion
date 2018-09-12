@@ -453,6 +453,7 @@ public:
                 player->SetAtLoginFlag(AT_LOGIN_RENAME);
                 creature->Whisper(GOSSIP_TEXT_SUCCESS_CHAR_RENAME, LANG_UNIVERSAL, player);
                 CloseGossipMenuFor(player);
+                break;
             }
             default:
                 break;

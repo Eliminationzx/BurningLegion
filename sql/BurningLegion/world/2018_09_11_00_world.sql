@@ -1,4 +1,4 @@
-UPDATE creature_template SET npcflag = 1, gossip_menu_id = 44468 WHERE entry=84915;
+UPDATE creature_template SET npcflag = 1, gossip_menu_id = 44468, ScriptName='npc_premium_minion' WHERE entry=84915;
 
 INSERT INTO `gossip_menu_option` VALUES 
 ('44468', '0', '0', 'Repair all items', '0', '1', '1', '0'),
