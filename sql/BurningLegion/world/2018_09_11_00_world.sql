@@ -17,5 +17,5 @@ INSERT INTO `gossip_menu_option` VALUES
 ('44468', '13', '0', 'Rename my character', '0', '1', '1', '0');
 
 INSERT INTO `gossip_menu_option_box` VALUES 
-('44468', '8', '1', '0', '', '0'),
-('44468', '12', '1', '0', '', '0');
+('44468', '8', '1', '0', 'Please type friend name', '0'),
+('44468', '12', '1', '0', 'You can change personal rates from 1 to 100', '0');
