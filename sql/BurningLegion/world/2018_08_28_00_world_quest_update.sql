@@ -1,4 +1,4 @@
-ALTER TABLE `world_quest_update`   
+/*ALTER TABLE `world_quest_update`   
   CHANGE `AreaID` `AreaID` VARCHAR(250) DEFAULT '' NOT NULL;
 
 UPDATE `world_quest_update` SET AreaID = '' WHERE AreaID = '0';
@@ -45,4 +45,4 @@ UPDATE `world_quest_update` SET `AreaID` = '7364 ' WHERE `QuestID` = '46170' AND
 
 ALTER TABLE `world_quest_item`   
   CHANGE `CheckSpell` `NotNeedSpell` INT(10) DEFAULT 0 NOT NULL,
-  ADD COLUMN `NeedSpell` INT(10) UNSIGNED DEFAULT 0 NOT NULL AFTER `NotNeedSpell`;
+  ADD COLUMN `NeedSpell` INT(10) UNSIGNED DEFAULT 0 NOT NULL AFTER `NotNeedSpell`;*/
