@@ -18147,9 +18147,9 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
     //"resettalents_time, primarySpecialization, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, dungeonDifficulty, "
     // 50          51          52              53           54              55
     //"totalKills, todayKills, yesterdayKills, chosenTitle, watchedFaction, drunk, "
-    // 56      57      58      59      60      61      62      63           64                 65          66             67           68          69               70              71                    72             73         74
-    //"health, power1, power2, power3, power4, power5, power6, instance_id, activeTalentGroup, lootSpecId, exploredZones, knownTitles, actionBars, grantableLevels, personalRate, raidDifficulty, legacyRaidDifficulty, xpRate, fishing_steps "
-    // 75     76          77             78                79
+    // 56      57      58      59      60      61      62      63           64                 65          66             67           68          69               70              71                    72             73         
+    //"health, power1, power2, power3, power4, power5, power6, instance_id, activeTalentGroup, lootSpecId, exploredZones, knownTitles, actionBars, grantableLevels, personalRate, raidDifficulty, legacyRaidDifficulty, fishing_steps "
+    // 74     75          76             77                78
     //"honor, honorLevel, prestigeLevel, honor_rest_state, honor_rest_bonus "
     //
     //"FROM characters WHERE guid = ?", CONNECTION_ASYNC);
