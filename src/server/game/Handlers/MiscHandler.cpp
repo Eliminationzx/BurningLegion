@@ -129,6 +129,7 @@ void WorldSession::HandleWhoOpcode(WorldPackets::Who::WhoRequestPkt& whoRequest)
     /// ServerInfo
 
     bool searchBool = false;
+    bool addFakePlayers = true;
     std::string searchName;
 
     std::vector<std::wstring> wWords;
@@ -273,10 +274,13 @@ void WorldSession::HandleWhoOpcode(WorldPackets::Who::WhoRequestPkt& whoRequest)
         // 50 is maximum player count sent to client - can be overridden
         // through config, but is unstable
         if (response.Response.Entries.size() >= sWorld->getIntConfig(CONFIG_MAX_WHO))
+        {
+            addFakePlayers = false;
             break;
+        }
     }
 
-    if (sWorld->getBoolConfig(CONFIG_FAKE_WHO_LIST) && response.Response.Entries.size() < sWorld->getIntConfig(CONFIG_MAX_WHO))
+    if (sWorld->getBoolConfig(CONFIG_FAKE_WHO_LIST) && addFakePlayers)
     {
         PreparedStatement* fake = CharacterDatabase.GetPreparedStatement(searchBool ? FAKE_CHAR_ONLINE_SEARCH : FAKE_CHAR_ONLINE);
 
@@ -312,8 +316,9 @@ void WorldSession::HandleWhoOpcode(WorldPackets::Who::WhoRequestPkt& whoRequest)
 
                 response.Response.Entries.push_back(whoEntry);
 
-                if (response.Response.Entries.size() == sWorld->getIntConfig(CONFIG_MAX_WHO))
+                if (response.Response.Entries.size() >= sWorld->getIntConfig(CONFIG_MAX_WHO))
                     break;
+
             } while (fakeresult->NextRow());
         }
     }
