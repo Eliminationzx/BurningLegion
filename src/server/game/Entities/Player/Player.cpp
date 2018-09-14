@@ -18147,9 +18147,9 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
     //"resettalents_time, primarySpecialization, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, dungeonDifficulty, "
     // 50          51          52              53           54              55
     //"totalKills, todayKills, yesterdayKills, chosenTitle, watchedFaction, drunk, "
-    // 56      57      58      59      60      61      62      63           64                 65          66             67           68          69               70              71                    72      73
-    //"health, power1, power2, power3, power4, power5, power6, instance_id, activeTalentGroup, lootSpecId, exploredZones, knownTitles, actionBars, grantableLevels, raidDifficulty, legacyRaidDifficulty, xpRate, fishing_steps "
-    // 74     75          76             77                78
+    // 56      57      58      59      60      61      62      63           64                 65          66             67           68          69               70              71                    72             73         74
+    //"health, power1, power2, power3, power4, power5, power6, instance_id, activeTalentGroup, lootSpecId, exploredZones, knownTitles, actionBars, grantableLevels, personalRate, raidDifficulty, legacyRaidDifficulty, xpRate, fishing_steps "
+    // 75     76          77             78                79
     //"honor, honorLevel, prestigeLevel, honor_rest_state, honor_rest_bonus "
     //
     //"FROM characters WHERE guid = ?", CONNECTION_ASYNC);
@@ -18274,7 +18274,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
     // set which actionbars the client has active - DO NOT REMOVE EVER AGAIN (can be changed though, if it does change fieldwise)
     SetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_ACTION_BAR_TOGGLES, fields[68].GetUInt8());
 
-    _PersonalRate = fields[72].GetUInt8();
+    _PersonalRate = fields[70].GetFloat();
     m_fishingSteps = fields[73].GetUInt8();
 
     InitDisplayIds();
@@ -20786,8 +20786,8 @@ void Player::SaveToDB(bool create /*=false*/)
 
         stmt->setUInt8(index++, GetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_ACTION_BAR_TOGGLES));
         stmt->setUInt32(index++, m_grantableLevels);
-        stmt->setUInt32(index++, realm.Build);
         stmt->setFloat(index++, _PersonalRate);
+        stmt->setUInt32(index++, realm.Build);
     }
     else
     {

@@ -1,1 +1,1 @@
-ALTER TABLE characters CHANGE `xpRate` `personalRate` tinyint(3);
+ALTER TABLE characters CHANGE `personalRate` `personalRate` float(5);
